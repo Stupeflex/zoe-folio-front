@@ -1,0 +1,147 @@
+@font-face
+  src: url('../assets/fonts/Neue/Thin.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 100
+  font-style: normal
+
+@font-face
+  src: url('../assets/fonts/Neue/ExtLt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 200
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Neue/Light.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 300
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Neue/SemLt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 350
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Neue/Reg.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 400
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Neue/Medium.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 500
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Neue/Bold.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 600
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Neue/Black.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 700
+  font-style: normal
+
+@font-face
+  src: url('../assets/fonts/Neue/ThIt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 100
+  font-style: italic
+
+@font-face
+  src: url('../assets/fonts/Neue/ExLtIt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 200
+  font-style: italic
+
+@font-face
+  src: url('../assets/fonts/Neue/LtIt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 300
+  font-style: italic
+@font-face
+  src: url('../assets/fonts/Neue/SmLtIt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 350
+  font-style: italic
+@font-face
+  src: url('../assets/fonts/Neue/Italic.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 400
+  font-style: italic
+@font-face
+  src: url('../assets/fonts/Neue/MedIta.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 500
+  font-style: italic
+@font-face
+  src: url('../assets/fonts/Neue/BdIt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 600
+  font-style: italic
+@font-face
+  src: url('../assets/fonts/Neue/BlkIt.otf') format('opentype')
+  font-family: 'Neue'
+  font-weight: 700
+  font-style: italic
+
+@font-face
+  src: url('../assets/fonts/Monument/Thin.woff2') format('woff2')
+  font-family: 'Monument'
+  font-weight: 200
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Monument/Light.woff2') format('woff2')
+  font-family: 'Monument'
+  font-weight: 300
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Monument/Regular.woff2') format('woff2')
+  font-family: 'Monument'
+  font-weight: 400
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Monument/Bold.woff2') format('woff2')
+  font-family: 'Monument'
+  font-weight: 500
+  font-style: normal
+@font-face
+  src: url('../assets/fonts/Monument/Black.woff2') format('woff2')
+  font-family: 'Monument'
+  font-weight: 600
+  font-style: normal
+
+@mixin detail
+  font-family: 'Neue'
+  font-size: 10px
+  font-weight: 350
+
+@mixin nav-link
+  font-family: 'Neue'
+  font-size: 14px
+  font-weight: 400
+  text-decoration: underline
+
+@mixin body
+  font-family: 'Neue'
+  font-size: 18px
+  font-weight: 400
+
+@mixin title-medium
+  font-family: 'Neue'
+  font-size: 76px
+  font-weight: 400
+  letter-spacing: -0.02em
+  line-height: 79.8px
+  
+
+@mixin title-big
+  font-family: 'Neue'
+  font-size: 108px
+  font-weight: 500
+  letter-spacing: -0.02em
+  line-height: 110.8px
+
+h1
+  @include title-big
+  color: $c-white
+  vertical-align: baseline
+  transform: translateY(20px)
