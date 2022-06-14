@@ -1,39 +1,57 @@
 <template>
-  <nav id="nav">
-    <span id="nav__logo">zoë candito</span>
+  <nav id="nav" :class="{ clear }">
+    <router-link to="/" id="nav__logo">zoë candito</router-link>
     <div id="nav__links">
-      <a
-        :href="link.to"
+      <router-link
+        :to="link.to"
         v-for="(link, index) in links"
         :key="link.title"
         class="nav__link"
       >
         <span class="link__index"> 0{{ index + 1 }} </span>
         <span class="link__title"> {{ link.title }} </span>
-      </a>
+      </router-link>
     </div>
 
-    <a href="/contact" class="nav__link" id="nav__contact">
+    <router-link to="/contact" class="nav__link" id="nav__contact">
       <span class="link__index">05</span>
       <span class="link__title">Contact</span>
-    </a>
+    </router-link>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
+import { ref } from '@vue/reactivity';
+import { watch } from '@vue/runtime-dom';
+
 export type navLink = {
   title: string;
   to: string;
   [key: string]: string;
 };
 
+const route = useRoute();
+
 const links: navLink[] = [
-  { title: 'Projets', to: '#projects' },
-  { title: 'Processus', to: '#process' },
-  { title: 'Studio', to: '#studio' },
-  { title: 'A propos', to: '#about' },
+  { title: 'Projets', to: '/#projects' },
+  { title: 'Processus', to: '/#process' },
+  { title: 'Studio', to: '/#studio' },
+  { title: 'A propos', to: '/#about' },
 ];
+
+const clearRoutes = ['projectDetails'];
+const needsClearBg = () =>
+  clearRoutes.includes(String(route?.name || 'no route'));
+
+const clear = ref<boolean>(needsClearBg());
+
+watch(
+  () => route.name,
+  () => {
+    clear.value = needsClearBg();
+  }
+);
 </script>
 
 <style lang="sass">
@@ -43,40 +61,49 @@ const links: navLink[] = [
   left: 0
   right: 0
   padding: 20px $unit
+  height: $cell-height
   display: grid
   grid-template-columns: repeat(19, $cell-width)
   grid-gap: $unit
   z-index: 10
   color: white
-  backdrop-filter: blur(20px) saturate(180%)
-  background-color: rgba(255, 255, 255, .1)
+  transition: backdrop-filter 0.6s linear 0s, background-color 0.6s linear 0s
+
+  &:not(.clear)
+    backdrop-filter: blur(20px) saturate(180%)
+    background-color: rgba(255, 255, 255, .1)
 
   #nav__logo
     font-family: 'Monument'
     font-weight: 500
+    color: $c-white
     font-size: 18px
     text-transform: uppercase
     align-self: end
     grid-column: 2 / span 5
-
+    transform: translateY(5px)
 
   #nav__links
     display: flex
     gap: $unit
     grid-column: 13 / -3
+    grid-row: 1 / 1
 
   .nav__link
     display: flex
     flex-direction: column
     color: white
+    justify-content: flex-end
 
     .link__index
       @include detail
       opacity: 0.7
 
     .link__title
-      @include nav-link
+      @include link
 
   #nav__contact
-    grid-column: -3/ -1
+    grid-column: -5 / -2
+    grid-row: 1 / 1
+    justify-self: end
 </style>

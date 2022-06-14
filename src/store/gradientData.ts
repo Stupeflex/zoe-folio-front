@@ -1,70 +1,156 @@
-import { defineStore } from "pinia";
-
-
+import { defineStore } from 'pinia';
+import gsap from 'gsap';
+import { formatRgbaString, rgbColor, Vec3 } from '@/utils/gradient';
+import {
+  hexToRgb,
+  vec3ArrayToUniforms,
+  rgbToVec3,
+  extractRgbaFromString,
+  defaultPalette,
+} from '@/utils/gradient';
 
 type color = string;
 
 type GradientState = {
-  colors: color[];
-  targetColors: color[];
-}
+  colors: rgbColor[];
+  defaultColors: rgbColor[];
+  targetColors: rgbColor[];
+};
 
-export interface Vec3 {
-  x: number;
-  y: number;
-  z: number;
-}
+export type hexComponent =
+  | '0'
+  | '1'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | 'A'
+  | 'B'
+  | 'C'
+  | 'D'
+  | 'E'
+  | 'F'
+  | 'a'
+  | 'b'
+  | 'c'
+  | 'd'
+  | 'e'
+  | 'f';
 
-export type hexComponent = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f';
-
-// export type hexColor = `#${hexComponent}${hexComponent}${hexComponent}${hexComponent}${hexComponent}${hexComponent}`;
-
-export const hexToVec3 = (color: string): Vec3 => {
-  if(color[0] === '#') {
-    color = color.slice(1);
-  }
-  if(color.length === 3) {
-    return {
-      x: parseInt(color[0], 16) / 15,
-      y: parseInt(color[1], 16) / 15,
-      z: parseInt(color[2], 16) / 15,
-    }
-  }
-  if(color.length === 6) {
-    return {
-      x: parseInt(color.slice(0, 2), 16) / 255,
-      y: parseInt(color.slice(2, 4), 16) / 255,
-      z: parseInt(color.slice(4, 6), 16) / 255,
-    }
-  }
-  throw new Error('unsupported string provided to HexToVec3')
-}
-
-export const vec3ArrayToUniforms = (vectors: Vec3[]) => {
-  return vectors.reduce((acc: number[], vec: Vec3,): number[] => [...acc, ...[vec.x, vec.y, vec.z ]], [])
-
-}
+const killAllTweens = () => gsap.globalTimeline.clear();
 
 export const useGradientData = defineStore('gradientData', {
   state: (): GradientState => ({
-    colors: ['#111114', '#D18D24', '#539A84', '#223', '#111114'],
-    targetColors: ['#111114', '#D18D24', '#539A84', '#223', '#111114'],
+    colors: [...defaultPalette],
+    defaultColors: [...defaultPalette],
+    targetColors: ['#111114', '#D18D24', '#539A84', '#223', '#111114'].map(
+      (hex) => hexToRgb(hex)
+    ),
     //colors: ['#F00', '#00f', '#00f', '#ff0', '#000'],
   }),
   getters: {
-    uniforms(state): number[] {
-      return vec3ArrayToUniforms(state.colors.map(color => hexToVec3(color)));
-    }
+    uniforms(state: GradientState): number[] {
+      return vec3ArrayToUniforms(state.colors.map((color) => rgbToVec3(color)));
+    },
   },
   actions: {
-    setColors(colors: color[]) {
-      this.colors = colors;
-    },
-    setColorAtIndex(color: color, index: number) {
-      if(index < this.colors.length) {
-        this.colors[index] = color;
+    setColors(colors: color[], transition = false) {
+      if (colors.length === this.colors.length) {
+        killAllTweens();
+        this.targetColors = colors.map((hex) => hexToRgb(hex));
+        if (transition) {
+          colors.forEach((targetColor, index) => {
+            const c = this.colors[index];
+            const tmp = { color: formatRgbaString(c) };
+            gsap.to(tmp, {
+              color: targetColor,
+              duration: 2,
+              onUpdate: () => {
+                this.colors[index] =
+                  tmp.color[0] === '#'
+                    ? hexToRgb(tmp.color)
+                    : extractRgbaFromString(tmp.color);
+              },
+            });
+          });
+        } else {
+          console.log('setColors no transition');
+          this.colors = colors.map((hex) => hexToRgb(hex));
+        }
+      } else {
+        console.warn('#######');
+        throw new Error('color count not matched');
       }
-    }
-  }
-});
+    },
+    setColorsRgb(colors: rgbColor[], transition = false) {
+      if (colors.length === this.colors.length) {
+        killAllTweens();
+        this.targetColors = colors;
+        if (transition) {
+          colors.forEach((targetColor, index) => {
+            const c = this.colors[index];
+            const tmp = { color: `rgba(${c[0]},${c[1]},${c[2]},${c[3] || 1})` };
+            gsap.to(tmp, {
+              color: formatRgbaString(targetColor),
+              duration: 2,
+              onUpdate: () => {
+                this.colors[index] =
+                  tmp.color[0] === '#'
+                    ? hexToRgb(tmp.color)
+                    : extractRgbaFromString(tmp.color);
+              },
+            });
+          });
+        } else {
+          console.log('setColors no transition');
+          this.colors = colors;
+        }
+      } else {
+        console.warn('#######');
+        throw new Error('color count not matched');
+      }
+    },
 
+    resetDefaultColors(transition = false) {
+      killAllTweens();
+      this.targetColors = this.defaultColors;
+      if (transition) {
+        [...this.defaultColors].forEach((targetColor, index) => {
+          const c = this.colors[index];
+          const tmp = { color: `rgba(${c[0]},${c[1]},${c[2]},${c[3] || 1})` };
+          gsap.to(tmp, {
+            color: formatRgbaString(targetColor),
+            duration: 1,
+            onUpdate: () => {
+              this.colors[index] =
+                tmp.color[0] === '#'
+                  ? hexToRgb(tmp.color)
+                  : extractRgbaFromString(tmp.color);
+            },
+          });
+        });
+      } else {
+        console.log('resetDefaultColors no transition');
+        this.colors = [...this.defaultColors];
+      }
+    },
+  },
+  // setColorAtIndex(color: color, index: number, transition = false) {
+  //   if (index < this.colors.length) {
+  //     if (transition) {
+  //       const newColors = [...this.colors];
+  //       newColors[index] = color;
+  //       gsap.to(this.colors, {
+  //         endArray: newColors,
+  //         duration: 2,
+  //       });
+  //     } else {
+  //       this.colors[index] = color;
+  //     }
+  //   }
+  // },
+});

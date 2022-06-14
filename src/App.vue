@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue';
+import { RouterView } from 'vue-router';
 import GradientBackground from './components/GradientBackground.vue';
 import { useMouseData } from './store/mouseData';
 import { useProjectData } from './store/projectData';
 import GestureHandler, { Vector2 } from './utils/gestures';
-import Scroller from './views/Scroller.vue';
+// import Scroller from './views/Scroller.vue';
 import Projects from './views/sections/Projects.vue';
 import NavBar from './components/Nav.vue';
 
@@ -19,7 +20,7 @@ const onMove = (pos: Vector2, delta: Vector2) => {
 };
 
 onMounted(() => {
-  projectData.fetch();
+  projectData.fetch(true);
   gestures = new GestureHandler({
     onMove,
   });
@@ -38,9 +39,9 @@ onBeforeUnmount(() => {
 
 <template>
   <GradientBackground />
-  <Scroller>
-    <Projects />
-  </Scroller>
+  <!-- <transition> -->
+  <router-view v-if="projectData.fetched" />
+  <!-- </transition> -->
   <NavBar />
   <GridOverlay />
 </template>

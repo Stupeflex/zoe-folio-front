@@ -10,18 +10,18 @@ export default defineConfig({
     preprocessorOptions: {
       sass: {
         additionalData: `
+        @use "sass:math"
         @import "@/styles/reset.sass"
         @import "@/styles/vars.sass"
         @import "@/styles/fonts.sass"
         @import "@/styles/root.sass"
-        `
-      }
-    }
+        `,
+      },
+    },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
-  }
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
 });
-

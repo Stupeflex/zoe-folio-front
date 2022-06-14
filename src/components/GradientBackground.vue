@@ -22,9 +22,6 @@ let halfTick: boolean = false;
 const mouseData = useMouseData();
 const gradientData = useGradientData();
 
-console.warn(gradientData);
-console.log(gradientData.uniforms);
-
 const createColorStops = (colors: (string | number)[]): ColorStop[] =>
   colors.map((color, index) => ({
     color,
@@ -84,23 +81,23 @@ const initPixi = () => {
       //resizeTo: window,
       // autoStart: false
     });
-    const gradientTexture = createGradientTexture(
-      {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      },
-      {
-        x0: 0,
-        y0: 0,
-        x1: window.innerWidth,
-        y1: window.innerHeight,
-        colorStops: createColorStops(gradientData.colors),
-      }
-    );
-    if (gradientTexture === null) {
-      console.error('failed to create gradient texture');
-      return;
-    }
+    // const gradientTexture = createGradientTexture(
+    //   {
+    //     width: window.innerWidth,
+    //     height: window.innerHeight,
+    //   },
+    //   {
+    //     x0: 0,
+    //     y0: 0,
+    //     x1: window.innerWidth,
+    //     y1: window.innerHeight,
+    //     colorStops: createColorStops(gradientData.colors),
+    //   }
+    // );
+    // if (gradientTexture === null) {
+    //   console.error('failed to create gradient texture');
+    //   return;
+    // }
     // app.stage.addChild(new Sprite(gradientTexture));
     app.stage.addChild(gradientSprite);
     // app.stage.addChild(cursorShape);
@@ -132,6 +129,7 @@ const onFrame = (deltaTime: number) => {
   // cursorShape.clear();
   gradientFilter.uniforms.iResolution.x = window.innerWidth;
   gradientFilter.uniforms.iResolution.y = window.innerHeight;
+  gradientFilter.uniforms.u_colors = gradientData.uniforms;
 
   twistFilter.offset.x =
     window.innerWidth / 2 +
