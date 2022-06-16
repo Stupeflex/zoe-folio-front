@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { extractPalette } from '@/utils/gradient';
 import { generateProjectLink } from '@/utils/navigation';
-import { computed } from '@vue/reactivity';
+import { computed, ref } from '@vue/reactivity';
 import { defineProps } from 'vue';
 import { Project, useProjectData } from '../store/projectData';
 import { useGradientData } from '@/store/gradientData';
@@ -15,6 +15,10 @@ type ProjectThumbnailProps = {
 
 const gradientData = useGradientData();
 const projectData = useProjectData();
+
+const inTransition = ref<boolean>(false);
+
+const MAX_WIDTH = 9;
 
 const isImage = (
   el: HTMLElement | HTMLImageElement | null
@@ -53,11 +57,17 @@ const extractPaletteFallback = (e: MouseEvent) => {
     const palette = extractPalette(i, true);
     if (palette) {
       gradientData.setColorsRgb(palette, true);
+      projectData.replacePalette(props.project.id, palette);
     }
   }
 };
 
-const onHover2 = (e: MouseEvent) => {
+const speed = computed(
+  () => (1 - (props.project.size?.width || MAX_WIDTH) / MAX_WIDTH) * 2
+);
+console.log(speed.value, props.project.size.width);
+
+const applyPalette = (e: MouseEvent) => {
   const palette = projectData.palettes.find(
     ({ id }) => id === props.project.id
   );
@@ -73,10 +83,15 @@ const onLeave = () => {
   const isDifferent = gradientData.targetColors.some(
     (color, index) => color !== gradientData.defaultColors[index]
   );
-  if (isDifferent) {
+  if (isDifferent && !inTransition.value) {
     console.log('leave', isDifferent);
     gradientData.resetDefaultColors(true);
   }
+};
+
+const onClick = (e: MouseEvent) => {
+  inTransition.value = true;
+  applyPalette(e);
 };
 </script>
 
@@ -86,12 +101,15 @@ const onLeave = () => {
       project.size.height + 1
     } project__thumbnail__container hover__parent`"
     :style="style"
+    data-scroll
+    :data-scroll-speed="speed"
   >
     <router-link
       :to="generateProjectLink(project)"
       class="project__thumbnail"
-      @mouseover="onHover2"
+      @mouseover="applyPalette"
       @mouseleave="onLeave"
+      @click="onClick"
     >
       <img
         :src="project.thumbnailUrl"

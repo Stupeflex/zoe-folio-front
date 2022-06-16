@@ -40,7 +40,11 @@ onBeforeUnmount(() => {
 <template>
   <GradientBackground />
   <!-- <transition> -->
-  <router-view v-if="projectData.fetched" />
+  <router-view v-slot="{ Component, route }">
+    <transition :name="(route.meta.transitionName as string | undefined)">
+      <component v-if="projectData.fetched" :is="Component" :key="route.path" />
+    </transition>
+  </router-view>
   <!-- </transition> -->
   <NavBar />
   <GridOverlay />
@@ -52,6 +56,28 @@ onBeforeUnmount(() => {
   width: 100%
   height: 100%
 
-  section
-    height: 100%
+.fade-enter-active,
+.fade-leave-active
+  transition: opacity 1s ease
+
+.fade-enter-active
+  transition-delay: 1s
+
+.fade-enter-from,
+.fade-leave-to
+  opacity: 0 !important
+
+.slide-up-enter-active
+  transition: transform .6s ease-out 0s
+
+.slide-up-leave-active
+  transition: opacity 0.6s ease 0s, transform .6s ease-in 0s
+
+.slide-up-enter-from
+  transform: translateY(110vh)
+  // transition-delay: 1s
+
+.slide-up-leave-to
+  opacity: 0 !important
+  // transform: translateY(-100vh) !important
 </style>

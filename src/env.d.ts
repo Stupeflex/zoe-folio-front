@@ -8,3 +8,5 @@ declare module '*.vue' {
 }
 
 declare module 'locomotive-scroll';
+
+declare module '@/utils/scroller/Main';

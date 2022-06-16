@@ -22,8 +22,9 @@
 
 <script setup lang="ts">
 import { RouterLink, useRoute } from 'vue-router';
-import { ref } from '@vue/reactivity';
+import { ref, computed } from '@vue/reactivity';
 import { watch } from '@vue/runtime-dom';
+import { useScrollData } from '@/store/scrollData';
 
 export type navLink = {
   title: string;
@@ -31,6 +32,7 @@ export type navLink = {
   [key: string]: string;
 };
 
+const scrollData = useScrollData();
 const route = useRoute();
 
 const links: navLink[] = [
@@ -44,13 +46,21 @@ const clearRoutes = ['projectDetails'];
 const needsClearBg = () =>
   clearRoutes.includes(String(route?.name || 'no route'));
 
-const clear = ref<boolean>(needsClearBg());
+const routeNeedsClearBg = computed(() =>
+  clearRoutes.includes(String(route?.name || 'no route'))
+);
+
+const scrolledDown = computed<boolean>(
+  () => scrollData.scrollPos.y >= window.innerHeight / 2
+);
+
+const clear = computed<boolean>(
+  () => routeNeedsClearBg.value && !scrolledDown.value
+);
 
 watch(
-  () => route.name,
-  () => {
-    clear.value = needsClearBg();
-  }
+  () => scrollData.scrollPos,
+  (pos) => console.warn(pos)
 );
 </script>
 
@@ -70,8 +80,7 @@ watch(
   transition: backdrop-filter 0.6s linear 0s, background-color 0.6s linear 0s
 
   &:not(.clear)
-    backdrop-filter: blur(20px) saturate(180%)
-    background-color: rgba(255, 255, 255, .1)
+    @include blur-bg
 
   #nav__logo
     font-family: 'Monument'

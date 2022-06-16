@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { ref } from '@vue/reactivity';
-import Locomotive from 'locomotive-scroll';
+import Locomotive from '@/utils/scroller/Main';
 import { onMounted, onBeforeUnmount, nextTick, watch } from '@vue/runtime-dom';
+import { useScrollData } from '@/store/scrollData';
+
+const scrollData = useScrollData();
 
 let scroll: {
   update: () => void;
@@ -24,15 +27,17 @@ const initLocomotive = () => {
   if (mainRef.value) {
     // document.addEventListener('DOMContentLoaded', () => {
     console.log(props.direction);
-    scroll = new Locomotive({
+    scrollData.init({
       el: mainRef.value,
       smooth: true,
-      smoothMobile: false,
       getDirection: true,
       getSpeed: true,
       direction: props.direction,
-      gestureDirection: 'both',
+      gestureDirection:
+        props.direction === 'vertical' ? props.direction : 'both',
+      reloadOnContextChange: true,
       repeat: true,
+      scrollFromAnywhere: true,
       // smartphone: {
       //   direction: 'vertical',
       //   gestureDirection: 'vertical',
@@ -40,13 +45,18 @@ const initLocomotive = () => {
     });
 
     // scroll.on('scroll', (e) => {
-    //   console.log(e);
+    //   console.log(
+    //     e,
+    //     document.documentElement.offsetWidth,
+    //     document.documentElement.offsetHeight
+    //   );
+    //   // console.log(scroll);
     // });
 
     nextTick(() => {
       setTimeout(() => {
         console.log('update scroll');
-        scroll.update();
+        scrollData.update();
       }, 300);
     });
     // });
@@ -87,10 +97,10 @@ if (props.dependencies) {
     () => {
       console.log('scroller dependency changed');
       if (scroll) {
-        nextTick(() => {
-          console.log('updating scroller');
+        setTimeout(() => {
+          console.log('update scroll');
           scroll.update();
-        });
+        }, 300);
       }
     }
   );
@@ -105,9 +115,9 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  if (scroll) {
+  if (scrollData.scroller) {
     console.log('destroy scroll');
-    scroll.destroy();
+    scrollData.destroy();
   }
 });
 </script>
@@ -126,5 +136,5 @@ div#scroller
   right: 0
   bottom: 0
   z-index: 1
-  display: flex
+  // display: flex
 </style>

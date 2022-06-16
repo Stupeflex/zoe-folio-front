@@ -1,11 +1,7 @@
 import { ProjectType } from '@/api/types';
 import { defineStore } from 'pinia';
 import { fetchProjects } from '@/api/projects';
-import {
-  extractPaletteFromUrl,
-  rgbColor,
-  defaultPalette,
-} from '@/utils/gradient';
+import { extractPaletteFromUrl, rgbColor } from '@/utils/gradient';
 
 export type MediaSize = {
   width: number;
@@ -90,6 +86,7 @@ export const useProjectData = defineStore('projectData', {
             id,
             palette: palettes[index],
           }));
+          console.log(this.palettes);
           this.fetched = true;
           if (res[0]?.id && selectFirstProject) {
             this.selectedId = res[0].id;
@@ -124,6 +121,12 @@ export const useProjectData = defineStore('projectData', {
     },
     toggleSound() {
       this.setSound(!this.soundActive);
+    },
+    replacePalette(id: identifier, palette: rgbColor[]) {
+      const index = this.palettes.findIndex((p) => p.id === id);
+      if (this.palettes[index].palette === null) {
+        this.palettes[index].palette = palette;
+      }
     },
   },
 });

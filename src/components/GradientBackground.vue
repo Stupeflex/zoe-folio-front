@@ -7,7 +7,7 @@ import { KawaseBlurFilter } from '@pixi/filter-kawase-blur';
 import { OldFilmFilter } from '@pixi/filter-old-film';
 import { TwistFilter } from '@pixi/filter-twist';
 
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { createGradientTexture, ColorStop } from '../utils/gradient';
 import { Point } from '@pixi/math';
 import { useMouseData } from '../store/mouseData';
@@ -18,20 +18,25 @@ import fragmentShader from '../shaders/gradient.frag';
 
 let app: Application;
 let halfTick: boolean = false;
+const MaxCanvasWidth = 650;
 
 const mouseData = useMouseData();
 const gradientData = useGradientData();
 
-const createColorStops = (colors: (string | number)[]): ColorStop[] =>
-  colors.map((color, index) => ({
-    color,
-    offset: index / (colors.length - 1),
-  }));
+const generateDimensions = (): { width: number; height: number } => {
+  const ratio = window.innerWidth / window.innerHeight;
+  const width = Math.min(window.innerWidth, MaxCanvasWidth);
+  const height = Math.min(window.innerHeight, MaxCanvasWidth / ratio);
+  console.log(ratio, width, height);
+  return { width, height };
+};
+
+const dimensions = ref<{ width: number; height: number }>(generateDimensions());
 
 const gradientFilter = new Filter(undefined, fragmentShader, {
   iResolution: {
-    x: window.innerWidth,
-    y: window.innerHeight,
+    x: dimensions.value.width,
+    y: dimensions.value.height,
   },
   u_colors: gradientData.uniforms,
   u_colorsCount: gradientData.colors.length,
@@ -48,22 +53,24 @@ const noiseFilter = new OldFilmFilter({
   scratch: 0,
   scratchDensity: 0,
   noise: 0.05,
-  noiseSize: 1.5,
+  noiseSize: 0.5,
   vignetting: 0,
 });
 // noiseFilter.blendMode = BLEND_MODES.EXCLUSION
 // noiseFilter.resolution = 0.2
 
-const cursorShape = new Graphics();
-cursorShape.beginFill(0xffffff, 0.5);
-cursorShape.drawCircle(0, 0, 500);
-cursorShape.x = window.innerWidth / 2;
-cursorShape.y = window.innerHeight / 2;
-cursorShape.endFill();
+// const cursorShape = new Graphics();
+// cursorShape.beginFill(0xffffff, 0.5);
+// cursorShape.drawCircle(0, 0, 500);
+// cursorShape.x = window.innerWidth / 2;
+// cursorShape.y = window.innerHeight / 2;
+// cursorShape.endFill();
 
 const gradientSprite = new Sprite(Texture.WHITE);
-gradientSprite.width = window.innerWidth;
-gradientSprite.height = window.innerHeight;
+gradientSprite.width = dimensions.value.width;
+gradientSprite.height = dimensions.value.height;
+// gradientSprite.height = dimensions.value.height;
+// gradientSprite.height = dimensions.value.height;
 
 gradientSprite.filters = [gradientFilter];
 
@@ -71,40 +78,25 @@ const initPixi = () => {
   const canvas = document.getElementById('blur-gradient');
 
   // initPixiPlugins()
+  // const { width, height } = generateDimensions();
+
   if (canvas) {
     app = new Application({
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: dimensions.value.width,
+      height: dimensions.value.height,
       // antialias: true,
       backgroundAlpha: 0,
       view: canvas as HTMLCanvasElement,
       //resizeTo: window,
       // autoStart: false
     });
-    // const gradientTexture = createGradientTexture(
-    //   {
-    //     width: window.innerWidth,
-    //     height: window.innerHeight,
-    //   },
-    //   {
-    //     x0: 0,
-    //     y0: 0,
-    //     x1: window.innerWidth,
-    //     y1: window.innerHeight,
-    //     colorStops: createColorStops(gradientData.colors),
-    //   }
-    // );
-    // if (gradientTexture === null) {
-    //   console.error('failed to create gradient texture');
-    //   return;
-    // }
-    // app.stage.addChild(new Sprite(gradientTexture));
+
     app.stage.addChild(gradientSprite);
     // app.stage.addChild(cursorShape);
 
     app.stage.filters = [
       // gradientFilter,
-      new KawaseBlurFilter(30, 20, true),
+      new KawaseBlurFilter(10, 3, true),
       twistFilter,
       noiseFilter,
     ];
@@ -115,38 +107,53 @@ const initPixi = () => {
 };
 
 const onResize = () => {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  app.renderer.resize(w, h);
-  gradientSprite.width = w;
-  gradientSprite.height = h;
-  gradientFilter.uniforms.iResolution.x = w;
-  gradientFilter.uniforms.iResolution.y = h;
+  // const { width, height } = generateDimensions();
+  dimensions.value = generateDimensions();
+  app.renderer.resize(dimensions.value.width, dimensions.value.height);
+  gradientSprite.width = dimensions.value.width;
+  gradientSprite.height = dimensions.value.height;
+  gradientFilter.uniforms.iResolution.x = dimensions.value.width;
+  gradientFilter.uniforms.iResolution.y = dimensions.value.height;
   app.renderer.render(app.stage);
 };
 
+watch(
+  () => mouseData.normalizedMousePos,
+  (pos) => {
+    twistFilter.offset.x =
+      dimensions.value.width / 2 - (pos.x * dimensions.value.width) / 4;
+    twistFilter.offset.y =
+      dimensions.value.height / 2 - (pos.y * dimensions.value.height) / 4;
+    twistFilter.angle = 4 * pos.x;
+    // twistFilter.radius =
+    //   Math.max(dimensions.value.width, dimensions.value.height) *
+    //   (1 - Math.abs(pos.y)) *
+    //   2;
+  }
+);
+
 const onFrame = (deltaTime: number) => {
   // cursorShape.clear();
-  gradientFilter.uniforms.iResolution.x = window.innerWidth;
-  gradientFilter.uniforms.iResolution.y = window.innerHeight;
+  // gradientFilter.uniforms.iResolution.x = window.innerWidth;
+  // gradientFilter.uniforms.iResolution.y = window.innerHeight;
   gradientFilter.uniforms.u_colors = gradientData.uniforms;
 
-  twistFilter.offset.x =
-    window.innerWidth / 2 +
-    (mouseData.normalizedMousePos.x * window.innerWidth) / 4;
-  twistFilter.offset.y =
-    window.innerHeight / 2 +
-    (mouseData.normalizedMousePos.y * window.innerHeight) / 4;
-  twistFilter.angle = 4 * mouseData.normalizedMousePos.x;
-  twistFilter.radius =
-    Math.max(window.innerWidth, window.innerHeight) *
-    (1 - Math.abs(mouseData.normalizedMousePos.y)) *
-    2;
+  // twistFilter.offset.x =
+  //   window.innerWidth / 2 +
+  //   (mouseData.normalizedMousePos.x * window.innerWidth) / 4;
+  // twistFilter.offset.y =
+  //   window.innerHeight / 2 +
+  //   (mouseData.normalizedMousePos.y * window.innerHeight) / 4;
+  // twistFilter.angle = 4 * mouseData.normalizedMousePos.x;
+  // twistFilter.radius =
+  //   Math.max(window.innerWidth, window.innerHeight) *
+  //   (1 - Math.abs(mouseData.normalizedMousePos.y)) *
+  //   2;
   if (halfTick) {
     noiseFilter.seed = Math.random() * 0.01;
   }
-  cursorShape.x = mouseData.mousePos.x;
-  cursorShape.y = mouseData.mousePos.y;
+  // cursorShape.x = mouseData.mousePos.x;
+  // cursorShape.y = mouseData.mousePos.y;
   halfTick = !halfTick;
 };
 

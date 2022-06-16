@@ -13,7 +13,7 @@ const soundActive = computed(() => projectData.soundActive);
     type="button"
     @click="projectData.toggleSound"
     id="mute__toggle"
-    class="details__btn"
+    class="details__btn hover__parent"
   >
     <Sound :active="soundActive" />
     <span>Sound {{ soundActive ? 'on' : 'off' }}</span>
@@ -21,7 +21,6 @@ const soundActive = computed(() => projectData.soundActive);
 </template>
 
 <style lang="sass">
-
 #mute__toggle
   gap: math.div($unit, 2)
   z-index: 2

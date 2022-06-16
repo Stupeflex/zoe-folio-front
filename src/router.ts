@@ -52,4 +52,10 @@ const router = createRouter({
   routes,
 });
 
+router.afterEach((to, from) => {
+  const betweenProjects =
+    to.name === 'projectDetails' && from.name === 'projectDetails';
+  to.meta.transitionName = betweenProjects ? 'slide-up' : 'fade';
+});
+
 export default router;

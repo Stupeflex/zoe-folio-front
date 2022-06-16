@@ -4,9 +4,9 @@
   padding: 0
   text-decoration: none
 
-@mixin grid($cols: 19, $useRows: false, $rows: 12, $flow: row)
+@mixin grid($cols: auto-fit, $useRows: false, $rows: auto-fit, $flow: row)
   display: grid
-  grid-template-columns: repeat(auto-fit, $cell-width)
+  grid-template-columns: repeat($cols, $cell-width)
   grid-auto-columns: $cell-width
   grid-auto-rows: $cell-height
   grid-auto-flow: $flow
@@ -14,7 +14,7 @@
   padding: $unit
 
   @if $useRows
-    grid-template-rows: repeat(auto-fit, $cell-height)
+    grid-template-rows: repeat($rows, $cell-height)
 
 @mixin col-x
   @for $i from 1 through $max-cols
@@ -37,7 +37,7 @@
     content: ""
     left: 0
     right: 0
-    height: 1.5px
+    height: 1px
     background-color: $c-white
     width: 100%
     transform: scaleX(0)
@@ -53,3 +53,8 @@
   transform: scaleX(1)
   transition: transform .2s ease-in 0s
   transform-origin: bottom left
+
+@mixin blur-bg
+  backdrop-filter: blur(20px) saturate(180%)
+  -webkit-backdrop-filter: blur(20px) saturate(180%)
+  background-color: rgba(255, 255, 255, .1)

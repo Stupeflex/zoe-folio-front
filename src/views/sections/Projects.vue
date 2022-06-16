@@ -27,10 +27,10 @@ const projectData = useProjectData();
 
 <style lang="sass" scoped>
 #section__projects
-  @include grid(19, true, 11)
+  @include grid(auto-fit, true, 11)
   padding-top: calc($cell-height + $unit + $unit)
   // min-width: 100%
-  // height: 100%
+  height: 100%
   min-width: max-content
 
 #title
