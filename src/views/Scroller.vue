@@ -15,6 +15,7 @@ let scroll: {
 interface ScrollerProps {
   direction?: 'horizontal' | 'vertical';
   dependencies?: any;
+  delay?: number;
 }
 
 const props = withDefaults(defineProps<ScrollerProps>(), {
@@ -38,10 +39,12 @@ const initLocomotive = () => {
       reloadOnContextChange: true,
       repeat: true,
       scrollFromAnywhere: true,
-      // smartphone: {
-      //   direction: 'vertical',
-      //   gestureDirection: 'vertical',
-      // },
+      smartphone: {
+        smooth: true,
+        direction: props.direction,
+        gestureDirection: props.direction,
+      },
+      lerp: 0.07,
     });
 
     // scroll.on('scroll', (e) => {
@@ -110,7 +113,11 @@ if (props.dependencies) {
 
 onMounted(() => {
   console.log('onMounted scroller');
-  initLocomotive();
+  if (props.delay) {
+    setTimeout(initLocomotive, props.delay);
+  } else {
+    initLocomotive();
+  }
   // setupUpdateDeps();
 });
 

@@ -11,9 +11,9 @@ export interface MouseProps {
 
 export const useMouseData = defineStore('mouseData', {
   state: (): MouseProps => ({
-    mousePos: { x: window.innerWidth / 2, y: window.innerHeight + 100 },
-    targetMousePos: { x: window.innerWidth / 2, y: window.innerHeight + 100 },
-    lastMousePos: { x: window.innerWidth / 2, y: window.innerHeight + 100 },
+    mousePos: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+    targetMousePos: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+    lastMousePos: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
     mouseDown: false,
   }),
   getters: {

@@ -31,13 +31,22 @@ const isImage = (
 
 const props = defineProps<ProjectThumbnailProps>();
 
+const size = computed(() => ({
+  ...props.project.size,
+  width:
+    window.innerWidth < 600
+      ? props.project.size.width + 7
+      : props.project.size.width,
+  // height:
+  //   window.innerWidth < 600
+  //     ? props.project.size.height - 1
+  //     : props.project.size.height,
+}));
+
 const style = computed(() => ({
   gridColumnStart:
-    typeof props.project.size.x === 'number'
-      ? props.project.size.x + 3
-      : undefined,
-  gridRowStart:
-    typeof props.project.size.y === 'number' ? props.project.size.y : undefined,
+    typeof size.value.x === 'number' ? size.value.x + 3 : undefined,
+  gridRowStart: typeof size.value.y === 'number' ? size.value.y : undefined,
 }));
 
 const extractPaletteFallback = (e: MouseEvent) => {
@@ -63,9 +72,11 @@ const extractPaletteFallback = (e: MouseEvent) => {
 };
 
 const speed = computed(
-  () => (1 - (props.project.size?.width || MAX_WIDTH) / MAX_WIDTH) * 2
+  () => (1 - (size.value?.width || MAX_WIDTH) / MAX_WIDTH) * 2
 );
-console.log(speed.value, props.project.size.width);
+
+const spacingX = computed(() => (window.innerWidth < 600 ? 5 : 2));
+const spacingY = computed(() => (window.innerWidth < 600 ? 0 : 1));
 
 const applyPalette = (e: MouseEvent) => {
   const palette = projectData.palettes.find(
@@ -97,12 +108,13 @@ const onClick = (e: MouseEvent) => {
 
 <template>
   <div
-    :class="`col-${project.size.width + 2} row-${
-      project.size.height + 1
+    :class="`col-${size.width + spacingX} row-${
+      size.height + spacingY
     } project__thumbnail__container hover__parent`"
     :style="style"
     data-scroll
     :data-scroll-speed="speed"
+    data-scroll-offset="1200, -1200"
   >
     <router-link
       :to="generateProjectLink(project)"
@@ -135,6 +147,8 @@ const onClick = (e: MouseEvent) => {
   flex-direction: column
   gap: $unit
   z-index: 2
+  width: 100%
+  height: 100%
 
   &::first-of-type
     grid-column-start: 3 !important
@@ -147,6 +161,10 @@ const onClick = (e: MouseEvent) => {
   display: flex
   overflow: hidden
   cursor: pointer
+
+  @media screen and (max-width: 600px)
+    width: calc(100% - $cell-width * 5 - $unit * 5)
+    height: 100%
 
   img
     object-fit: cover

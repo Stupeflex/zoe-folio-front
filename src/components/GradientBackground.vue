@@ -17,8 +17,8 @@ import { Graphics } from '@pixi/graphics';
 import fragmentShader from '../shaders/gradient.frag';
 
 let app: Application;
-let halfTick: boolean = false;
-const MaxCanvasWidth = 650;
+const MaxCanvasWidth = 700;
+let tick = 0;
 
 const mouseData = useMouseData();
 const gradientData = useGradientData();
@@ -53,10 +53,10 @@ const noiseFilter = new OldFilmFilter({
   scratch: 0,
   scratchDensity: 0,
   noise: 0.05,
-  noiseSize: 0.5,
+  noiseSize: dimensions.value.width / window.innerWidth,
   vignetting: 0,
 });
-// noiseFilter.blendMode = BLEND_MODES.EXCLUSION
+noiseFilter.blendMode = BLEND_MODES.LIGHTEN;
 // noiseFilter.resolution = 0.2
 
 // const cursorShape = new Graphics();
@@ -98,8 +98,10 @@ const initPixi = () => {
       // gradientFilter,
       new KawaseBlurFilter(10, 3, true),
       twistFilter,
-      noiseFilter,
     ];
+    if (window.innerWidth > 800) {
+      app.stage.filters.push(noiseFilter);
+    }
 
     // app.render()
     app.ticker.add(onFrame);
@@ -117,20 +119,22 @@ const onResize = () => {
   app.renderer.render(app.stage);
 };
 
-watch(
-  () => mouseData.normalizedMousePos,
-  (pos) => {
-    twistFilter.offset.x =
-      dimensions.value.width / 2 - (pos.x * dimensions.value.width) / 4;
-    twistFilter.offset.y =
-      dimensions.value.height / 2 - (pos.y * dimensions.value.height) / 4;
-    twistFilter.angle = 4 * pos.x;
-    // twistFilter.radius =
-    //   Math.max(dimensions.value.width, dimensions.value.height) *
-    //   (1 - Math.abs(pos.y)) *
-    //   2;
-  }
-);
+// watch(
+//   () => mouseData.normalizedMousePos,
+//   (pos) => {
+//     twistFilter.offset.x =
+//       dimensions.value.width / 2 - (pos.x * dimensions.value.width) / 4;
+//     twistFilter.offset.y =
+//       dimensions.value.height / 2 - (pos.y * dimensions.value.height) / 4;
+//     twistFilter.angle = 4 * pos.x;
+//     // twistFilter.radius =
+//     //   Math.max(dimensions.value.width, dimensions.value.height) *
+//     //   (1 - Math.abs(pos.y)) *
+//     //   2;
+//   }
+// );
+
+console.log(mouseData.normalizedMousePos);
 
 const onFrame = (deltaTime: number) => {
   // cursorShape.clear();
@@ -144,17 +148,26 @@ const onFrame = (deltaTime: number) => {
   // twistFilter.offset.y =
   //   window.innerHeight / 2 +
   //   (mouseData.normalizedMousePos.y * window.innerHeight) / 4;
-  // twistFilter.angle = 4 * mouseData.normalizedMousePos.x;
-  // twistFilter.radius =
-  //   Math.max(window.innerWidth, window.innerHeight) *
-  //   (1 - Math.abs(mouseData.normalizedMousePos.y)) *
-  //   2;
-  if (halfTick) {
+  twistFilter.angle = 4 * mouseData.normalizedMousePos.x;
+
+  if (tick % 4 === 0) {
     noiseFilter.seed = Math.random() * 0.01;
   }
+  const sin = Math.sin(tick / 60);
+  twistFilter.uniforms.offset.x =
+    dimensions.value.width / 2 +
+    sin * 100 +
+    (mouseData.normalizedMousePos.x * dimensions.value.width) / 4;
+  twistFilter.uniforms.offset.y =
+    dimensions.value.height / 2 +
+    sin * 100 +
+    (mouseData.normalizedMousePos.y * dimensions.value.height) / 4;
+  // twistFilter.uniforms.offset.y += sin * (window.innerWidth / 60);
+  // twistFilter.uniforms.angle += (1 - sin) / 100;
+
   // cursorShape.x = mouseData.mousePos.x;
   // cursorShape.y = mouseData.mousePos.y;
-  halfTick = !halfTick;
+  tick++;
 };
 
 onMounted(() => {

@@ -74,7 +74,10 @@ const onLeave = () => {
           >
             {{ nextProject.client }} —
           </h5>
-          <h4 id="next__project__title" class="project__title project__info">
+          <h4
+            id="next__project__title"
+            class="project__title project__info hover__underline"
+          >
             {{ nextProject.title }}
           </h4>
         </div>
@@ -86,7 +89,7 @@ const onLeave = () => {
       </div>
       <div id="next__project__cta">
         <arrow-big :rotation="180" />
-        <h2 class="hover__underline">Projet suivant</h2>
+        <h2 class="hover__underline hover__active">Projet suivant</h2>
       </div>
     </div>
   </router-link>
@@ -137,7 +140,7 @@ const onLeave = () => {
       display: flex
       align-items: baseline
       gap: $unit
-      // transform: translateY(-$unit)
+      transition: transform 0.3s ease
 
       svg
         width: 52px
@@ -163,4 +166,7 @@ const onLeave = () => {
         grid-column: 4 / -1
         grid-row: 1 / 1
         margin-left: -$unit
+
+  &:hover #next__project__cta
+    transform: translateX($unit * 2)
 </style>

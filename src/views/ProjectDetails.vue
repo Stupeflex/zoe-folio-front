@@ -22,7 +22,6 @@ const scrollData = useScrollData();
 const route = useRoute();
 
 const loaded = ref<boolean>(false);
-const rendered = ref(false);
 const index = ref<string>('01');
 
 const videoRef = ref<HTMLVideoElement>();
@@ -97,8 +96,10 @@ watch(
     if (value) {
       console.warn('NEW PROJECT');
       nextTick(() => {
+        setTimeout(() => {
+          scrollData.update();
+        }, 1000);
         // scrollData.scrollTo(0);
-        scrollData.update();
       });
     }
   }
@@ -137,7 +138,7 @@ fetchProject();
 </script>
 
 <template>
-  <Scroller direction="vertical">
+  <Scroller direction="vertical" :delay="600">
     <div id="scroll__container">
       <section
         id="page__project__details"
@@ -187,19 +188,11 @@ fetchProject();
           </span>
         </div>
 
-        <div
-          id="mute__toggle__container"
-          data-scroll
-          data-scroll-speed="4"
-          data-scroll-offset="0, 150%"
-        >
+        <div id="mute__toggle__container">
           <MuteToggle />
         </div>
 
         <button
-          data-scroll
-          data-scroll-speed="4"
-          data-scroll-offset="0, 150%"
           type="button"
           id="scroll__indicator"
           class="details__btn"
@@ -225,6 +218,7 @@ fetchProject();
 
 <style lang="sass">
 #scroll__container
+  width: 100%
 
 #page__project__details
   @include grid(19, true, auto-fit, row)
@@ -255,10 +249,16 @@ fetchProject();
   #project__type
     grid-column-start: 4
     grid-row-start: 8
+    @media screen and (max-width: 600px)
+      grid-column-start: 1
+      grid-row-start: 7
 
   #project__date
     grid-column-start: 5
     grid-row-start: 8
+    @media screen and (max-width: 600px)
+      grid-column-start: 3
+      grid-row-start: 7
 
   #project__title__container
     grid-column-start: 7
@@ -275,6 +275,11 @@ fetchProject();
     justify-content: flex-start
     z-index: 2
 
+    @media screen and (max-width: 600px)
+      grid-column-start: 1
+      grid-row-start: 8
+      grid-column-end: -1
+
   #project__index__container
     align-self: flex-end
 
@@ -283,6 +288,7 @@ fetchProject();
     z-index: 2
     max-width: 100%
     width: auto
+    word-break: break-word
 
 
   .details__btn

@@ -1,8 +1,15 @@
 <script lang="ts" setup>
 import { useProjectData } from '@/store/projectData';
 import ProjectThumbnail from '@/components/ProjectThumbnail.vue';
+import { onMounted } from '@vue/runtime-dom';
+import { useGradientData } from '@/store/gradientData';
 
 const projectData = useProjectData();
+const gradientData = useGradientData();
+
+onMounted(() => {
+  gradientData.resetDefaultColors();
+});
 </script>
 
 <template>
@@ -11,7 +18,7 @@ const projectData = useProjectData();
       id="title"
       data-scroll
       data-scroll-speed="-4"
-      data-scroll-offset="-50%, -50%"
+      data-scroll-offset="0, -200%"
     >
       <h1>Projets<br />d'étalonnage</h1>
     </div>
@@ -39,4 +46,8 @@ const projectData = useProjectData();
   grid-row-end: -3
   grid-row-start: 6
   align-self: end
+  // filter: blur(3px)
+
+  @media screen and (max-width: 500px)
+    opacity: 0.7
 </style>

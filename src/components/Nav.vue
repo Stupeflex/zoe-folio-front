@@ -71,13 +71,15 @@ watch(
   left: 0
   right: 0
   padding: 20px $unit
-  height: $cell-height
+  min-height: max-content
   display: grid
   grid-template-columns: repeat(19, $cell-width)
   grid-gap: $unit
   z-index: 10
   color: white
   transition: backdrop-filter 0.6s linear 0s, background-color 0.6s linear 0s
+  @media screen and (max-width: 600px)
+    padding: $unit
 
   &:not(.clear)
     @include blur-bg
@@ -89,7 +91,8 @@ watch(
     font-size: 18px
     text-transform: uppercase
     align-self: end
-    grid-column: 2 / span 5
+    grid-column: 2 / -1
+    grid-row: 1 / 1
     transform: translateY(5px)
 
   #nav__links

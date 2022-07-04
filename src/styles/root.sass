@@ -44,15 +44,24 @@
     transition: transform .3s ease-out 0s
     transform-origin: bottom right
 
+  &.hover__active::after
+    transform-origin: bottom left
+    transform: scaleX(1)
+
   &:hover::after
     transform-origin: bottom left
     transform: scaleX(1)
     transition: transform .2s ease-in 0s
 
-.hover__parent:hover .hover__underline::after
+.hover__parent:hover .hover__underline:not(.hover__active)::after
   transform: scaleX(1)
   transition: transform .2s ease-in 0s
   transform-origin: bottom left
+
+.hover__parent:hover .hover__underline.hover__active::after
+  transform: scaleX(0)
+  transition: transform .2s ease-in 0s
+  transform-origin: bottom right
 
 @mixin blur-bg
   backdrop-filter: blur(20px) saturate(180%)

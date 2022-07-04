@@ -74,8 +74,11 @@ onBeforeUnmount(() => {
   transition: opacity 0.6s ease 0s, transform .6s ease-in 0s
 
 .slide-up-enter-from
-  transform: translateY(110vh)
+  transform: translateY(100vh)
   // transition-delay: 1s
+
+.slide-up-enter-to
+  transform: translateY(0) !important
 
 .slide-up-leave-to
   opacity: 0 !important
