@@ -17,7 +17,7 @@ import { Graphics } from '@pixi/graphics';
 import fragmentShader from '../shaders/gradient.frag';
 
 let app: Application;
-const MaxCanvasWidth = 700;
+const MaxCanvasWidth = 1000;
 let tick = 0;
 
 const mouseData = useMouseData();
@@ -56,7 +56,7 @@ const noiseFilter = new OldFilmFilter({
   noiseSize: dimensions.value.width / window.innerWidth,
   vignetting: 0,
 });
-noiseFilter.blendMode = BLEND_MODES.LIGHTEN;
+noiseFilter.blendMode = BLEND_MODES.DARKEN;
 // noiseFilter.resolution = 0.2
 
 // const cursorShape = new Graphics();
@@ -104,6 +104,8 @@ const initPixi = () => {
     }
 
     // app.render()
+    // noiseFilter.seed = Math.random() * 0.01;
+
     app.ticker.add(onFrame);
   }
 };
@@ -150,7 +152,7 @@ const onFrame = (deltaTime: number) => {
   //   (mouseData.normalizedMousePos.y * window.innerHeight) / 4;
   twistFilter.angle = 4 * mouseData.normalizedMousePos.x;
 
-  if (tick % 4 === 0) {
+  if (tick % 8 === 0) {
     noiseFilter.seed = Math.random() * 0.01;
   }
   const sin = Math.sin(tick / 60);
