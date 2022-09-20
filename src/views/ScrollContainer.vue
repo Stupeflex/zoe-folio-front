@@ -1,16 +1,9 @@
 <script lang="ts" setup>
-import { ref } from '@vue/reactivity';
-import Locomotive from '@/utils/scroller/Main';
-import { onMounted, onBeforeUnmount, nextTick, watch } from '@vue/runtime-dom';
+import { ref } from 'vue';
+import { onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { useScrollData } from '@/store/scrollData';
 
 const scrollData = useScrollData();
-
-let scroll: {
-  update: () => void;
-  destroy: () => void;
-  on: (event: string, cb: (e: unknown) => void) => void;
-};
 
 interface ScrollerProps {
   direction?: 'horizontal' | 'vertical';
@@ -44,17 +37,8 @@ const initLocomotive = () => {
         direction: props.direction,
         gestureDirection: props.direction,
       },
-      lerp: 0.07,
+      lerp: 0.05,
     });
-
-    // scroll.on('scroll', (e) => {
-    //   console.log(
-    //     e,
-    //     document.documentElement.offsetWidth,
-    //     document.documentElement.offsetHeight
-    //   );
-    //   // console.log(scroll);
-    // });
 
     nextTick(() => {
       setTimeout(() => {
@@ -62,47 +46,17 @@ const initLocomotive = () => {
         scrollData.update();
       }, 300);
     });
-    // });
   }
 };
-
-// watchEffect(() => {
-//   if (mainRef.value && scroll) {
-//     setTimeout(() => {
-//       console.log('update scroll');
-//       scroll.update();
-//     }, 300);
-//   }
-// });
-
-// const setupUpdateDeps = () => {
-//   if (props?.dependencies && props.dependencies?.length > 0) {
-//     console.warn('setup update deps');
-//     props.dependencies.forEach((dep) => {
-//       watch(
-//         () => dep,
-//         () => {
-//           console.log('dependency chande, updating scroller');
-//           if (scroll) {
-//             nextTick(() => {
-//               scroll.update();
-//             });
-//           }
-//         }
-//       );
-//     });
-//   }
-// };
-
 if (props.dependencies) {
   watch(
     () => props?.dependencies,
     () => {
       console.log('scroller dependency changed');
-      if (scroll) {
+      if (scrollData.scroller) {
         setTimeout(() => {
           console.log('update scroll');
-          scroll.update();
+          scrollData.update();
         }, 300);
       }
     }
@@ -143,5 +97,7 @@ div#scroller
   right: 0
   bottom: 0
   z-index: 1
-  // display: flex
+  //display: flex
+  //flex-direction: row
+  //gap: calc($cell-width * 2 + $unit)
 </style>

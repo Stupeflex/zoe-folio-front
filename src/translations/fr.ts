@@ -1,0 +1,44 @@
+import type { Translation } from '@/translations/index';
+
+export const fr: Translation = {
+  titles: {
+    projects: 'Projets\nd\'étallonage',
+    process: 'Processus',
+    studio: 'Un studio créatif\nen plein Paris',
+    about: 'À propos',
+  },
+  filters: {
+    clips: 'Clips',
+    pubs: 'Publicité',
+    fiction: 'Fiction',
+  },
+  nav: {
+    projects: 'Projets',
+    process: 'Processus',
+    studio: 'Studio',
+    about: 'À propos',
+    contact: 'Contact',
+    back: 'Retour',
+    hook: 'Un projet ? Une question ?',
+  },
+  sections: {
+    studio: {
+      address: '24, Rue de Saint Antoine\n4ème arrondissement\n75004 Paris',
+      hook: 'Entre brainstorming et ajustements de courbes, le studio sait s’effacer pour laisser libre court à la vision de vos projets.',
+      cta: 'Prendre rendez-vous',
+    },
+  },
+  project: {
+    type: {
+      clip: 'Clip',
+      pub: 'Publicité',
+      fiction: 'Fiction',
+    },
+    next: 'Projet suivant',
+    scroll: 'Défiler',
+    sound: {
+      on: 'Son actif',
+      off: 'Muet',
+    },
+  },
+};
