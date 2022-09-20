@@ -128,3 +128,16 @@ export type Project_Raw = ApiItem<{
 export type ApiProjectResponse = {
   data: Project_Raw[] | Project_Raw;
 };
+
+export interface ProcessStep {
+  index: number;
+  title: string;
+  content: string;
+  id?: identifier;
+  size?: {
+    y?: number;
+    x?: number;
+    height?: number;
+    width?: number;
+  };
+}

@@ -7,6 +7,10 @@ import { computed, watch, onMounted } from 'vue';
 import FilterButton from '@/components/FilterButton.vue';
 import { nextTick } from 'vue';
 import { scrollSpeedToBlurStyle } from '@/utils/effects';
+import { useI18n } from 'vue-i18n';
+import { tr } from '@/translations';
+
+const { t } = useI18n();
 
 const projectData = useProjectData();
 const gradientData = useGradientData();
@@ -42,9 +46,11 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
       data-scroll-target="#section__projects"
       :class="{ blur: doBlur }"
     >
-      <h1 class="section__title" :style="blurStyle">
-        Projets<br />d'étalonnage
-      </h1>
+      <h1
+        class="section__title"
+        :style="blurStyle"
+        v-html="tr(t, 'titles.projects')"
+      />
     </div>
     <div
       id="filters"
@@ -52,9 +58,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
       data-scroll-sticky
       data-scroll-target="#section__projects"
     >
-      <filter-button filter="clip">Clips</filter-button>
-      <filter-button filter="pub">Publicités</filter-button>
-      <filter-button filter="fiction">Fiction</filter-button>
+      <filter-button filter="clip">{{ t('filters.clips') }}</filter-button>
+      <filter-button filter="pub">{{ t('filters.pubs') }}</filter-button>
+      <filter-button filter="fiction">{{ t('filters.fiction') }}</filter-button>
     </div>
     <ProjectThumbnail
       v-for="(project, index) in projectData.filteredProjects"

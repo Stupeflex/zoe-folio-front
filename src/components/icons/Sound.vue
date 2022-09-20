@@ -34,7 +34,7 @@ withDefaults(defineProps<Props>(), { active: false });
     transform: scaleY(1)
 
   50%
-    transfrom: scaleY(0.3)
+    transform: scaleY(0.3)
 
   75%
     transform: scaleY(0.7)
@@ -48,10 +48,11 @@ withDefaults(defineProps<Props>(), { active: false });
   line
     transform-origin: bottom center
     stroke: $c-white
-    transition: transform 0.25s linear
+    transition: transform 0.25s $bezier 0s
 
   &:not(.active) line
-    transform: scaleY(math.div(1, 12) * 2)
+    transform: scaleY(calc(1 / 12 * 2))
+    transition: transform 0.6s $bezier 0s
 
   &.active line
     // animation-name: pulse

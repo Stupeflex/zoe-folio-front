@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { extractPalette } from '@/utils/gradient';
-import { generateProjectLink } from '@/utils/navigation';
-import { computed } from '@vue/reactivity';
-import { defineProps } from 'vue';
-import { Project, ProjectMedia, useProjectData } from '../store/projectData';
-import { useGradientData } from '@/store/gradientData';
-import { RouterLink } from 'vue-router';
+import { computed } from 'vue';
+import { ProjectMedia, useProjectData } from '../store/projectData';
 
 type ProjectMediaProps = {
   media: ProjectMedia;
 };
 
-const gradientData = useGradientData();
 const projectData = useProjectData();
 
 const props = defineProps<ProjectMediaProps>();

@@ -1,4 +1,4 @@
-export const baseUrl = 'http://192.168.1.12:1337';
+export const baseUrl = 'http://localhost:1337';
 
 export const apiUrl = baseUrl + '/api';
 

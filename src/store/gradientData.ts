@@ -90,6 +90,7 @@ export const useGradientData = defineStore('gradientData', {
       if (colors.length === this.colors.length) {
         killAllTweens();
         this.targetColors = colors;
+        this.updateHTMLBackgroundColor();
         if (transition) {
           colors.forEach((targetColor, index) => {
             const c = this.colors[index];
@@ -118,6 +119,7 @@ export const useGradientData = defineStore('gradientData', {
     resetDefaultColors(transition = false) {
       killAllTweens();
       this.targetColors = this.defaultColors;
+      this.updateHTMLBackgroundColor();
       if (transition) {
         [...this.defaultColors].forEach((targetColor, index) => {
           const c = this.colors[index];
@@ -136,6 +138,14 @@ export const useGradientData = defineStore('gradientData', {
       } else {
         console.log('resetDefaultColors no transition');
         this.colors = [...this.defaultColors];
+      }
+    },
+    updateHTMLBackgroundColor() {
+      const html = document.body.parentElement;
+      if (html) {
+        const [r, g, b] = this.targetColors[2];
+        html.style.background = `rgb(${r}, ${g}, ${b})`;
+        document.body.style.background = `rgb(${r}, ${g}, ${b})`;
       }
     },
   },

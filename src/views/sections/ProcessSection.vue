@@ -4,8 +4,10 @@ import ProcessStepCard from '@/components/ProcessStepCard.vue';
 import { computed } from 'vue';
 import { useScrollData } from '@/store/scrollData';
 import { scrollSpeedToBlurStyle } from '@/utils/effects';
+import { useI18n } from 'vue-i18n';
 
 const scrollData = useScrollData();
+const { t } = useI18n();
 
 const steps: ProcessStep[] = [
   {
@@ -27,7 +29,7 @@ const steps: ProcessStep[] = [
     size: {
       y: 6,
       x: 5,
-      width: 3,
+      width: 5,
     },
   },
   {
@@ -47,7 +49,7 @@ const steps: ProcessStep[] = [
       'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore.',
     index: 3,
     size: {
-      x: 10,
+      x: 11,
       width: 3,
       y: 7,
       height: 3,
@@ -73,7 +75,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
       data-scroll-sticky
       data-scroll-target="#section__process"
     >
-      <h1 class="section__title" :style="blurStyle">Processus</h1>
+      <h1 class="section__title" :style="blurStyle">
+        {{ t('titles.process') }}
+      </h1>
     </div>
     <process-step-card
       v-for="(step, index) in steps"

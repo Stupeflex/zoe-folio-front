@@ -9,15 +9,25 @@ import { Extract } from '@pixi/extract';
 import { AppLoaderPlugin } from '@pixi/loaders';
 import { ParticleRenderer } from '@pixi/particle-container';
 import { Prepare } from '@pixi/prepare';
+import { createI18n } from 'vue-i18n';
 
-import router from './router'
+import router from './router';
 import App from './App.vue';
+import { translations } from '@/translations';
 
 const pinia = createPinia();
+
+const i18n = createI18n({
+  legacy: false,
+  locale: 'fr',
+  fallbackLocale: 'en',
+  messages: translations,
+});
 
 const app = createApp(App);
 
 app.use(pinia);
+app.use(i18n);
 app.use(router);
 
 const initPixiPlugins = () => {

@@ -110,30 +110,30 @@
   font-style: normal
 
 @mixin detail
-  font-family: 'Neue'
+  font-family: 'Neue', sans-serif
   font-size: 10px
   font-weight: 350
 
 @mixin link
-  font-family: 'Neue'
+  font-family: 'Neue', sans-serif
   font-size: 14px
   font-weight: 400
   text-decoration: underline
 
 @mixin body
-  font-family: 'Neue'
+  font-family: 'Neue', sans-serif
   font-size: 18px
   font-weight: 400
 
 @mixin title-medium
-  font-family: 'Neue'
+  font-family: 'Neue', sans-serif
   font-size: 76px
   font-weight: 400
   letter-spacing: -0.02em
   line-height: 79.8px
 
 @mixin title-big
-  font-family: 'Neue'
+  font-family: 'Neue', sans-serif
   font-size: 108px
   font-weight: 500
   letter-spacing: -0.02em
@@ -143,11 +143,27 @@
     @include title-medium
     font-weight: 500
 
+@mixin process-step
+  font-family: 'Neue', sans-serif
+  font-weight: 400
+  font-size: 14px
+  line-height: unset
+  margin: 0
+
 h1
   @include title-big
   color: $c-white
   vertical-align: baseline
   transform: translateY(20px)
+
+  &.section__title
+    filter: blur(0px)
+    transition: filter 0.3s linear
+    user-select: none
+    z-index: -1
+
+    &.blur
+      filter: blur(4px)
 
 h2
   @include title-medium

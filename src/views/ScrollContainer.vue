@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { useScrollData } from '@/store/scrollData';
 
@@ -81,15 +81,35 @@ onBeforeUnmount(() => {
     scrollData.destroy();
   }
 });
+
+const scrollIndicatorStyle = computed(() => {
+  const progress =
+    scrollData.progress[props.direction === 'vertical' ? 'y' : 'x'];
+  return {
+    transform: `scaleX(${progress})`,
+  };
+});
 </script>
 
 <template>
-  <div id="scroller" ref="mainRef" data-scroll-container>
-    <slot></slot>
+  <div id="scroll__container">
+    <div id="scroller" ref="mainRef" data-scroll-container>
+      <slot></slot>
+    </div>
+    <div id="scrollbar" :data-direction="direction">
+      <div id="scrollbar__indicator" :style="scrollIndicatorStyle"></div>
+    </div>
   </div>
 </template>
 
 <style lang="sass" scoped>
+#scroll__container
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+
 div#scroller
   position: fixed
   top: 0
@@ -97,7 +117,22 @@ div#scroller
   right: 0
   bottom: 0
   z-index: 1
-  //display: flex
-  //flex-direction: row
-  //gap: calc($cell-width * 2 + $unit)
+
+#scrollbar
+  position: fixed
+  background-color: rgba(255, 255, 255, .1)
+  bottom: 0
+  left: 0
+  z-index: 10
+  height: calc($unit / 4)
+  right: 0
+  width: 100%
+
+  #scrollbar__indicator
+    height: 100%
+    width: 100%
+    transform: scaleX(0.01)
+    @include blur-bg
+    background-color: rgba(255, 255, 255, .3)
+    transform-origin: left bottom
 </style>

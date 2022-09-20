@@ -1,15 +1,13 @@
 <script lang="ts" setup>
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { useGradientData } from '@/store/gradientData';
 import { Project, useProjectData } from '@/store/projectData';
 import { formatNumber } from '@/utils/format';
 import { generateProjectLink } from '@/utils/navigation';
 import ArrowBig from '@/components/icons/ArrowBig.vue';
-import { useScrollData } from '@/store/scrollData';
 
 const projectData = useProjectData();
 const gradientData = useGradientData();
-const scrollData = useScrollData();
 
 const index = computed<number>(
   () => projectData.getIndexOfId(projectData.selectedId) + 1
@@ -95,10 +93,21 @@ const onLeave = () => {
   </router-link>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
+
+.project__info
+  @include body
+  color: $c-white
+  text-transform: capitalize
+  z-index: 2
+
+.project__count
+  @include detail
+  color: $c-white
+  opacity: 0.7
+
 #next__project
   @include grid(19, true, 5)
-  @include blur-bg
   // padding: $unit * 2 $unit
   // padding-bottom: $unit * 2
   width: 100%
@@ -106,22 +115,54 @@ const onLeave = () => {
   text-align: left
   cursor: pointer
   z-index: 0
+  position: relative
+  margin-top: calc($cell-height + $unit)
+
+  &::before
+    @include blur-bg
+    position: absolute
+    z-index: 0
+    content: ""
+    height: 100%
+    width: 100%
+    top: 0
+    left: 0
+    transition: all 0.3s $bezier 0s
+
+  &:hover
+    &::before
+      height: calc(100% - $unit)
+      width: calc(100% - $unit)
+      top: $unit-h
+      left: $unit-h
+      border-radius: $unit * 2
+
+    #thumbnail__container
+      border-radius: $unit * 1.5
+
+      img#thumbnail
+        transform: scale(1.1)
 
   #thumbnail__container
     grid-column: 1 / span 9
     grid-row: 1 / -1
     height: 100%
     width: 100%
+    z-index: 1
+    overflow: hidden
+    transition: all 0.9s $bezier 0s, border-radius 0.3s $bezier 0s
 
     img#thumbnail
       height: 100%
       width: 100%
       object-fit: cover
+      transition: transform 0.6s $bezier 0s
 
   #next__project__index__container
     grid-column: 18 / -1
     grid-row: 1 / span 1
     padding-top: $unit
+    z-index: 1
 
   #next__project__content
     display: flex
@@ -135,12 +176,14 @@ const onLeave = () => {
     width: 100%
     height: 100%
     padding-bottom: $unit
+    z-index: 1
 
     #next__project__cta
       display: flex
       align-items: baseline
       gap: $unit
       transition: transform 0.3s ease
+      z-index: 1
 
       svg
         width: 52px
@@ -150,6 +193,7 @@ const onLeave = () => {
       grid-template-rows: auto
       padding: 0
       align-items: end
+      z-index: 1
 
       #next__project__credits
         grid-column: 1 / -1

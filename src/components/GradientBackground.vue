@@ -7,12 +7,10 @@ import { KawaseBlurFilter } from '@pixi/filter-kawase-blur';
 import { OldFilmFilter } from '@pixi/filter-old-film';
 import { TwistFilter } from '@pixi/filter-twist';
 
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
-import { createGradientTexture, ColorStop } from '../utils/gradient';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 import { Point } from '@pixi/math';
-import { useMouseData } from '../store/mouseData';
-import { useGradientData } from '../store/gradientData';
-import { Graphics } from '@pixi/graphics';
+import { useMouseData } from '@/store/mouseData';
+import { useGradientData } from '@/store/gradientData';
 
 import fragmentShader from '../shaders/gradient.frag';
 
@@ -59,18 +57,9 @@ const noiseFilter = new OldFilmFilter({
 noiseFilter.blendMode = BLEND_MODES.DARKEN;
 // noiseFilter.resolution = 0.2
 
-// const cursorShape = new Graphics();
-// cursorShape.beginFill(0xffffff, 0.5);
-// cursorShape.drawCircle(0, 0, 500);
-// cursorShape.x = window.innerWidth / 2;
-// cursorShape.y = window.innerHeight / 2;
-// cursorShape.endFill();
-
 const gradientSprite = new Sprite(Texture.WHITE);
 gradientSprite.width = dimensions.value.width;
 gradientSprite.height = dimensions.value.height;
-// gradientSprite.height = dimensions.value.height;
-// gradientSprite.height = dimensions.value.height;
 
 gradientSprite.filters = [gradientFilter];
 
@@ -121,41 +110,20 @@ const onResize = () => {
   app.renderer.render(app.stage);
 };
 
-// watch(
-//   () => mouseData.normalizedMousePos,
-//   (pos) => {
-//     twistFilter.offset.x =
-//       dimensions.value.width / 2 - (pos.x * dimensions.value.width) / 4;
-//     twistFilter.offset.y =
-//       dimensions.value.height / 2 - (pos.y * dimensions.value.height) / 4;
-//     twistFilter.angle = 4 * pos.x;
-//     // twistFilter.radius =
-//     //   Math.max(dimensions.value.width, dimensions.value.height) *
-//     //   (1 - Math.abs(pos.y)) *
-//     //   2;
-//   }
-// );
-
 console.log(mouseData.normalizedMousePos);
 
-const onFrame = (deltaTime: number) => {
+const onFrame = () => {
   // cursorShape.clear();
   // gradientFilter.uniforms.iResolution.x = window.innerWidth;
   // gradientFilter.uniforms.iResolution.y = window.innerHeight;
   gradientFilter.uniforms.u_colors = gradientData.uniforms;
 
-  // twistFilter.offset.x =
-  //   window.innerWidth / 2 +
-  //   (mouseData.normalizedMousePos.x * window.innerWidth) / 4;
-  // twistFilter.offset.y =
-  //   window.innerHeight / 2 +
-  //   (mouseData.normalizedMousePos.y * window.innerHeight) / 4;
-  twistFilter.angle = 4 * mouseData.normalizedMousePos.x;
+  const sin = Math.sin(tick / 60);
+  twistFilter.angle = 4 * mouseData.normalizedMousePos.x + sin / 2;
 
   if (tick % 8 === 0) {
     noiseFilter.seed = Math.random() * 0.01;
   }
-  const sin = Math.sin(tick / 60);
   twistFilter.uniforms.offset.x =
     dimensions.value.width / 2 +
     sin * 100 +
@@ -164,11 +132,7 @@ const onFrame = (deltaTime: number) => {
     dimensions.value.height / 2 +
     sin * 100 +
     (mouseData.normalizedMousePos.y * dimensions.value.height) / 4;
-  // twistFilter.uniforms.offset.y += sin * (window.innerWidth / 60);
-  // twistFilter.uniforms.angle += (1 - sin) / 100;
 
-  // cursorShape.x = mouseData.mousePos.x;
-  // cursorShape.y = mouseData.mousePos.y;
   tick++;
 };
 
@@ -199,8 +163,6 @@ onBeforeUnmount(() => {
   right: 0
   bottom: 0
   z-index: 0
-
-  #blur-gradient__rect
-    fill: url(#blur-gradient__gradient)
-    filter: url(#blur-gradient__displacement)
+  backface-visibility: visible
+  transform: translate3d(0, 0, 0)
 </style>

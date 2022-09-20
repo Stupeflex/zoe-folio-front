@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { identifier, useProjectData } from '@/store/projectData';
 import { useRoute } from 'vue-router';
-import { watch, onMounted, nextTick } from '@vue/runtime-dom';
-import { computed, ref } from '@vue/reactivity';
+import { watch, nextTick } from 'vue';
+import { computed, ref } from 'vue';
 
 import { fetchProjectById } from '@/api/projects';
 
-import Scroller from '@/views/Scroller.vue';
+import Scroller from '@/views/ScrollContainer.vue';
 import { useGradientData } from '@/store/gradientData';
 import { extractPaletteFromUrl } from '@/utils/gradient';
 import Arrow from '../components/icons/Arrow.vue';
@@ -15,11 +15,13 @@ import ProjectMedia from '@/components/ProjectMedia.vue';
 import { useScrollData } from '@/store/scrollData';
 import { formatNumber } from '@/utils/format';
 import NextProject from '@/components/NextProject.vue';
+import { useI18n } from 'vue-i18n';
 
 const projectData = useProjectData();
 const gradientData = useGradientData();
 const scrollData = useScrollData();
 const route = useRoute();
+const { t } = useI18n();
 
 const loaded = ref<boolean>(false);
 const index = ref<string>('01');
@@ -34,7 +36,8 @@ const fetchProject = async () => {
     if (ID) {
       loaded.value = false;
       projectData.selectProject(Number(ID));
-      console.log(ID);
+      projectData.inTransitionId = null;
+      projectData.hoveringId = null;
       const projectIndex = projectData.getIndexOfId(Number(ID));
       preloadNextProject(projectIndex);
       // set display index
@@ -63,6 +66,7 @@ const fetchProject = async () => {
           ({ id }) => id === fetchedProject?.id
         );
         if (maybeProjectPalette && maybeProjectPalette.palette) {
+          console.log('set stored palette');
           gradientData.setColorsRgb(maybeProjectPalette.palette, true);
         } else {
           try {
@@ -70,6 +74,7 @@ const fetchProject = async () => {
               fetchedProject.thumbnailUrl
             );
             if (generatedPalette) {
+              console.log('set fetched palette');
               gradientData.setColorsRgb(generatedPalette, true);
             }
           } catch (e) {
@@ -120,32 +125,17 @@ const scrollDown = () => {
 watch(() => route.params.id, fetchProject);
 
 fetchProject();
-
-// onMounted(() => {
-//   if (loaded.value) {
-//     rendered.value = true;
-//   } else {
-//     watch(
-//       () => loaded.value,
-//       (newVal) => {
-//         if (newVal) {
-//           rendered.value = true;
-//         }
-//       }
-//     );
-//   }
-// });
 </script>
 
 <template>
-  <Scroller direction="vertical" :delay="600">
+  <Scroller direction="vertical">
     <div id="scroll__container">
       <section
         id="page__project__details"
         class="has-scroll-dragging"
         data-scroll-section
       >
-        <div id="project__cover__container" data-scroll data-scroll-speed="2">
+        <div id="project__cover__container" data-scroll>
           <video
             v-if="project?.videoUrl"
             crossorigin="anonymous"
@@ -167,8 +157,8 @@ fetchProject();
             :alt="project?.title"
           />
         </div>
-        <span id="project__type" class="project__info">{{
-          project?.type
+        <span v-if="project?.type" id="project__type" class="project__info">{{
+          t(`project.type.${project.type}`)
         }}</span>
         <span id="project__date" class="project__info">{{
           formattedDate
@@ -195,10 +185,12 @@ fetchProject();
         <button
           type="button"
           id="scroll__indicator"
-          class="details__btn"
+          class="details__btn hover__parent"
           @click="scrollDown"
         >
-          <span> Scroll</span>
+          <span class="hover__underline hover__active">{{
+            t('project.scroll')
+          }}</span>
           <div class="icon__container">
             <Arrow :rotation="-90" />
           </div>
@@ -216,7 +208,7 @@ fetchProject();
   </Scroller>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
 #scroll__container
   width: 100%
 
@@ -234,8 +226,7 @@ fetchProject();
     grid-row: 1 / span 11
     width: calc(100% + $unit * 2)
     height: calc(100% + $unit)
-    margin: -$unit
-    margin-bottom: 0
+    margin: -$unit -$unit 0 -$unit
     z-index: 1
 
   .project__cover
@@ -249,6 +240,7 @@ fetchProject();
   #project__type
     grid-column-start: 4
     grid-row-start: 8
+    text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.4)
     @media screen and (max-width: 600px)
       grid-column-start: 1
       grid-row-start: 7
@@ -256,6 +248,7 @@ fetchProject();
   #project__date
     grid-column-start: 5
     grid-row-start: 8
+    text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.4)
     @media screen and (max-width: 600px)
       grid-column-start: 3
       grid-row-start: 7
@@ -289,7 +282,7 @@ fetchProject();
     max-width: 100%
     width: auto
     word-break: break-word
-
+    text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.4)
 
   .details__btn
     @include link
@@ -298,6 +291,7 @@ fetchProject();
     display: flex
     color: $c-white
     align-items: flex-start
+    text-decoration: none
     padding: 0
     z-index: 2
 
@@ -318,7 +312,7 @@ fetchProject();
       height: 12px
 
     &:hover .icon__container
-      transform: translateY(math.div($unit, 2))
+      transform: translateY($unit-h)
 
   #mute__toggle__container
     grid-column-start: 2
@@ -331,9 +325,11 @@ fetchProject();
   color: $c-white
   text-transform: capitalize
   z-index: 2
+  text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.4)
 
 .project__count
   @include detail
   color: $c-white
   opacity: 0.7
+  text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.4)
 </style>

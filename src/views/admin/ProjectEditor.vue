@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Project, useProjectData } from '@/store/projectData';
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { reactive, ref } from 'vue';
 import { formatNumber } from '@/utils/format';
-import Scroller from '../Scroller.vue';
+import Scroller from '../ScrollContainer.vue';
 import MuteToggle from '@/components/MuteToggle.vue';
 import ProjectMedia from '@/components/ProjectMedia.vue';
 

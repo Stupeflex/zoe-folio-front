@@ -1,6 +1,6 @@
 <template>
   <button @click="toggle" class="filter">
-    <div class="filter__indicator" :class="{ active: isSelected }"></div>
+    <div :class="{ active: isSelected, filter__indicator: true }" />
     <slot />
     ({{ count }})
   </button>
@@ -41,7 +41,7 @@ const isSelected = computed(() => projectData.filters.includes(props.filter));
   cursor: pointer
   z-index: 5
   pointer-events: all
-  transition: filter 0.4s $bezier 0s color .4s $bezier
+  transition: filter 0.4s $bezier 0s, color .4s $bezier 0s
 
   &:first-child
     grid-column-start: 2

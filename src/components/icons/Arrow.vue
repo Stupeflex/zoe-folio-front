@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 
-export interface Props {
-  rotation: number;
+interface Props {
+  rotation?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {

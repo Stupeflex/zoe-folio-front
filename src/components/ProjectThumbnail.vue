@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { extractPalette } from '@/utils/gradient';
-import { generateProjectLink } from '@/utils/navigation';
-import { computed, ref } from '@vue/reactivity';
-import { defineProps } from 'vue';
-import { Project, useProjectData } from '../store/projectData';
+import {
+  generateProjectLink,
+  transitionToProjectPage,
+} from '@/utils/navigation';
+import { computed, ref } from 'vue';
+import { Project, useProjectData } from '@/store/projectData';
 import { useGradientData } from '@/store/gradientData';
-import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router';
+import { useScrollData } from '@/store/scrollData';
 
 type ProjectThumbnailProps = {
   project: Project;
@@ -15,8 +18,12 @@ type ProjectThumbnailProps = {
 
 const gradientData = useGradientData();
 const projectData = useProjectData();
+const scrollData = useScrollData();
+const router = useRouter();
 
 const inTransition = ref<boolean>(false);
+const img = ref<HTMLDivElement>();
+const info = ref<HTMLDivElement>();
 
 const MAX_WIDTH = 9;
 
@@ -29,6 +36,7 @@ const isImage = (
   return false;
 };
 
+// eslint-disable-next-line no-undef
 const props = defineProps<ProjectThumbnailProps>();
 
 const size = computed(() => ({
@@ -72,7 +80,7 @@ const extractPaletteFallback = (e: MouseEvent) => {
 };
 
 const speed = computed(
-  () => (1 - (size.value?.width || MAX_WIDTH) / MAX_WIDTH) * 2
+  () => (1 - (size.value?.width || MAX_WIDTH) / MAX_WIDTH) * 4
 );
 
 const spacingX = computed(() => (window.innerWidth < 600 ? 5 : 2));
@@ -90,50 +98,80 @@ const applyPalette = (e: MouseEvent) => {
   }
 };
 
+const getAllThumbnailContainers = () =>
+  document.querySelectorAll('.project__thumbnail__container');
+
+const onHover = (e: MouseEvent) => {
+  applyPalette(e);
+  projectData.hoveringId = props.project.id;
+};
+
 const onLeave = () => {
   const isDifferent = gradientData.targetColors.some(
     (color, index) => color !== gradientData.defaultColors[index]
   );
   if (isDifferent && !inTransition.value) {
-    console.log('leave', isDifferent);
     gradientData.resetDefaultColors(true);
+    console.log('reset gradient');
   }
+  projectData.hoveringId = null;
 };
 
 const onClick = (e: MouseEvent) => {
+  e.preventDefault();
+  scrollData.stop();
+  scrollData.destroy();
+  projectData.inTransitionId = props.project.id;
   inTransition.value = true;
-  applyPalette(e);
+  // applyPalette(e);
+  transitionToProjectPage(img.value, info.value, () =>
+    router.push(generateProjectLink(props.project))
+  );
 };
 </script>
 
 <template>
   <div
-    :class="`col-${size.width + spacingX} row-${
-      size.height + spacingY
-    } project__thumbnail__container hover__parent`"
+    :class="{
+      [`col-${size.width + spacingX}`]: true,
+      [`row-${size.height + spacingY}`]: true,
+      project__thumbnail__container: true,
+      hover__parent: true,
+      transition: inTransition,
+      blurred:
+        !!projectData.hoveringId && projectData.hoveringId !== project.id,
+      hidden:
+        !!projectData.inTransitionId &&
+        projectData.inTransitionId !== project.id,
+    }"
     :style="style"
-    data-scroll
     :data-scroll-speed="speed"
-    data-scroll-offset="1200, -1200"
+    data-scroll
+    :data-scroll-delay="speed"
+    :id="`project__thumbnail__${project.id}`"
   >
-    <router-link
-      :to="generateProjectLink(project)"
+    <a
+      :href="generateProjectLink(project)"
       class="project__thumbnail"
-      @mouseover="applyPalette"
+      @mouseover="onHover"
       @mouseleave="onLeave"
+      @mouseout="onLeave"
       @click="onClick"
+      ref="img"
     >
       <img
         :src="project.thumbnailUrl"
         :alt="project.title"
         crossorigin="anonymous"
       />
-    </router-link>
-    <div class="project__info">
+    </a>
+    <div class="project__info" ref="info">
       <h5 v-if="project.client" class="project__client">
         {{ project.client }}
       </h5>
-      <h4 class="project__title hover__underline">{{ project.title }}</h4>
+      <h4 class="project__title hover__underline">
+        {{ project.title }}
+      </h4>
     </div>
   </div>
 </template>
@@ -141,6 +179,12 @@ const onClick = (e: MouseEvent) => {
 <style lang="sass" scoped>
 @include col-x
 @include row-x
+
+@keyframes appear
+  0%
+    transform: translateX(-100%) scale(1)
+  100%
+    transform: translateX(0) scale(1)
 
 .project__thumbnail__container
   display: flex
@@ -150,9 +194,31 @@ const onClick = (e: MouseEvent) => {
   width: 100%
   height: 100%
 
-  &::first-of-type
+  &:first-of-type
     grid-column-start: 3 !important
     grid-row-start: 2 !important
+
+  &.blurred
+    .project__thumbnail
+      opacity: 0.4
+      filter: blur(10px)
+
+    .project__info
+      filter: blur(20px)
+
+  &.transition
+    z-index: 10
+    position: relative
+
+  &.hidden
+    pointer-events: none
+    .project__thumbnail
+      opacity: 0
+      filter: blur(20px)
+
+    .project__info
+      opacity: 0
+      filter: blur(20px)
 
 
 .project__thumbnail
@@ -161,31 +227,75 @@ const onClick = (e: MouseEvent) => {
   display: flex
   overflow: hidden
   cursor: pointer
+  transition: border-radius 0.3s $bezier 0s, opacity 0.6s $bezier 0s, filter 0.6s $bezier 0s
 
   @media screen and (max-width: 600px)
     width: calc(100% - $cell-width * 5 - $unit * 5)
     height: 100%
 
+  @for $i from 1 to 50
+    &:nth-child(#{$i}) img
+      animation-duration: 1s + 0.6s * $i
+
   img
     object-fit: cover
-    transition: transform 0.3s ease-in-out 0s
+    transition: transform 0.3s $bezier 0s
     width: 100%
     height: 100%
+    animation: appear $bezier
+
 
   &:hover img
-    transform: scale(1.1)
-    transition: transform 0.5s ease-in-out 0s
+    transition: transform 0.6s $bezier 0s
+    transform: translateX(0) scale(1.1)
+
+  &:hover
+    border-radius: $unit * 2
+
+  &.transition
+    transform-origin: top left
+    transition: border-radius 0.3s $bezier 0s, opacity 0.6s $bezier 0s, filter 0.6s $bezier 0s
+    border-radius: 0 !important
+    z-index: 10
+
+    img
+      transform: translateX(0) scale(1)
 
 .project__info
   width: max-content
+  transition: filter 0.6s $bezier 0s
+  z-index: auto
+  transform-origin: top left
+  position: relative
 
-.project__client
-  @include body
-  font-weight: 300
-  color: $c-white
-  opacity: 0.7
 
-.project__title
-  @include body
-  color: $c-white
+  .project__client
+    @include body
+    font-weight: 300
+    color: $c-white
+    opacity: 0.7
+    transition: all 0.6s $bezier 0s
+
+  .project__title
+    @include body
+    color: $c-white
+    position: relative
+    transition: all 0.9s $bezier 0s
+
+  &.transition
+    z-index: 11
+
+    .project__title
+      @include title-big
+      transform: translateX(-5px)
+
+      &:after
+        width: 0
+
+    .project__client
+      font-weight: 400
+      opacity: 1
+
+      &:before
+        content: "— "
 </style>

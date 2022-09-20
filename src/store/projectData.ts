@@ -51,24 +51,34 @@ export type Project = {
 interface State {
   projects: Project[];
   selectedId: identifier;
-  filter: MediaType | null;
+  filters: ProjectType[];
   palettes: ProjectPalette[];
   fetched: boolean;
   soundActive: boolean;
+  inTransitionId: identifier | null;
+  hoveringId: identifier | null;
 }
 
 export const useProjectData = defineStore('projectData', {
   state: (): State => ({
     projects: [],
     selectedId: 'default',
-    filter: null,
+    filters: [],
     palettes: [],
     fetched: false,
     soundActive: false,
+    inTransitionId: null,
+    hoveringId: null,
   }),
   getters: {
     selectedProject: (state: State): Project | undefined =>
       state.projects.find(({ id }) => id === state.selectedId),
+    filteredProjects: (state: State): Project[] =>
+      state.filters.length > 0
+        ? state.projects.filter((project) =>
+          state.filters.includes(project.type)
+        )
+        : state.projects,
   },
   actions: {
     setProjects(projects: Project[]) {
@@ -126,6 +136,14 @@ export const useProjectData = defineStore('projectData', {
       const index = this.palettes.findIndex((p) => p.id === id);
       if (this.palettes[index].palette === null) {
         this.palettes[index].palette = palette;
+      }
+    },
+    toggleFilter(filter: ProjectType) {
+      const filterIndex = this.filters.indexOf(filter);
+      if (filterIndex >= 0) {
+        this.filters.splice(filterIndex, 1);
+      } else {
+        this.filters.push(filter);
       }
     },
   },

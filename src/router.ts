@@ -1,6 +1,10 @@
-import Index from './views/Index.vue';
+import Index from './views/SectionIndex.vue';
 import ProjectDetails from './views/ProjectDetails.vue';
 import Contact from './views/Contact.vue';
+import ProjectEditor from './views/admin/ProjectEditor.vue';
+import AdminPanel from './views/admin/AdminPanel.vue';
+import ProjectList from './views/admin/ProjectList.vue';
+import AdminDashboard from './views/admin/AdminDashboard.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
 // import { identifier, useProjectData } from './store/projectData';
@@ -44,6 +48,30 @@ const routes = [
     path: '/contact',
     component: Contact,
     name: 'contact',
+  },
+  {
+    path: '/admin/new-project',
+    component: ProjectEditor,
+    name: 'projectEditor',
+  },
+  {
+    path: '/admin',
+    component: AdminPanel,
+    name: 'AdminPanel',
+    children: [
+      {
+        path: 'projects',
+        component: ProjectList,
+      },
+      {
+        path: '',
+        component: AdminDashboard,
+      },
+      {
+        path: 'media',
+        component: ProjectList,
+      },
+    ],
   },
 ];
 

@@ -43,11 +43,11 @@ export const formatProjects = (
       raw.attributes.Medias.length > 0 &&
       isFullyFetchedProjectMediaComponentArray(raw.attributes.Medias)
         ? raw.attributes.Medias.map((m) => ({
-            id: m.id,
-            url: baseUrl + m.media.data.attributes.url,
-            type: MediaType.image,
-            size: m.size,
-          }))
+          id: m.id,
+          url: baseUrl + m.media.data.attributes.url,
+          type: MediaType.image,
+          size: m.size,
+        }))
         : undefined,
     type: raw.attributes.type,
     date: raw.attributes.date ? new Date(raw.attributes.date) : undefined,

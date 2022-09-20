@@ -1,15 +1,23 @@
 <template>
   <article
-    :class="`process__step col-${size.width + spacingX}`"
+    :class="`process__step col-${size.width}`"
     :style="style"
-    data-scroll-speed="4"
     data-scroll
+    data-scroll-speed="1"
   >
-    <header>
+    <header :id="'step__header__' + step.index" data-scroll>
       <div class="process__step__number__container">
         <span class="process__step__number">0{{ step.index + 1 }}</span>
       </div>
-      <div class="process__step__title__container">
+      <div
+        class="process__step__title__container"
+        data-scroll
+        data-scroll-position="right"
+        data-scroll-sticky
+        data-scroll-offset="-24"
+        data-scroll-speed="1"
+        :data-scroll-target="'#step__header__' + step.index"
+      >
         <h3 class="process__step__title">{{ step.title }}</h3>
       </div>
     </header>
@@ -42,8 +50,6 @@ const defaultSize: Size = {
 
 // eslint-disable-next-line no-undef
 const props = defineProps<ProcessStepProps>();
-
-const spacingX = computed(() => (window.innerWidth < 600 ? 5 : 2));
 
 const size = computed<Size>(() =>
   Object.assign({}, defaultSize, props.step.size)
