@@ -1,38 +1,41 @@
 <template>
   <article
-    :class="`process__step col-${size.width}`"
-    :style="style"
+    class="process__step__container"
     data-scroll
-    data-scroll-speed="1"
+    :data-scroll-id="`process-step-${index}`"
+    :class="`col-${size.width} row-${size.height}`"
+    :style="style"
   >
-    <header :id="'step__header__' + step.index" data-scroll>
-      <div class="process__step__number__container">
-        <span class="process__step__number">0{{ step.index + 1 }}</span>
-      </div>
-      <div
-        class="process__step__title__container"
-        data-scroll
-        data-scroll-position="right"
-        data-scroll-sticky
-        data-scroll-offset="-24"
-        data-scroll-speed="1"
-        :data-scroll-target="'#step__header__' + step.index"
-      >
-        <h3 class="process__step__title">{{ step.title }}</h3>
-      </div>
-    </header>
+    <div class="process__step" :style="cardStyle">
+      <header :id="'step__header__' + index" data-scroll>
+        <div class="process__step__title__container">
+          <h3 class="process__step__title">{{ card.title }}</h3>
+        </div>
+      </header>
 
-    <p v-if="step.content" :innerHTML="content"></p>
+      <Vue3Lottie :animation-data="card.animation" :speed="0.75" height="50%" />
+
+      <div class="process__step__text__container">
+        <span class="process__step__number">0{{ index + 1 }}</span>
+        <p v-if="card.content" v-html="content"></p>
+      </div>
+    </div>
   </article>
 </template>
 
 <script setup lang="ts">
-import type { ProcessStep } from '@/api/types';
 import { computed } from 'vue';
+import { Vue3Lottie } from 'vue3-lottie';
+import { useProcessData } from '@/store/processData';
+import { useResponsiveData } from '@/store/responsiveData';
 
 interface ProcessStepProps {
-  step: ProcessStep;
+  index: number;
 }
+
+const processData = useProcessData();
+const responsiveData = useResponsiveData();
+const card = computed(() => processData.getCard(props.index));
 
 interface Size {
   x: number | undefined;
@@ -41,94 +44,133 @@ interface Size {
   width: number | undefined;
 }
 
-const defaultSize: Size = {
-  y: undefined,
-  x: undefined,
-  height: undefined,
-  width: 5,
-};
-
-// eslint-disable-next-line no-undef
 const props = defineProps<ProcessStepProps>();
 
-const size = computed<Size>(() =>
-  Object.assign({}, defaultSize, props.step.size)
+const width = computed(() =>
+  responsiveData.getValue(
+    {
+      mobile: 5,
+      tablet: 8,
+      default: 8,
+    },
+    responsiveData.breakpoint
+  )
 );
 
-const style = computed(() => ({
-  gridColumnStart:
-    typeof size.value.x === 'number' ? size.value.x + 3 : undefined,
-  gridRowStart: typeof size.value.y === 'number' ? size.value.y : undefined,
+const startX = computed(() =>
+  responsiveData.getValue(
+    {
+      mobile: 6,
+      tablet: 9,
+      default: 12,
+    },
+    responsiveData.breakpoint
+  )
+);
+
+const size = computed(() => ({
+  y: 3,
+  x: props.index * width.value,
+  width: width.value,
+  height: 9,
 }));
 
-const content =
-  props.step.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>') ?? undefined;
+const style = computed(() => ({
+  gridColumnStart: size.value.x + startX.value,
+  gridColumnEnd: 'span ' + size.value.width,
+  gridRowStart: size.value.y,
+  zIndex: 2 + props.index,
+}));
+
+const cardStyle = computed(() => ({
+  transform: `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${card.value.translate.x},${card.value.translate.y},0,1)`,
+}));
+
+const content = computed(() =>
+  (card.value.content ?? '').replace(/(?:\r\n|\r|\n)/g, '<br/>')
+);
 </script>
 
 <style scoped lang="sass">
 @include col-x
 @include row-x
 
+.process__step__container
+  position: relative
+  //width: calc($cell-width * 8 + $unit * 7)
+  margin-right: calc($cell-width + $unit)
+  grid-column-end: span 8
+
 .process__step
   @include blur-bg
   display: flex
   flex-direction: column
-  gap: $unit * 2
-  padding: $unit * 3 $unit $unit $unit
+  gap: $unit-d
+  padding: calc($unit * 3)
+  padding-left: calc($unit * 4)
   border: 1px solid $c-grey
   border-radius: $unit
-  position: relative
+  border-top-left-radius: calc($unit * 3)
+  height: 100%
+  width: 100%
   z-index: 1
-  height: max-content
+  position: relative
+  max-height: max-content
 
   header
     display: flex
-    flex-direction: row
-    height: $unit * 3
-    width: 100%
+    flex-direction: column
+    width: calc($unit * 3)
+    height: auto
     gap: $unit
     position: absolute
-    top: -$unit * 1.5
-    left: -$unit * 1.5
+    top: calc($unit * 3)
+    left: calc($unit * -1.625)
     z-index: 2
     transform: scale(1)
-
-    .process__step__number__container
-      display: flex
-      height: $unit * 3
-      width: $unit * 3
-      min-width: $unit * 3
-      background-color: $c-black
-      border-radius: 50%
-      justify-content: center
-      padding: calc($unit / 2)
-      align-items: center
-
-      span
-        @include process-step
-        color: $c-white
 
     .process__step__title__container
       justify-content: center
       align-items: center
       display: flex
-      border-radius: $unit * 1.5
+      border-radius: calc($unit * 1.5)
       background-color: $c-white
-      height: $unit * 3
-      width: max-content
-      padding: calc($unit / 2) $unit
+      width: calc($unit * 3)
+      height: max-content
+      padding: $unit $unit-h
       z-index: 2
 
 
       h3
         @include process-step
         color: $c-black
+        text-orientation: mixed
+        writing-mode: vertical-lr
+        transform: rotate(180deg)
+
+  .process__step__text__container
+    display: grid
+    grid-template-columns: calc($cell-width * 2 - $unit-d) 1fr
+    gap: 0
+    min-height: calc($cell-height * 3 - $unit)
+    height: max-content
+    padding-right: calc($cell-width - $unit-d)
+
+    align-items: baseline
+
+    .process__step__number
+      @include title-medium
+      color: $c-grey
+      text-shadow: $text-shadow
 
   p
     width: 100%
     @include body
-    color: $c-grey
+    color: $c-white
     height: max-content
     min-height: max-content
     white-space: normal
+
+    @media only screen and (max-width: $b-mobile)
+      @include process-step
 </style>

@@ -5,7 +5,7 @@ export const fr: Translation = {
     projects: 'Projets\nd\'étallonage',
     process: 'Processus',
     studio: 'Un studio créatif\nen plein Paris',
-    about: 'À propos',
+    about: 'À propos de Zoë Candito',
   },
   filters: {
     clips: 'Clips',
@@ -20,12 +20,16 @@ export const fr: Translation = {
     contact: 'Contact',
     back: 'Retour',
     hook: 'Un projet ? Une question ?',
+    projectManagement: 'Gestion des projets',
   },
   sections: {
     studio: {
       address: '24, Rue de Saint Antoine\n4ème arrondissement\n75004 Paris',
       hook: 'Entre brainstorming et ajustements de courbes, le studio sait s’effacer pour laisser libre court à la vision de vos projets.',
       cta: 'Prendre rendez-vous',
+    },
+    about: {
+      clients: 'Selected clients',
     },
   },
   project: {

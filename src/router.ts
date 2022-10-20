@@ -6,29 +6,9 @@ import AdminPanel from './views/admin/AdminPanel.vue';
 import ProjectList from './views/admin/ProjectList.vue';
 import AdminDashboard from './views/admin/AdminDashboard.vue';
 
-import { createRouter, createWebHistory } from 'vue-router';
-// import { identifier, useProjectData } from './store/projectData';
-// import { fetchProjectById } from './api/projects';
-// import { extractPaletteFromUrl } from './utils/gradient';
+import GridTest from './views/GridTest.vue';
 
-// const fetchProject = async (ID: identifier) => {
-//   conprojectData = useProjectData();
-//   try {
-//     if (ID) {
-//       projectData.selectProject(ID);
-//       const fetchedProject = await fetchProjectById(ID);
-//       if (fetchedProject && !Array.isArray(fetchedProject)) {
-//         console.log(fetchedProject);
-//         const palette = await extractPaletteFromUrl(
-//           fetchedProject.thumbnailUrl
-//         );
-//         projectData.updateProject(fetchedProject, true);
-//       }
-//     }
-//   } catch (e) {
-//     console.error(e);
-//   }
-// };
+import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
   {
@@ -50,11 +30,6 @@ const routes = [
     name: 'contact',
   },
   {
-    path: '/admin/new-project',
-    component: ProjectEditor,
-    name: 'projectEditor',
-  },
-  {
     path: '/admin',
     component: AdminPanel,
     name: 'AdminPanel',
@@ -71,7 +46,22 @@ const routes = [
         path: 'media',
         component: ProjectList,
       },
+      {
+        path: 'project-editor/:id',
+        component: ProjectEditor,
+        name: 'projectEditor',
+      },
+      {
+        path: 'project-editor/new',
+        component: ProjectEditor,
+        name: 'projectEditorCreate',
+      },
     ],
+  },
+  {
+    path: '/grid-test',
+    component: GridTest,
+    name: 'GridTest',
   },
 ];
 
@@ -83,7 +73,8 @@ const router = createRouter({
 router.afterEach((to, from) => {
   const betweenProjects =
     to.name === 'projectDetails' && from.name === 'projectDetails';
-  to.meta.transitionName = betweenProjects ? 'slide-up' : 'fade';
+  to.meta.transitionName =
+    to?.meta?.transitionName ?? betweenProjects ? 'slide-up' : 'fade';
 });
 
 export default router;

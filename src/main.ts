@@ -11,22 +11,27 @@ import { ParticleRenderer } from '@pixi/particle-container';
 import { Prepare } from '@pixi/prepare';
 import { createI18n } from 'vue-i18n';
 
+import 'vue3-lottie/dist/style.css';
+
 import router from './router';
 import App from './App.vue';
 import { translations } from '@/translations';
+import InlineSvg from 'vue-inline-svg';
 
 const pinia = createPinia();
 
 const i18n = createI18n({
   legacy: false,
-  locale: 'fr',
+  locale: 'en',
   fallbackLocale: 'en',
   messages: translations,
 });
 
 const app = createApp(App);
-
 app.use(pinia);
+
+app.component('inline-svg', InlineSvg);
+
 app.use(i18n);
 app.use(router);
 

@@ -1,12 +1,16 @@
 import { Project } from '@/store/projectData';
 import { gsap, Power3 } from 'gsap';
+import {
+  cellHeight,
+  cellWidth,
+  responsiveValue,
+  unit,
+} from '@/utils/responsive';
+import { ScrollSectionId } from '@/store/scrollData';
+import { gridLength } from '@/utils/grid';
 
 export const generateProjectLink = (project: Project) =>
   `/project/${project.id}/${project.title.replaceAll(' ', '-').toLowerCase()}`;
-
-export const unit = 12;
-export const cellWidth = () => (window.innerWidth - unit) / 19 - unit;
-export const cellHeight = () => (window.innerHeight - unit) / 12 - unit;
 
 export const transitionToProjectPage = (
   img?: HTMLDivElement,
@@ -33,7 +37,8 @@ export const transitionProjectThumbnail = (
   // generate needed scale and position to fill screen;
   img.style.minHeight = rect.height + 'px';
   const scaleX = window.innerWidth / rect.width;
-  const scaleY = (window.innerHeight - cellHeight() - unit * 2) / rect.height;
+  const scaleY =
+    (window.innerHeight - cellHeight() * 2 - unit() * 3) / rect.height;
   const scale = Math.max(scaleX, scaleY);
   img.classList.add('transition');
   tl.to(
@@ -56,16 +61,73 @@ export const transitionProjectInfo = (
   const rect = info.getBoundingClientRect();
   info.classList.add('transition');
 
-  const x = -rect.x + cellWidth() * 6 + unit * 7;
-  const y = -rect.y + cellHeight() * 7 + unit * 8;
+  const rows = responsiveValue({
+    default: 7,
+    tablet: 4,
+    mobile: 2,
+  });
+
+  const columns = responsiveValue({
+    default: 7,
+    tablet: 8,
+    mobile: 2,
+  });
+
+  const width = gridLength(
+    responsiveValue({
+      default: 12,
+      tablet: 12,
+      mobile: 7,
+    }),
+    'x'
+  );
+
+  const x = -rect.x + cellWidth() * (rows - 1) + unit() * rows;
+  const y = -rect.y + cellHeight() * (columns - 1) + unit() * columns;
   tl.to(
     info,
     {
       x,
       y,
+      width,
       duration: 0.6,
       ease: Power3.easeInOut,
     },
     0
   );
 };
+
+type navLink = {
+  title: string;
+  to: string;
+  identifier?: string;
+  id: ScrollSectionId;
+  [key: string]: string | undefined;
+};
+
+export const sectionLinks: navLink[] = [
+  {
+    title: 'nav.projects',
+    to: '/#projects',
+    identifier: '#section__projects',
+    id: 'projects',
+  },
+  {
+    title: 'nav.process',
+    to: '/#process',
+    identifier: '#section__process',
+    id: 'process',
+  },
+  {
+    title: 'nav.studio',
+    to: '/#studio',
+    identifier: '#section__studio',
+    id: 'studio',
+  },
+  {
+    title: 'nav.about',
+    to: '/#about',
+    identifier: '#section__about',
+    id: 'about',
+  },
+];

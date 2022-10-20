@@ -5,10 +5,10 @@ export const en: Translation = {
     projects: 'Color grading\nprojects',
     process: 'Process',
     studio: 'Creative studio\nin Paris',
-    about: 'About me',
+    about: 'About',
   },
   filters: {
-    clips: 'Music videos',
+    clips: 'Music',
     pubs: 'Advertising',
     fiction: 'Fiction',
   },
@@ -19,13 +19,17 @@ export const en: Translation = {
     about: 'About',
     contact: 'Contact',
     back: 'Back',
-    hook: 'Got a project for me? Let\'s get in touch!',
+    hook: 'Got a project for me? Let\'s get in touch!', // eslint-disable-line prettier/prettier
+    projectManagement: 'Project Management',
   },
   sections: {
     studio: {
       address: '24, Rue de Saint Antoine\n4ème arrondissement\n75004 Paris',
       hook: 'Entre brainstorming et ajustements de courbes, le studio sait s’effacer pour laisser libre court à la vision de vos projets.',
       cta: 'Book a session',
+    },
+    about: {
+      clients: 'Selected clients',
     },
   },
   project: {

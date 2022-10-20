@@ -1,242 +1,521 @@
 <script setup lang="ts">
-import { Project, useProjectData } from '@/store/projectData';
-import { computed } from 'vue';
+import { identifier, Project, useProjectData } from '@/store/projectData';
+import { computed, watch } from 'vue';
 import { reactive, ref } from 'vue';
-import { formatNumber } from '@/utils/format';
 import Scroller from '../ScrollContainer.vue';
-import MuteToggle from '@/components/MuteToggle.vue';
-import ProjectMedia from '@/components/ProjectMedia.vue';
+import ProjectContents from '@/components/Project/ProjectContents.vue';
+import { useRoute } from 'vue-router';
+import {
+  addMediasToProject,
+  deleteProjectMedia,
+  fetchProjectById,
+  setMediaSizes,
+  updateProject,
+} from '@/api/projects';
+import { useI18n } from 'vue-i18n';
+import { FileRejectReason, useDropzone } from 'vue3-dropzone';
+import ProjectMediaItem from '@/components/ProjectMedia.vue';
+import { formatNumber } from '@/utils/format';
+import { GridLayoutData } from '@/utils/grid';
 
+const route = useRoute();
 const projectData = useProjectData();
+const { t } = useI18n();
 
-const project = reactive<Partial<Project>>({});
+const mediaPanelOpen = ref(false);
+const infoPanelOpen = ref(false);
+const saving = ref(false);
+const saved = ref(false);
+const infoPanelRef = ref<HTMLElement>();
+const mediaPanelRef = ref<HTMLElement>();
 
-const formattedDate = computed<string>(() => {
-  if (!project?.date) return '0';
-  let m = project?.date?.getMonth();
-  const M = m && m < 10 ? `0${m}` : String(m);
-  return `${M}/${project?.date?.getFullYear()}`;
+const project = reactive<Partial<Project>>({
+  title: 'New Project',
+  ...(projectData.selectedProject ?? {}),
 });
 
-const index = ref<string>('01');
+const isInfoFilled = ({
+  id,
+  type,
+  date,
+  title,
+  client,
+}: Partial<Project>): boolean =>
+  !!client && !!type && !!id && !!title && !!date && title?.length > 0;
 
-const onCoverChange = (e) => {
-  console.log(e.target.files);
+const infoSaveAllowed = computed(() => isInfoFilled(project));
+
+const gridLayout = ref<GridLayoutData>();
+
+const displayDate = computed({
+  get() {
+    const D = project.date ?? new Date(Date.now());
+    const m = D.getMonth() + 1;
+    const d = D.getDate();
+    const y = D.getFullYear();
+    const s = `${y}-${formatNumber(m)}-${d}`;
+    console.log(s);
+    return s;
+  },
+  set(newVal: string) {
+    project.date = new Date(newVal);
+  },
+});
+
+const toggleInfoPanel = () => {
+  infoPanelOpen.value = !infoPanelOpen.value;
 };
+
+const toggleMediaPanel = () => {
+  mediaPanelOpen.value = !mediaPanelOpen.value;
+};
+
+const fetchProject = async (updateMedia?: boolean) => {
+  const ID: identifier | null = route?.params?.id
+    ? String(route.params.id)
+    : null;
+  if (ID) {
+    projectData.selectProject(Number(String(project.id ?? route.params.id)));
+    let fetchedProject = projectData.selectedProject;
+    if (!fetchedProject?.fullyFetched || updateMedia) {
+      console.warn('project ' + fetchedProject?.title + ' needs full fetch');
+      const justFetched = await fetchProjectById(ID);
+      if (justFetched !== null && !Array.isArray(justFetched)) {
+        fetchedProject = justFetched;
+      }
+    }
+    if (
+      fetchedProject &&
+      fetchedProject?.id &&
+      !Array.isArray(fetchedProject)
+    ) {
+      console.log(fetchedProject, fetchedProject.media);
+      projectData.updateProject(fetchedProject, true);
+      if (updateMedia && fetchedProject.media) {
+        project.media = fetchedProject.media;
+      }
+    }
+    return fetchedProject;
+  }
+};
+
+const onDrop = async (files: File[], rejectReasons: FileRejectReason[]) => {
+  console.log(rejectReasons);
+  if (files.length > 0 && project.id) {
+    const response = await addMediasToProject(
+      project.id,
+      project.media?.length ?? 0,
+      files
+    );
+    if (response) {
+      fetchProject(true);
+    }
+  }
+};
+
+const { getInputProps, getRootProps, isDragActive } = useDropzone({
+  onDrop,
+  accept: 'image/*',
+});
+
+const onInfoPanelScroll = (e: WheelEvent) => {
+  if (!infoPanelRef.value) return;
+  infoPanelRef.value.scrollTop += e.deltaY;
+};
+
+const onMediaPanelScroll = (e: WheelEvent) => {
+  if (!mediaPanelRef.value) return;
+  mediaPanelRef.value.scrollTop += e.deltaY;
+};
+
+const deleteMedia = async (mediaId: identifier) => {
+  if (project.id) {
+    const res = await deleteProjectMedia(project.id, mediaId);
+    if (res) {
+      fetchProject(true);
+    }
+  }
+};
+
+const onGridLayout = (l: GridLayoutData) => {
+  gridLayout.value = l;
+};
+
+const saveLayout = async () => {
+  console.log('save btn press', gridLayout.value);
+  if (
+    gridLayout.value &&
+    project.media &&
+    (project.media ?? []).length > 0 &&
+    project.id &&
+    !saving.value
+  ) {
+    console.log('saving');
+    saving.value = true;
+    const mediaSizes = (gridLayout.value?.items ?? []).map((item) => ({
+      id: item.id,
+      size: {
+        width: item.width,
+        height: item.height,
+        x: item.x,
+        y: item.y,
+      },
+    }));
+    const res = await setMediaSizes(project.id, mediaSizes);
+    if (res) {
+      await fetchProject(true);
+      saved.value = true;
+    }
+    saving.value = false;
+  }
+};
+
+const saveProjectInfo = async () => {
+  const p = Object.assign({}, project);
+  if (isInfoFilled(p)) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    updateProject(p);
+  }
+};
+
+watch(
+  () => route.params.id,
+  () => fetchProject()
+);
+
+watch(
+  () => projectData.selectedProject,
+  (data) => {
+    Object.entries(data ?? {}).forEach(([key, value]) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (project[key] !== value && saved.value) {
+        saved.value = false;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      project[key] = value;
+    });
+  }
+);
+
+fetchProject();
 </script>
 
 <template>
   <Scroller direction="vertical" :delay="600">
     <div id="scroll__container">
-      <section
-        id="page__project__details"
-        class="has-scroll-dragging"
-        data-scroll-section
-      >
-        <div id="project__cover__container" data-scroll data-scroll-speed="2">
-          <video
-            v-if="project?.videoUrl"
-            crossorigin="anonymous"
-            class="project__cover"
-            id="project__video"
-            :src="project.videoUrl"
-            disablePictureInPicture
-            preload="auto"
-            ref="videoRef"
-            loop
-            autoplay
-            :muted="!projectData.soundActive"
-          ></video>
-          <img
-            v-else-if="project.thumbnailUrl"
-            crossorigin="anonymous"
-            class="project__cover"
-            :src="project?.thumbnailUrl"
-            :alt="project?.title"
-          />
-          <label v-else class="project__cover">
-            <div id="cover__input__inside"></div>
-            <input type="file" @change="onCoverChange" />
-          </label>
-        </div>
-        <span id="project__type" class="project__info">{{
-          project?.type
-        }}</span>
-        <span id="project__date" class="project__info">{{
-          formattedDate
-        }}</span>
-        <div id="project__title__container">
-          <h3 v-if="project?.client" id="project__client" class="project__info">
-            — {{ project?.client }}
-          </h3>
-          <h1 id="project__title">
-            {{ project?.title }}
-          </h1>
-          <span id="project__index__container">
-            <span class="project__info project__index">{{ index }}</span>
-            <span class="project__count"
-              >/{{ formatNumber(projectData.projects.length) }}</span
-            >
-          </span>
-        </div>
-
-        <div id="mute__toggle__container">
-          <MuteToggle />
-        </div>
-
-        <button
-          type="button"
-          id="scroll__indicator"
-          class="details__btn"
-          @click="scrollDown"
-        >
-          <span> Scroll</span>
-          <div class="icon__container">
-            <Arrow :rotation="-90" />
-          </div>
-        </button>
-
-        <project-media
-          v-if="project?.media && project?.media?.length > 0"
-          v-for="media in project?.media"
-          :key="media.id"
-          :media="media"
-        />
-      </section>
-      <next-project></next-project>
+      <project-contents
+        :project="project"
+        editable
+        @deleteItem="deleteMedia"
+        @gridLayout="onGridLayout"
+      />
     </div>
   </Scroller>
+  <button
+    id="btn__open__info"
+    :class="{ active: !infoPanelOpen, edit__btn: true }"
+    @click="toggleInfoPanel"
+  >
+    Info
+  </button>
+
+  <button
+    id="btn__open__media"
+    :class="{ active: !mediaPanelOpen, edit__btn: true }"
+    @click="toggleMediaPanel"
+  >
+    Media
+  </button>
+  <button
+    id="btn__save__layout"
+    :disabled="saving || !gridLayout"
+    :class="{
+      active: mediaPanelOpen,
+      disabled: saving || !gridLayout,
+      edit__btn: true,
+    }"
+    @click="saveLayout"
+  >
+    {{ saving ? 'Saving' : saved ? 'Saved!' : 'Save layout' }}
+  </button>
+  <button id="btn__unpin" :class="{ active: mediaPanelOpen, edit__btn: true }">
+    Unpin all
+  </button>
+
+  <button
+    id="btn__save__info"
+    :disabled="saving || !infoSaveAllowed"
+    :class="{
+      active: infoPanelOpen,
+      disabled: saving || !infoSaveAllowed,
+      edit__btn: true,
+    }"
+    @click="saveProjectInfo"
+  >
+    {{ saving ? 'Saving' : saved ? 'Saved!' : 'Save info' }}
+  </button>
+  <aside
+    id="edit__panel"
+    :class="{ open: infoPanelOpen }"
+    @wheel.prevent="onInfoPanelScroll"
+  >
+    <button
+      id="btn__close__info"
+      class="active edit__btn"
+      @click="toggleInfoPanel"
+    >
+      Close
+    </button>
+    <h2>Info</h2>
+    <div class="edit__content" ref="infoPanelRef">
+      <label
+        >Title
+        <input type="text" v-model="project.title" />
+      </label>
+      <label
+        >Client
+        <input type="text" v-model="project.client" />
+      </label>
+      <label
+        >Date
+        <input type="date" v-model="displayDate" />
+      </label>
+      <label
+        >Category
+        <select v-model="project.type">
+          <option value="pub">{{ t('project.type.pub') }}</option>
+          <option value="fiction">{{ t('project.type.fiction') }}</option>
+          <option value="clip">{{ t('project.type.clip') }}</option>
+        </select>
+      </label>
+    </div>
+  </aside>
+  <aside
+    id="edit__media__panel"
+    :class="{ open: mediaPanelOpen }"
+    @wheel.prevent="onMediaPanelScroll"
+  >
+    <button
+      id="btn__close__media"
+      class="active edit__btn"
+      @click="toggleMediaPanel"
+    >
+      Close
+    </button>
+    <h2>Medias</h2>
+    <div class="edit__content" ref="mediaPanelRef">
+      <div id="dropzone__container">
+        <div id="dropzone" :class="{ isDragActive }" v-bind="getRootProps()">
+          <input type="file" v-bind="getInputProps()" />
+          <p v-if="isDragActive">Drop the files here ...</p>
+          <p v-else>Drag 'n' drop some files here, or click to select files</p>
+        </div>
+      </div>
+      <div id="edit__medias">
+        <template v-if="project.media && project.media.length > 0">
+          <article
+            class="editor__media"
+            v-for="(media, index) in project.media"
+            :key="media.id"
+          >
+            <project-media-item :media="media" />
+            <span class="media__index">{{ formatNumber(index + 1) }}</span>
+            <button
+              class="btn__delete hover__underline"
+              @click="deleteMedia(media.id)"
+            >
+              Delete
+            </button>
+          </article>
+        </template>
+      </div>
+    </div>
+  </aside>
 </template>
 
 <style lang="sass" scoped>
 
 #scroll__container
   width: 100%
+  min-height: var(--app-height)
+  padding-bottom: calc($cell-height + $unit)
 
-#page__project__details
-  @include grid(19, true, auto-fit, row)
-  // padding-top: calc($cell-height + $unit + $unit)
-  width: 100%
-  max-width: 100vw
-  height: max-content !important
-  min-height: max-content
-  // min-height: max-content
+aside
+  @include blur-bg
+  position: fixed
 
-  #project__cover__container
-    grid-column: 1 / -1
-    grid-row: 1 / span 11
-    width: calc(100% + $unit * 2)
-    height: calc(100% + $unit)
-    margin: -$unit
-    margin-bottom: 0
-    z-index: 1
+  top: calc($cell-height + $unit-d)
+  bottom: calc($unit * 5)
+  width: calc($cell-width * 5 + $unit * 4)
+  border-radius: $unit
+  z-index: 10
+  padding: $unit
+  transition: transform 0.6s $bezier 0s
+  display: flex
+  flex-direction: column
+  gap: $unit
 
-  .project__cover
+  &#edit__panel
+    right: $unit
+    transform: translateX(0)
+
+    &:not(.open)
+      transform: translateX(calc($cell-width * 5 + $unit * 5))
+
+  &#edit__media__panel
+    left: $unit
+    transform: translateX(0)
+
+    &:not(.open)
+      transform: translateX(calc($cell-width * -5 - $unit * 5))
+
+    h2
+      text-align: right
+
+    #edit__medias
+      display: flex
+      flex-direction: column
+      gap: $unit-h
+      padding-bottom: $cell-height
+
+  .edit__content
+    display: flex
     width: 100%
-    height: 100%
-    object-fit: cover
-    pointer-events: none
-    user-select: none
-    -webkit-user-select: none
+    flex-grow: 1
+    flex-direction: column
+    gap: $unit
+    padding: $unit 0
+    overflow-y: scroll
+    border-radius: $unit
 
-    #cover__input__inside
-      width: 100%
-      height: 100%
-      background-color: red
-      pointer-events: all
-      user-select: all
-
-    input[type="file"]
+    ::-webkit-scrollbar
       display: none
 
-  #project__type
-    grid-column-start: 4
-    grid-row-start: 8
-    @media screen and (max-width: 600px)
-      grid-column-start: 1
-      grid-row-start: 7
-
-  #project__date
-    grid-column-start: 5
-    grid-row-start: 8
-    @media screen and (max-width: 600px)
-      grid-column-start: 3
-      grid-row-start: 7
-
-  #project__title__container
-    grid-column-start: 7
-    grid-column-end: 18
-    grid-row-start: 8
-    grid-row-end: 11
-    height: 100%
-    width: max-content
-    max-width: 100%
+  label, .label
+    @include detail
     display: flex
     flex-direction: column
-    gap: 0px
-    align-items: flex-start
-    justify-content: flex-start
-    z-index: 2
+    gap: $unit-h
+    width: 100%
+    color: $c-grey
 
-    @media screen and (max-width: 600px)
-      grid-column-start: 1
-      grid-row-start: 8
-      grid-column-end: -1
-
-  #project__index__container
-    align-self: flex-end
-
-  #project__title
-    transform: translateX(-5px)
-    z-index: 2
-    max-width: 100%
-    width: auto
-    word-break: break-word
-
-
-  .details__btn
-    @include link
-    height: max-content
-    width: max-content
-    display: flex
+  input, select, #dropzone
+    @include blur-bg
+    @include body
+    background: rgba(0, 0, 0, 0.25)
     color: $c-white
-    align-items: flex-start
-    padding: 0
-    z-index: 2
+    padding: $unit-h
+    width: 100%
+    border-radius: $unit-h
+    color-scheme: dark
 
+  input[type="file"]
+    display: none
 
-  #scroll__indicator
-    grid-column-start: -5
-    grid-column-end: -2
-    grid-row: 11 / span 1
-    justify-self: end
-    z-index: 2
-    cursor: pointer
+  #dropzone
+    border: 1px solid $c-grey
+    height: calc($cell-height * 1)
+    @include detail
+    display: flex
+    align-items: center
+    justify-content: center
+    flex-grow: 1
+    backdrop-filter: blur(10px)
+    -webkit-backdrop-filter: blur(10px)
+    background: rgba(255, 255, 255, 0.1)
 
-    .icon__container
-      transition: transform .3s ease-in
+  #dropzone__container
+    display: flex
+    gap: $unit-h
+    position: fixed
+    bottom: $unit-h
+    left: $unit-h
+    right: $unit-h
+    z-index: 10
 
-    svg
-      margin-top: 3.5px
-      height: 12px
+  #btn__files
+    height: 100%
+    padding: $unit-h
+    background: $c-grey
+    color: $c-black
+    border-radius: $unit-h
 
-    &:hover .icon__container
-      transform: translateY(math.div($unit, 2))
+    span
+      @include detail
 
-  #mute__toggle__container
-    grid-column-start: 2
-    grid-column-end: 5
-    grid-row: 11 / span 1
-    z-index: 2
+  .editor__media
+    width: 100%
+    height: calc($cell-height * 3 + $unit-d)
+    border-radius: $unit-h
+    overflow: hidden
+    position: relative
 
-.project__info
-  @include body
-  color: $c-white
-  text-transform: capitalize
-  z-index: 2
+    .media__index
+      position: absolute
+      top: $unit
+      left: $unit
+      color: $c-grey
 
-.project__count
+    .btn__delete
+      @include body
+      position: absolute
+      top: $unit
+      right: $unit
+      color: $c-white
+
+.edit__btn
+  position: fixed
   @include detail
-  color: $c-white
-  opacity: 0.7
+  height: calc($unit * 3)
+  width: calc($unit * 3)
+  border-radius: calc($unit * 1.5)
+  background: $c-white
+  color: $c-black
+  z-index: 11
+  cursor: pointer
+  transform: scale(1)
+  transition: transform 0.6s $bezier 0s
+
+  &:not(.active)
+    transform: scale(0)
+
+  &.disabled
+    background: $c-black
+    color: $c-grey
+    cursor: not-allowed
+
+#btn__close__info
+  top: $unit
+  right: $unit
+
+#btn__close__media
+  top: $unit
+  left: $unit
+
+#btn__save__layout
+  bottom: $unit
+  left: calc($cell-width * 3 + $unit * 4)
+  width: calc($cell-width * 2 + $unit)
+
+
+#btn__unpin
+  bottom: $unit
+  width: calc($unit * 6)
+  left: $unit
+
+#btn__open__info
+  right: $unit-d
+  top: calc($cell-height + $unit * 3)
+
+#btn__open__media
+  left: $unit-d
+  top: calc($cell-height + $unit * 3)
+
+#btn__save__info
+  right: $unit
+  bottom: $unit
+  width: calc($cell-width * 5 + $unit * 4)
 </style>

@@ -39,10 +39,14 @@
     "path": "^0.12.7",
     "pinia": "^2.0.14",
     "sass": "^1.52.1",
+    "strapi-sdk-js": "^2.2.0",
     "vite-plugin-glsl": "^0.1.2",
     "vue": "^3.2.25",
     "vue-i18n": "9",
-    "vue-router": "^4.0.15"
+    "vue-inline-svg": "^3.1.0",
+    "vue-router": "^4.0.15",
+    "vue3-dropzone": "^2.0.1",
+    "vue3-lottie": "^2.3.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.3",

@@ -1,39 +1,18 @@
 <template>
   <div id="grid__overlay" v-if="show">
     <template v-if="showCols">
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
-      <div class="grid__column"></div>
+      <div
+        :class="`grid__column c${c}`"
+        v-for="c in colCount"
+        :key="'col' + c"
+      ></div>
     </template>
     <template v-if="showRows">
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
-      <div class="grid__row"></div>
+      <div
+        :class="`grid__row r${r}`"
+        v-for="r in rowCount"
+        :key="'row' + r"
+      ></div>
     </template>
   </div>
 </template>
@@ -42,12 +21,16 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useGradientData } from '@/store/gradientData';
 import { generateRandomHexColor } from '@/utils/gradient';
+import { columns, rows } from '@/utils/responsive';
 
 const gradientData = useGradientData();
 
 const show = ref<boolean>(false);
 const showRows = ref<boolean>(false);
-const showCols = ref<boolean>(false);
+const showCols = ref<boolean>(true);
+
+const rowCount = ref(rows());
+const colCount = ref(columns());
 
 const onKey = (e: KeyboardEvent) => {
   if (e.key === 'g' || e.key === 'G') {
@@ -76,12 +59,20 @@ const onKey = (e: KeyboardEvent) => {
   }
 };
 
+const onResize = () => {
+  rowCount.value = rows();
+  console.log(rowCount.value);
+  colCount.value = columns();
+};
+
 onMounted(() => {
   window.addEventListener('keydown', onKey);
+  window.addEventListener('resize', onResize);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKey);
+  window.removeEventListener('resize', onResize);
 });
 </script>
 
@@ -93,8 +84,8 @@ onBeforeUnmount(() => {
   right: 0
   bottom: 0
   display: grid
-  grid-template-columns: repeat(19, 1fr)
-  grid-template-rows: repeat(12, 1fr)
+  grid-template-columns: repeat($columns, 1fr)
+  grid-template-rows: repeat($rows, 1fr)
   gap: $unit
   padding: $unit
   pointer-events: none
@@ -107,8 +98,8 @@ onBeforeUnmount(() => {
   // height: 100%
   // width: 100%
   background: rgba(255, 255, 255, 0.1)
-  @for $i from 1 through 19
-    &:nth-child(#{$i})
+  @for $i from 0 through 19
+    &.c#{$i}
       grid-column: $i / span 1
 
 .grid__row
@@ -117,7 +108,7 @@ onBeforeUnmount(() => {
   // width: 100%
   grid-column: 1 / -1
 
-  @for $i from 1 through 12
-    &:nth-child(#{$i + 19})
+  @for $i from 1 through 18
+    &.r#{$i}
       grid-row: $i / span 1
 </style>

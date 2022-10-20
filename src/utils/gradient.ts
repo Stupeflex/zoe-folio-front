@@ -151,12 +151,20 @@ export const extractPaletteFromUrl = (
     i.src = imgUrl;
   });
 
-export const defaultPalette = [
+export const defaultPaletteOld = [
   '#111114',
   '#D18D24',
   '#539A84',
   '#223',
   '#111114',
+].map((hex) => hexToRgb(hex));
+
+export const processSectionPalette = [
+  '#738290',
+  '#a1b5d8',
+  '#223',
+  '#e4f0d0',
+  '#c2d8b9',
 ].map((hex) => hexToRgb(hex));
 
 export const studioSectionPalette = [
@@ -167,10 +175,12 @@ export const studioSectionPalette = [
   '#564592',
 ].map((hex) => hexToRgb(hex));
 
-export const processSectionPalette = [
+export const defaultPalette = [
   '#D8CFAF',
   '#E6B89C',
   '#ED9390',
   '#F374AE',
-  '#6E8776',
+  '#6F8982',
 ].map((hex) => hexToRgb(hex));
+
+export const palette1 = ['#8ab0ab', '#3e505b', '#26413c', '#1a1d1a', '#03120e'];

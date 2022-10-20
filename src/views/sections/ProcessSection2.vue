@@ -1,0 +1,103 @@
+<script lang="ts" setup>
+import ProcessStepCard from '@/components/ProcessStepCard.vue';
+import { computed } from 'vue';
+import { useScrollData } from '@/store/scrollData';
+import { scrollSpeedToBlurStyle } from '@/utils/effects';
+import { useI18n } from 'vue-i18n';
+import { useProcessData } from '@/store/processData';
+
+const processData = useProcessData();
+const scrollData = useScrollData();
+const { t } = useI18n();
+
+const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
+</script>
+
+<template>
+  <section
+    id="section__process"
+    data-scroll-section
+    data-scroll
+    data-scroll-call="section,process"
+    data-scroll-id="process"
+  >
+    <div
+      id="process__title"
+      data-scroll
+      data-scroll-speed="-4"
+      data-scroll-sticky
+      data-scroll-target="#section__process"
+    >
+      <h1 class="section__title" :style="blurStyle">
+        {{ t('titles.process') }}
+      </h1>
+    </div>
+    <div
+      id="process__hook"
+      data-scroll
+      data-scroll-sticky
+      data-scroll-target="#section__process"
+    >
+      <p>
+        Soluta autem sit rerum reiciendis odit in. Voluptas nulla ea repellat
+        mollitia est molestias velit corporis necessitatibus. Architecto optio
+        dolorem. Voluptas nulla ea repellat mollitia est molestias velit
+        corporis necessitatibus.
+      </p>
+    </div>
+
+    <process-step-card
+      v-for="(step, index) in processData.cards"
+      :index="index"
+      :key="'step' + index"
+    />
+  </section>
+</template>
+
+<style lang="sass" scoped>
+#section__process
+  @include grid(auto-fit, true, 11)
+  display: inline-grid
+  padding-top: calc($cell-height + $unit + $unit)
+  height: 100%
+  min-width: max-content
+
+#process__title
+  grid-column-start: 1
+  grid-column-end: calc($columns - 5)
+  grid-row-start: 1
+  grid-row-end: 3
+  align-self: end
+  margin-left: calc($cell-width + $unit)
+
+#process__hook
+  grid-column: 4 / span 9
+  grid-row-start: 5
+  grid-row-end: -2
+  @include padding-x(4, right)
+
+  @media only screen and (max-width: $b-tablet)
+    grid-column: 3 / $columns
+    grid-row-start: 4
+    @include padding-x(8, right)
+
+  @media only screen and (max-width: $b-mobile)
+    grid-column: 1 / $columns
+    grid-row-start: 4
+    @include padding-x(4, right)
+
+  p
+    color: $c-grey
+    white-space: normal
+    @include body-big
+
+#steps__limit
+  grid-column-start: 10
+  grid-row: 2 / -1
+  @include grid(28, true, 10)
+  padding: 0
+  min-width: max-content
+
+  @media only screen and (max-width: $b-tablet)
+    grid-column-start: 7
+</style>

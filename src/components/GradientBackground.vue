@@ -15,7 +15,7 @@ import { useGradientData } from '@/store/gradientData';
 import fragmentShader from '../shaders/gradient.frag';
 
 let app: Application;
-const MaxCanvasWidth = 1000;
+const MaxCanvasWidth = 3000;
 let tick = 0;
 
 const mouseData = useMouseData();

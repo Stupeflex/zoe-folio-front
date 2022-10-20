@@ -2,6 +2,16 @@ import { ProjectType } from '@/api/types';
 import { defineStore } from 'pinia';
 import { fetchProjects } from '@/api/projects';
 import { extractPaletteFromUrl, rgbColor } from '@/utils/gradient';
+import { computed, ref } from 'vue';
+import {
+  generateGridLayout,
+  GridItem,
+  GridLayoutData,
+  GridLayoutOptions,
+  normalizeGridItems,
+} from '@/utils/grid';
+import { Breakpoint, columns, responsiveMap, rows } from '@/utils/responsive';
+import { useResponsiveData } from '@/store/responsiveData';
 
 export type MediaSize = {
   width: number;
@@ -48,103 +58,191 @@ export type Project = {
   fullyFetched?: boolean;
 };
 
-interface State {
-  projects: Project[];
-  selectedId: identifier;
-  filters: ProjectType[];
-  palettes: ProjectPalette[];
-  fetched: boolean;
-  soundActive: boolean;
-  inTransitionId: identifier | null;
-  hoveringId: identifier | null;
-}
+const projectsToGridItems = (
+  projects: Project[]
+): Partial<GridItem<{ project: Project }>>[] =>
+  projects.map((project) => ({
+    ...project.size,
+    id: project.id,
+    extraData: {
+      project,
+    },
+  }));
 
-export const useProjectData = defineStore('projectData', {
-  state: (): State => ({
-    projects: [],
-    selectedId: 'default',
-    filters: [],
-    palettes: [],
-    fetched: false,
-    soundActive: false,
-    inTransitionId: null,
-    hoveringId: null,
-  }),
-  getters: {
-    selectedProject: (state: State): Project | undefined =>
-      state.projects.find(({ id }) => id === state.selectedId),
-    filteredProjects: (state: State): Project[] =>
-      state.filters.length > 0
-        ? state.projects.filter((project) =>
-          state.filters.includes(project.type)
-        )
-        : state.projects,
-  },
-  actions: {
-    setProjects(projects: Project[]) {
-      this.projects = projects;
+const projectGridReservedSpace = (b: Breakpoint) => {
+  const titleHeight = b == 'mobile' ? 4 : b === 'tablet' ? 4 : 3;
+  const titleWidth = b === 'mobile' ? columns() - 2 : b === 'tablet' ? 11 : 9;
+  let spaces = [
+    {
+      x: 0,
+      y: rows() - titleHeight - 2,
+      width: titleWidth,
+      height: titleHeight,
     },
-    async fetch(selectFirstProject = false): Promise<Project[] | null> {
-      try {
-        const res = await fetchProjects();
-        if (Array.isArray(res)) {
-          this.projects = res;
-          const palettes = await Promise.all(
-            res.map(({ thumbnailUrl }) => extractPaletteFromUrl(thumbnailUrl))
-          );
-          this.palettes = res.map(({ id }, index) => ({
-            id,
-            palette: palettes[index],
-          }));
-          console.log(this.palettes);
-          this.fetched = true;
-          if (res[0]?.id && selectFirstProject) {
-            this.selectedId = res[0].id;
-          }
-          return res;
+    {
+      x: 0,
+      y: 0,
+      height: rows(),
+      width: b === 'mobile' ? 2 : 3,
+    },
+  ];
+  if (b === 'mobile') {
+    spaces = [
+      ...spaces,
+      {
+        x: 0,
+        y: rows() - 1,
+        height: 1,
+        width: 50,
+      },
+      {
+        x: 0,
+        y: 7,
+        width: 4,
+        height: rows() - 7,
+      },
+    ];
+  }
+  return spaces;
+};
+
+const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
+  marginX: 2,
+  marginY: b === 'mobile' ? 2 : 1,
+  rows: responsiveMap.rows[b] - 2,
+  columns: responsiveMap.columns[b],
+  axis: 'y',
+  reservedSpace: projectGridReservedSpace(b),
+});
+
+export const useProjectData = defineStore('projectData', () => {
+  const projects = ref<Project[]>([]);
+  const selectedId = ref<identifier>('default');
+  const filters = ref<ProjectType[]>([]);
+  const palettes = ref<ProjectPalette[]>([]);
+  const fetched = ref(false);
+  const soundActive = ref(false);
+  const inTransitionId = ref<identifier | null>(null);
+  const hoveringId = ref<identifier | null>(null);
+
+  const responsiveData = useResponsiveData();
+
+  // getters
+  const selectedProject = computed((): Project | undefined =>
+    projects.value.find(({ id }) => id === selectedId.value)
+  );
+  const filteredProjects = computed((): Project[] =>
+    filters.value.length > 0
+      ? projects.value.filter((project) => filters.value.includes(project.type))
+      : projects.value
+  );
+  const gridItems = computed((): (Partial<GridItem> & { id: identifier })[] => {
+    return normalizeGridItems(projectsToGridItems(filteredProjects.value));
+  });
+  const gridLayout = computed(
+    (): GridLayoutData =>
+      generateGridLayout(
+        gridItems.value,
+        projectGridOptions(responsiveData.breakpoint)
+      )
+  );
+
+  // actions
+
+  const setProjects = (p: Project[]) => {
+    projects.value = p;
+  };
+  const fetch = async (
+    selectFirstProject = false
+  ): Promise<Project[] | null> => {
+    try {
+      const res = await fetchProjects();
+      if (Array.isArray(res)) {
+        setProjects(res);
+        const pls = await Promise.all(
+          res.map(({ thumbnailUrl }) => extractPaletteFromUrl(thumbnailUrl))
+        );
+        palettes.value = res.map(({ id }, index) => ({
+          id,
+          palette: pls[index],
+        }));
+        fetched.value = true;
+        if (res[0]?.id && selectFirstProject) {
+          selectedId.value = res[0].id;
         }
-        return null;
-      } catch (e) {
-        console.error(e);
-        return [];
+        return res;
       }
-    },
-    selectProject(selectedId: identifier) {
-      if (this.projects.some(({ id }) => id === selectedId)) {
-        this.selectedId = selectedId;
+      return null;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
+
+  const selectProject = (sid: identifier) => {
+    if (projects.value.some(({ id }) => id === sid)) {
+      selectedId.value = sid;
+    }
+  };
+
+  const getIndexOfId = (projectId: identifier): number => {
+    return projects.value.findIndex((p) => p.id === projectId);
+  };
+
+  const updateProject = (project: Project, setAsSelected = false) => {
+    const i = projects.value.findIndex((p) => p.id === project.id);
+    if (i >= 0) {
+      projects.value[i] = project;
+      if (setAsSelected) {
+        selectProject(project.id);
       }
-    },
-    getIndexOfId(projectId: identifier): number {
-      return this.projects.findIndex((p) => p.id === projectId);
-    },
-    updateProject(project: Project, setAsSelected = false) {
-      const i = this.projects.findIndex((p) => p.id === project.id);
-      if (i >= 0) {
-        this.projects[i] = project;
-        if (setAsSelected) {
-          this.selectProject(project.id);
-        }
-      }
-    },
-    setSound(soundActive: boolean) {
-      this.soundActive = soundActive;
-    },
-    toggleSound() {
-      this.setSound(!this.soundActive);
-    },
-    replacePalette(id: identifier, palette: rgbColor[]) {
-      const index = this.palettes.findIndex((p) => p.id === id);
-      if (this.palettes[index].palette === null) {
-        this.palettes[index].palette = palette;
-      }
-    },
-    toggleFilter(filter: ProjectType) {
-      const filterIndex = this.filters.indexOf(filter);
-      if (filterIndex >= 0) {
-        this.filters.splice(filterIndex, 1);
-      } else {
-        this.filters.push(filter);
-      }
-    },
-  },
+    }
+  };
+
+  const setSound = (active: boolean) => {
+    soundActive.value = active;
+  };
+
+  const toggleSound = () => {
+    setSound(!soundActive.value);
+  };
+
+  const replacePalette = (id: identifier, palette: rgbColor[]) => {
+    const index = palettes.value.findIndex((p) => p.id === id);
+    if (palettes.value[index].palette === null) {
+      palettes.value[index].palette = palette;
+    }
+  };
+
+  const toggleFilter = (filter: ProjectType) => {
+    const filterIndex = filters.value.indexOf(filter);
+    if (filterIndex >= 0) {
+      filters.value.splice(filterIndex, 1);
+    } else {
+      filters.value.push(filter);
+    }
+  };
+
+  return {
+    projects,
+    selectedId,
+    filters,
+    palettes,
+    fetched,
+    soundActive,
+    inTransitionId,
+    hoveringId,
+    selectedProject,
+    gridItems,
+    gridLayout,
+    setProjects,
+    fetch,
+    selectProject,
+    getIndexOfId,
+    updateProject,
+    setSound,
+    toggleSound,
+    replacePalette,
+    toggleFilter,
+  };
 });

@@ -1,8 +1,49 @@
-$unit: 12px
-$unit-h: calc($unit / 2)
+:root
+  --unit: 12px
+  --app-height: 100vh
+  --columns: 19
+  --rows: 12
 
-$cell-width: calc((100vw - $unit) / 19 - $unit)
-$cell-height: calc((100vh - $unit) / 12 - $unit)
+$unit: var(--unit)
+$unit-h: calc($unit / 2)
+$unit-d: calc($unit * 2)
+$unit-n: calc($unit * -1)
+
+$b-mobile: 700px
+$b-tablet: 1440px
+
+@mixin w-mobile
+  @media only screen and (max-width: $b-mobile)
+    @content
+
+
+@mixin w-tablet
+  @media only screen and (max-width: $b-tablet)
+    @content
+
+
+$rows: var(--rows)
+
+$columns: var(--columns)
+
+$app-height: var(--app-height)
+$app-width: 100vw
+
+@media screen and (max-width: $b-tablet)
+  :root
+    --rows: 14
+    --columns: 15
+    --unit: 12px
+
+@media screen and (max-width: $b-mobile)
+  :root
+    --rows: 17
+    --columns: 10
+    --unit: 8px
+
+$cell-width: calc(($app-width - $unit) / $columns - $unit)
+
+$cell-height: calc(($app-height - $unit) / $rows - $unit)
 $c-white: #FFF
 $c-grey: #EDEDED
 $c-black: #212121
@@ -11,3 +52,5 @@ $bezier: cubic-bezier(.38,0,.21,.98)
 
 $max-cols: 21
 $max-rows: 21
+
+$text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.3)

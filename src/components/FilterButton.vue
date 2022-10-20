@@ -28,12 +28,12 @@ const isSelected = computed(() => projectData.filters.includes(props.filter));
 .filter
   @include blur-bg
   @include process-step
-  height: $unit * 2
-  padding: calc($unit / 2)
+  height: $unit-d
+  padding: $unit-h
   display: flex
   align-items: center
   justify-content: center
-  border-radius: $unit * 1.5
+  border-radius: calc($unit * 1.5)
   gap: calc($unit / 2)
   border: 1px solid $c-grey
   color: $c-grey
@@ -42,6 +42,11 @@ const isSelected = computed(() => projectData.filters.includes(props.filter));
   z-index: 5
   pointer-events: all
   transition: filter 0.4s $bezier 0s, color .4s $bezier 0s
+
+  @media only screen and (max-width: $b-mobile)
+    padding: $unit-d
+    height: calc($unit * 4)
+    border-radius: $unit-d
 
   &:first-child
     grid-column-start: 2

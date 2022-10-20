@@ -3,15 +3,19 @@ import Scroller from '@/views/ScrollContainer.vue';
 import { useProjectData } from '@/store/projectData';
 import { onMounted } from 'vue';
 import { useScrollData } from '@/store/scrollData';
-import ProcessSection from './sections/ProcessSection.vue';
+import ProcessSection from './sections/ProcessSection2.vue';
 import StudioSection from '@/views/sections/StudioSection.vue';
 import ProjectsSection from '@/views/sections/ProjectsSection.vue';
+import { useRoute } from 'vue-router';
+import AboutSection from '@/views/sections/AboutSection.vue';
 
 const projectData = useProjectData();
 const scrollData = useScrollData();
+const route = useRoute();
 
 onMounted(() => {
   scrollData.update();
+  console.log(route);
 });
 </script>
 
@@ -20,6 +24,7 @@ onMounted(() => {
     <projects-section />
     <process-section />
     <studio-section />
+    <about-section />
   </Scroller>
 </template>
 

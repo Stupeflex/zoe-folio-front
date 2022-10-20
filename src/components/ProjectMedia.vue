@@ -1,49 +1,60 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { ProjectMedia, useProjectData } from '../store/projectData';
+import { ProjectMedia } from '@/store/projectData';
 
 type ProjectMediaProps = {
   media: ProjectMedia;
+  preview?: boolean;
+  blur?: boolean;
 };
-
-const projectData = useProjectData();
-
 const props = defineProps<ProjectMediaProps>();
 
-const style = computed(() => ({
-  gridColumnStart:
-    typeof props.media.size.x === 'number' ? props.media.size.x : undefined,
-  gridRowStart:
-    typeof props.media.size.y === 'number'
-      ? props.media.size.y + 12
-      : undefined,
-}));
+const emit = defineEmits(['preview']);
+
+console.log(props.media.size);
+
+const togglePreview = () => {
+  emit('preview', props.media.id);
+};
 </script>
 
 <template>
   <div
-    :class="`col-${media.size.width} row-${
-      media.size.height + 1
-    } project__media hover__parent`"
-    :style="style"
+    :class="{ project__media: true, hover__parent: true, preview, blur }"
+    @click="togglePreview"
   >
     <img :src="media.url" :alt="'media ' + media.id" crossorigin="anonymous" />
   </div>
 </template>
 
 <style lang="sass" scoped>
-@include col-x
-@include row-x
 
 .project__media
   width: 100%
-  height: calc(100% - $cell-height - $unit)
+  height: 100%
   display: flex
   overflow: hidden
   cursor: pointer
+  align-items: center
+  justify-content: center
+  transition: filter 0.6s $bezier 0s, opacity 0.6s $bezier 0s
 
   img
-    object-fit: cover
-    width: 100%
+    object-fit: contain
+    width: auto
     height: 100%
+    object-position: top left
+    transition: object-position 0.6s $bezier 0s
+
+    @media only screen and (max-width: $b-mobile)
+      width: 100%
+      height: auto
+
+  &.preview img
+    height: 100%
+    width: 100%
+    object-position: center center
+
+  &.blur
+    opacity: 0.7
+    filter: blur(20px)
 </style>

@@ -3,12 +3,16 @@ import Scroller from '@/utils/scroller/Main';
 import type { Options, Vec2 } from '@/utils/scroller/types';
 import { useGradientData } from '@/store/gradientData';
 import {
+  clamp,
   defaultPalette,
   processSectionPalette,
-  rgbColor,
   studioSectionPalette,
 } from '@/utils/gradient';
-import { ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
+import { gridLength } from '@/utils/grid';
+import { useProcessData } from '@/store/processData';
+import { unit } from '@/utils/responsive';
+import { useResponsiveData } from '@/store/responsiveData';
 
 type target = HTMLElement | Document | null | undefined;
 
@@ -32,6 +36,8 @@ type scrollEvent = {
       id: string;
       el: HTMLElement;
       left: number;
+      top: number;
+      bottom: number;
       right: number;
     };
   };
@@ -45,6 +51,12 @@ interface Scroller {
   scrollTo: (target: scrollTarget, options?: scrollToOptions) => void;
   stop: () => void;
   start: () => void;
+  instance: {
+    scroll: {
+      x: number;
+      y: number;
+    };
+  };
 }
 
 const sectionIds = ['process', 'projects', 'studio', 'about'];
@@ -80,10 +92,13 @@ const getCurrentActiveSection = (
 export const useScrollData = defineStore('scrollData', () => {
   const scroller = ref<Scroller | null>(null);
   const target = ref<target>(null);
-  const scrollPos = ref<Vec2>({ x: 0, y: 0 });
+  const scrollPos = reactive<Vec2>({ x: 0, y: 0 });
+  const limit = reactive<Vec2>({ x: window.innerWidth, y: window.innerHeight });
   const activeSection = ref<ScrollSectionId | undefined>(undefined);
   const speed = ref<number>(0);
   const progress = ref<Vec2>({ x: 0, y: 0 });
+  const processData = useProcessData();
+  const responsiveData = useResponsiveData();
 
   const init = (options: Options) => {
     target.value = options?.el || undefined;
@@ -95,6 +110,7 @@ export const useScrollData = defineStore('scrollData', () => {
 
     window.addEventListener('resize', onResize);
   };
+
   const update = () => {
     if (scroller.value) {
       scroller.value.off('scroll', onScroll);
@@ -111,7 +127,7 @@ export const useScrollData = defineStore('scrollData', () => {
   };
   const scrollTo = (target: string | number, options?: scrollToOptions) => {
     if (scroller.value) {
-      scroller.value.scrollTo(target, options);
+      return scroller.value.scrollTo(target, options);
     }
   };
   const start = () => {
@@ -153,13 +169,44 @@ export const useScrollData = defineStore('scrollData', () => {
     }
   };
 
+  const translateProcessCards = (e: scrollEvent) => {
+    const cards = Object.values(e.currentElements).filter(({ id }) =>
+      id.includes('process-step')
+    );
+
+    const l = responsiveData.getValue({
+      mobile: 6,
+      tablet: 7,
+      default: 9,
+    });
+    const visibleLength = unit() * 2 + gridLength(l, 'x');
+    const trackLength = gridLength(l - 1, 'x');
+    cards.forEach((card) => {
+      const deltaX = e.scroll.x + visibleLength - card.left;
+      const height = window.innerHeight - card.top;
+      const x = Math.max(deltaX, 0);
+      const yRatio = x / trackLength;
+      const coef = clamp(yRatio, 0, 1);
+      const sinCoef = Math.abs(clamp(deltaX, -0.1, 0));
+      const y = clamp(coef - Math.sin(sinCoef), 0, 1) * height;
+      const index = Number(card.id.split('-')[2]);
+      processData.updateTranslate(index, { x, y });
+    });
+  };
+
   const onScroll = (e: scrollEvent) => {
-    scrollPos.value.x = e.scroll.x;
-    scrollPos.value.y = e.scroll.y;
-    progress.value.x = e.scroll.x / e.limit.x;
-    progress.value.y = e.scroll.y / e.limit.y;
+    scrollPos.x = e.scroll.x;
+    scrollPos.y = e.scroll.y;
+    limit.x = e.limit.x;
+    limit.y = e.limit.y;
+    const pX = e.scroll.x / e.limit.x;
+    const pY = e.scroll.y / e.limit.y;
+    progress.value.x = isNaN(pX) ? 0 : pX;
+    progress.value.y = isNaN(pY) ? 0 : pY;
     speed.value = e.speed ?? 0;
+    // ScrollTrigger.update();
     activeSection.value = getCurrentActiveSection(e);
+    translateProcessCards(e);
   };
 
   watch(activeSection, updateSectionColor);
@@ -171,6 +218,7 @@ export const useScrollData = defineStore('scrollData', () => {
     scrollPos,
     speed,
     progress,
+    limit,
     init,
     update,
     destroy,

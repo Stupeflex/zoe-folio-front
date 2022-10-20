@@ -5,9 +5,11 @@ import { Project, useProjectData } from '@/store/projectData';
 import { formatNumber } from '@/utils/format';
 import { generateProjectLink } from '@/utils/navigation';
 import ArrowBig from '@/components/icons/ArrowBig.vue';
+import { useI18n } from 'vue-i18n';
 
 const projectData = useProjectData();
 const gradientData = useGradientData();
+const { t } = useI18n();
 
 const index = computed<number>(
   () => projectData.getIndexOfId(projectData.selectedId) + 1
@@ -87,7 +89,7 @@ const onLeave = () => {
       </div>
       <div id="next__project__cta">
         <arrow-big :rotation="180" />
-        <h2 class="hover__underline hover__active">Projet suivant</h2>
+        <h2 class="hover__underline hover__active">{{ t('project.next') }}</h2>
       </div>
     </div>
   </router-link>
@@ -108,8 +110,6 @@ const onLeave = () => {
 
 #next__project
   @include grid(19, true, 5)
-  // padding: $unit * 2 $unit
-  // padding-bottom: $unit * 2
   width: 100%
   min-width: 100%
   text-align: left
@@ -135,10 +135,10 @@ const onLeave = () => {
       width: calc(100% - $unit)
       top: $unit-h
       left: $unit-h
-      border-radius: $unit * 2
+      border-radius: $unit-d
 
     #thumbnail__container
-      border-radius: $unit * 1.5
+      border-radius: calc($unit * 1.5)
 
       img#thumbnail
         transform: scale(1.1)
@@ -170,7 +170,7 @@ const onLeave = () => {
     margin-left: $unit
     align-items: flex-start
     justify-content: flex-end
-    gap: $unit * 2
+    gap: $unit-d
     grid-column: 10 / -1
     grid-row: 2 / -1
     width: 100%
@@ -209,8 +209,8 @@ const onLeave = () => {
         font-weight: 200
         grid-column: 4 / -1
         grid-row: 1 / 1
-        margin-left: -$unit
+        margin-left: $unit-n
 
   &:hover #next__project__cta
-    transform: translateX($unit * 2)
+    transform: translateX($unit-d)
 </style>

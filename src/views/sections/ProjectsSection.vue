@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import { useProjectData } from '@/store/projectData';
-import ProjectThumbnail from '@/components/ProjectThumbnail.vue';
 import { useGradientData } from '@/store/gradientData';
 import { useScrollData } from '@/store/scrollData';
-import { computed, watch, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import FilterButton from '@/components/FilterButton.vue';
-import { nextTick } from 'vue';
 import { scrollSpeedToBlurStyle } from '@/utils/effects';
 import { useI18n } from 'vue-i18n';
 import { tr } from '@/translations';
+import ProjectGrid from '@/components/GridLayout/ProjectGrid.vue';
 
 const { t } = useI18n();
 
@@ -20,19 +19,18 @@ onMounted(() => {
   gradientData.resetDefaultColors();
 });
 
-watch(projectData, (next, prev) => {
-  if (next.filters.length !== prev.filters.length) {
-    nextTick(scrollData.update);
-  }
-});
-
 const doBlur = computed<boolean>(() => scrollData.scrollPos.x > 50);
 const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
+
+const sectionStyle = computed(() => ({
+  width: projectData.gridLayout.layoutDimensions.width,
+}));
 </script>
 
 <template>
   <section
     id="section__projects"
+    :style="sectionStyle"
     data-scroll-section
     data-scroll
     data-scroll-call="section,projects"
@@ -62,19 +60,13 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
       <filter-button filter="pub">{{ t('filters.pubs') }}</filter-button>
       <filter-button filter="fiction">{{ t('filters.fiction') }}</filter-button>
     </div>
-    <ProjectThumbnail
-      v-for="(project, index) in projectData.filteredProjects"
-      :key="project.id"
-      :project="project"
-      :x="index === 0 ? 1 : undefined"
-      :y="index === 0 ? 1 : undefined"
-    />
+    <ProjectGrid />
   </section>
 </template>
 
 <style lang="sass" scoped>
 #section__projects
-  @include grid(auto-fit, true, 11)
+  @include grid(auto-fit, true, calc($rows - 1))
   display: inline-grid
   padding-top: calc($cell-height + $unit + $unit)
   // min-width: 100%
@@ -91,14 +83,14 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   display: grid
   grid-template-columns: repeat(11, $cell-width)
   gap: $unit
-  // filter: blur(3px)
 
   h1
     align-self: end
     grid-column: 2 / -1
 
-  @media screen and (max-width: 500px)
-    opacity: 0.7
+  @media only screen and (max-width: $b-mobile)
+    grid-row-end: -3
+    grid-column-end: span calc($columns - 1)
 
 #filters
   display: flex
@@ -108,4 +100,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   grid-row-start: -2
   grid-column-start: 3
   grid-column-end: span 9
+
+  @media only screen and (max-width: $b-mobile)
+    background: red
+    grid-column: 1 / span calc($columns)
+    justify-content: space-between
 </style>

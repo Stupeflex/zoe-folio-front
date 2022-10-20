@@ -27,6 +27,10 @@
     .row-#{$i}
       grid-row-end: span $i
 
+@mixin padding-x($length: 1, $direction: right)
+  padding-#{$direction}: calc($cell-width * $length + $unit * ($length))
+
+
 // @mixin use-hover
 .hover__underline
   position: relative

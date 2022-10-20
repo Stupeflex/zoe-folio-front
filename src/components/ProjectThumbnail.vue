@@ -4,7 +4,7 @@ import {
   generateProjectLink,
   transitionToProjectPage,
 } from '@/utils/navigation';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { Project, useProjectData } from '@/store/projectData';
 import { useGradientData } from '@/store/gradientData';
 import { useRouter } from 'vue-router';
@@ -25,37 +25,16 @@ const inTransition = ref<boolean>(false);
 const img = ref<HTMLDivElement>();
 const info = ref<HTMLDivElement>();
 
-const MAX_WIDTH = 9;
+const MAX_WIDTH = 10;
 
 const isImage = (
   el: HTMLElement | HTMLImageElement | null
 ): el is HTMLImageElement => {
-  if (el && (el as HTMLImageElement)?.src) {
-    return true;
-  }
-  return false;
+  return !!(el && (el as HTMLImageElement)?.src);
 };
 
 // eslint-disable-next-line no-undef
 const props = defineProps<ProjectThumbnailProps>();
-
-const size = computed(() => ({
-  ...props.project.size,
-  width:
-    window.innerWidth < 600
-      ? props.project.size.width + 7
-      : props.project.size.width,
-  // height:
-  //   window.innerWidth < 600
-  //     ? props.project.size.height - 1
-  //     : props.project.size.height,
-}));
-
-const style = computed(() => ({
-  gridColumnStart:
-    typeof size.value.x === 'number' ? size.value.x + 3 : undefined,
-  gridRowStart: typeof size.value.y === 'number' ? size.value.y : undefined,
-}));
 
 const extractPaletteFallback = (e: MouseEvent) => {
   let i: HTMLImageElement | null = null;
@@ -79,12 +58,13 @@ const extractPaletteFallback = (e: MouseEvent) => {
   }
 };
 
-const speed = computed(
-  () => (1 - (size.value?.width || MAX_WIDTH) / MAX_WIDTH) * 4
+const speed = computed(() =>
+  (
+    (1 -
+      Math.min(props.project.size?.width || MAX_WIDTH, MAX_WIDTH) / MAX_WIDTH) *
+    3.9
+  ).toFixed(1)
 );
-
-const spacingX = computed(() => (window.innerWidth < 600 ? 5 : 2));
-const spacingY = computed(() => (window.innerWidth < 600 ? 0 : 1));
 
 const applyPalette = (e: MouseEvent) => {
   const palette = projectData.palettes.find(
@@ -97,9 +77,6 @@ const applyPalette = (e: MouseEvent) => {
     extractPaletteFallback(e);
   }
 };
-
-const getAllThumbnailContainers = () =>
-  document.querySelectorAll('.project__thumbnail__container');
 
 const onHover = (e: MouseEvent) => {
   applyPalette(e);
@@ -123,18 +100,17 @@ const onClick = (e: MouseEvent) => {
   scrollData.destroy();
   projectData.inTransitionId = props.project.id;
   inTransition.value = true;
-  // applyPalette(e);
-  transitionToProjectPage(img.value, info.value, () =>
-    router.push(generateProjectLink(props.project))
-  );
+  nextTick(() => {
+    transitionToProjectPage(img.value, info.value, () =>
+      router.push(generateProjectLink(props.project))
+    );
+  });
 };
 </script>
 
 <template>
   <div
     :class="{
-      [`col-${size.width + spacingX}`]: true,
-      [`row-${size.height + spacingY}`]: true,
       project__thumbnail__container: true,
       hover__parent: true,
       transition: inTransition,
@@ -144,7 +120,6 @@ const onClick = (e: MouseEvent) => {
         !!projectData.inTransitionId &&
         projectData.inTransitionId !== project.id,
     }"
-    :style="style"
     :data-scroll-speed="speed"
     data-scroll
     :data-scroll-delay="speed"
@@ -182,9 +157,19 @@ const onClick = (e: MouseEvent) => {
 
 @keyframes appear
   0%
-    transform: translateX(-100%) scale(1)
+    filter: blur(30px)
+    opacity: 0
+
   100%
-    transform: translateX(0) scale(1)
+    filter: blur(0px)
+    opacity: 1
+
+@keyframes appear-info
+  0%
+    opacity: 0
+
+  100%
+    opacity: 1
 
 .project__thumbnail__container
   display: flex
@@ -193,6 +178,7 @@ const onClick = (e: MouseEvent) => {
   z-index: 2
   width: 100%
   height: 100%
+  position: relative
 
   &:first-of-type
     grid-column-start: 3 !important
@@ -220,29 +206,27 @@ const onClick = (e: MouseEvent) => {
       opacity: 0
       filter: blur(20px)
 
+  @for $i from 1 to 50
+    &:nth-child(#{$i}) .project__thumbnail
+      animation-duration: 0.9s + 0.3s * $i
+
+    &:nth-child(#{$i}) .project__info
+      animation-duration: 0.9s + 0.3s * $i
 
 .project__thumbnail
-  width: calc(100% - $cell-width * 2 - $unit * 2)
-  height: calc(100% - $cell-height - $unit)
+  width: 100%
+  height: 100%
   display: flex
   overflow: hidden
   cursor: pointer
   transition: border-radius 0.3s $bezier 0s, opacity 0.6s $bezier 0s, filter 0.6s $bezier 0s
-
-  @media screen and (max-width: 600px)
-    width: calc(100% - $cell-width * 5 - $unit * 5)
-    height: 100%
-
-  @for $i from 1 to 50
-    &:nth-child(#{$i}) img
-      animation-duration: 1s + 0.6s * $i
+  animation: appear $bezier
 
   img
     object-fit: cover
     transition: transform 0.3s $bezier 0s
     width: 100%
     height: 100%
-    animation: appear $bezier
 
 
   &:hover img
@@ -250,7 +234,7 @@ const onClick = (e: MouseEvent) => {
     transform: translateX(0) scale(1.1)
 
   &:hover
-    border-radius: $unit * 2
+    border-radius: $unit-d
 
   &.transition
     transform-origin: top left
@@ -266,21 +250,28 @@ const onClick = (e: MouseEvent) => {
   transition: filter 0.6s $bezier 0s
   z-index: auto
   transform-origin: top left
-  position: relative
-
+  position: absolute
+  top: calc(100% + $unit)
+  left: 0
+  animation: appear-info $bezier
 
   .project__client
     @include body
-    font-weight: 300
     color: $c-white
     opacity: 0.7
     transition: all 0.6s $bezier 0s
+    font-weight: 300
+
+    @media only screen and (max-width: $b-mobile)
+      @include detail
 
   .project__title
     @include body
     color: $c-white
     position: relative
     transition: all 0.9s $bezier 0s
+    width: 100%
+    white-space: normal
 
   &.transition
     z-index: 11
@@ -289,12 +280,16 @@ const onClick = (e: MouseEvent) => {
       @include title-big
       transform: translateX(-5px)
 
+      @media only screen and (max-width: $b-mobile)
+        transform: translateY(0)
+
       &:after
         width: 0
 
     .project__client
       font-weight: 400
       opacity: 1
+      @include body
 
       &:before
         content: "— "

@@ -1,16 +1,21 @@
 <template>
-  <nav id="nav" :class="{ clear, open }">
+  <nav id="nav" :class="{ clear, open }" ref="navRef">
     <span id="email__tagline">{{ t('nav.hook') }}</span>
     <div id="email__container">
       <arrow-big />
       <a
         id="email"
         class="hover__underline"
+        target="_blank"
+        rel="noopener noreferrer"
         href="mailto:hello@zoecandito.studio"
         >hello@zoecandito.studio
       </a>
     </div>
-    <router-link to="/" id="nav__logo">zoë candito</router-link>
+    <router-link to="/" id="nav__logo">
+      <Logo :height="20" />
+      <span id="nav__logo__text"> zoë candito </span>
+    </router-link>
     <transition name="fade">
       <button
         v-if="displayBackButton"
@@ -92,11 +97,15 @@
 
 <script setup lang="ts">
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ScrollSectionId, useScrollData } from '@/store/scrollData';
 import ArrowBig from '@/components/icons/ArrowBig.vue';
 import { useI18n } from 'vue-i18n';
 import Arrow from '@/components/icons/Arrow.vue';
+import Logo from '@/components/icons/NavLogo.vue';
+import { cellHeight } from '@/utils/responsive';
+import { useResponsiveData } from '@/store/responsiveData';
+import { sectionLinks } from '@/utils/navigation';
 
 type navLink = {
   title: string;
@@ -107,36 +116,17 @@ type navLink = {
 };
 
 const scrollData = useScrollData();
+const responsiveData = useResponsiveData();
 const route = useRoute();
 const { t } = useI18n();
 const router = useRouter();
 
-const links: navLink[] = [
-  {
-    title: t('nav.projects'),
-    to: '/#projects',
-    identifier: '#section__projects',
-    id: 'projects',
-  },
-  {
-    title: t('nav.process'),
-    to: '/#process',
-    identifier: '#section__process',
-    id: 'process',
-  },
-  {
-    title: t('nav.studio'),
-    to: '/#studio',
-    identifier: '#section__studio',
-    id: 'studio',
-  },
-  {
-    title: t('nav.about'),
-    to: '/#about',
-    identifier: '#section__about',
-    id: 'about',
-  },
-];
+const navRef = ref<HTMLElement>();
+
+const links: navLink[] = sectionLinks.map(({ title, ...rest }) => ({
+  title: t(title),
+  ...rest,
+}));
 
 const clearRoutes = ['projectDetails'];
 
@@ -165,11 +155,6 @@ const onNavLinkClick = (identifier: string) => {
   }
 };
 
-watch(
-  () => scrollData.scrollPos,
-  (pos) => console.warn(pos)
-);
-
 const toggleContactOpen = () => {
   open.value = !open.value;
 };
@@ -180,6 +165,20 @@ const close = () => {
 };
 
 const displayBackButton = computed(() => route.name === 'projectDetails');
+
+const setNavHeight = () => {
+  if (navRef.value) {
+    const h = navRef.value?.getBoundingClientRect().height;
+    const height = h - cellHeight() * 3 - responsiveData.unit * 4;
+    console.log(height);
+    responsiveData.setNavHeight(height);
+  }
+};
+
+onMounted(() => {
+  setNavHeight();
+  window.addEventListener('resize', setNavHeight);
+});
 </script>
 
 <style lang="sass">
@@ -188,11 +187,11 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
   top: 0
   left: 0
   right: 0
-  padding: 20px $unit
+  padding: $unit $unit 20px $unit
   min-height: max-content
   height: auto
   display: grid
-  grid-template-columns: repeat(19, $cell-width)
+  grid-template-columns: repeat($columns, $cell-width)
   grid-template-rows: repeat(3, $cell-height) auto
   grid-gap: $unit
   z-index: 10
@@ -207,33 +206,65 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
   &:not(.open)
     transform: translateY(calc(($cell-height * 3 + $unit * 4) * -1))
 
+    #email__container
+      opacity: 0
+
   #nav__logo
-    font-family: 'Monument', sans-serif
-    font-weight: 500
-    color: $c-white
-    font-size: 18px
-    text-transform: uppercase
     align-self: end
-    grid-column: 2 / span 4
-    grid-row: -1 / -1
+    grid-column: 2 / span 6
+    grid-row: 4 / span 1
     transform: translateY(5px)
+
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 1
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column: 1 / span 1
+
+    #nav__logo__text
+      font-family: 'Monument', sans-serif
+      font-weight: 500
+      color: $c-white
+      font-size: 18px
+      text-transform: uppercase
+
+      @media only screen and (max-width: $b-mobile)
+        display: none
 
   #nav__goback
     grid-column: 7 / span 2
-    grid-row: -1 / -1
+    grid-row: 4 / span 1
     cursor: pointer
     width: max-content
 
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 6
+
+    @media only screen and (max-width: $b-mobile)
+      display: none
+
   #nav__links
     display: flex
-    gap: $unit * 2
+    gap: $unit-d
     grid-column: 13 / -3
-    grid-row: -1 / -1
+    grid-row: 4 / span 1
+    padding-top: 20px
+
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 8
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column: 2 / -2
+      justify-content: center
+
 
   .nav__link
     display: flex
     flex-direction: column
     justify-content: flex-end
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column-end: span 2
 
     .link__index
       @include detail
@@ -248,11 +279,12 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
       transition: transform .3s $bezier
       text-decoration: none
 
+
       &:before
         content: ""
         position: absolute
-        left: -$unit * 0.75
-        bottom: $unit * 0.35
+        left: calc($unit * -0.75)
+        bottom: calc($unit * 0.35)
         height: calc($unit / 2)
         width: calc($unit / 2)
         border-radius: 50%
@@ -261,21 +293,33 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
         transform-origin: left center
         transition: transform .3s $bezier
 
+        @media only screen and (max-width: $b-mobile)
+          height: calc($unit * 0.75)
+          width: calc($unit * 0.75)
+          bottom: calc($unit * 0.6)
+          left: calc($unit * -1.25)
+
       &:after
-        bottom: 0px
+        bottom: 0
 
     &.active > .link__title
-      transform: translateX(0.75 * $unit)
+      transform: translateX(calc(0.75 * $unit))
+
+      @media only screen and (max-width: $b-mobile)
+        transform: translateX(calc($unit * 1.25))
 
       &:before
         transform: scale(1)
 
   #nav__contact
     grid-column: -4 / -2
-    grid-row: -1 / -1
+    grid-row: 4 / span 1
     justify-self: end
     cursor: pointer
     outline: none
+
+    @media screen and (max-width: $b-mobile)
+      grid-column: -3 / -1
 
   #email__tagline
     @include body
@@ -284,12 +328,20 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
     grid-row: 1 / 1
     align-self: end
 
+    @media screen and (max-width: $b-tablet)
+      grid-column: 2 / -2
+
   #email__container
     display: flex
     align-items: baseline
     gap: $unit
-    grid-column: 5 / -5
+    grid-column: 5 / -2
     grid-row: 2 / 2
+    transition: opacity 0.6s $bezier 0.3s
+
+    @media screen and (max-width: $b-tablet)
+      grid-column: 4 / -2
+      justify-self: start
 
   #email
     @include title-medium

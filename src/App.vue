@@ -8,20 +8,43 @@ import GestureHandler, { Vector2 } from './utils/gestures';
 import NavBar from './components/Nav.vue';
 
 import GridOverlay from './components/GridOverlay.vue';
+import { useStudioData } from '@/store/studioData';
+import { setAppHeight } from '@/utils/format';
+import { useResponsiveData } from '@/store/responsiveData';
 
 let gestures: GestureHandler;
 const mouseData = useMouseData();
 const projectData = useProjectData();
+const studioData = useStudioData();
+const responsiveData = useResponsiveData();
 const route = useRoute();
 
-const onMove = (pos: Vector2, delta: Vector2) => {
+const onMove = (pos: Vector2) => {
   mouseData.setMousePos(pos);
+};
+
+const onTouch = (touches: Vector2[]) => {
+  if (touches.length === 1) {
+    mouseData.setMousePos(touches[0]);
+  }
+};
+
+const onStart = () => {
+  mouseData.mouseDown = true;
+};
+
+const onEnd = () => {
+  mouseData.mouseDown = false;
 };
 
 onMounted(() => {
   projectData.fetch(true);
+  studioData.fetch();
   gestures = new GestureHandler({
     onMove,
+    onStart,
+    onEnd,
+    onTouch,
   });
 });
 
@@ -32,6 +55,11 @@ onBeforeUnmount(() => {
 });
 
 const isAdminRoute = computed(() => route.path.includes('admin'));
+
+onMounted(() => {
+  setAppHeight();
+  window.addEventListener('resize', responsiveData.update);
+});
 </script>
 
 <template>
@@ -39,7 +67,11 @@ const isAdminRoute = computed(() => route.path.includes('admin'));
   <!-- <transition> -->
   <router-view v-slot="{ Component, route }">
     <transition :name="route.meta.transitionName">
-      <component v-if="projectData.fetched" :is="Component" :key="route.path" />
+      <component
+        v-if="projectData.fetched && studioData.fetched"
+        :is="Component"
+        :key="route.path"
+      />
     </transition>
   </router-view>
   <!-- </transition> -->
@@ -58,9 +90,6 @@ const isAdminRoute = computed(() => route.path.includes('admin'));
 .fade-leave-active
   transition: opacity 1s ease
 
-.fade-enter-active
-  //transition-delay: 0.5s
-
 .fade-enter-from,
 .fade-leave-to
   opacity: 0 !important
@@ -73,8 +102,8 @@ const isAdminRoute = computed(() => route.path.includes('admin'));
   transform-origin: center bottom
 
 .slide-up-enter-from
-  transform: translateY(100vh)
-   transition-delay: 1s
+  transform: translateY(var(--app-height))
+  transition-delay: 1s
 
 .slide-up-enter-to
   transform: translateY(0) !important
