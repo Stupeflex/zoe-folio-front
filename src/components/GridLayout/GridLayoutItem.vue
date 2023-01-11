@@ -396,6 +396,7 @@ watch(scrollData.scrollPos, (pos) => {
   &.editable
     @include blur-bg
     border: 1px solid $c-grey
+    border-radius: $unit-h
     transition: box-shadow 0.6s $bezier 0s, transform 0.3s $bezier 0s, height 0.3s $bezier 0s, width 0.3s $bezier 0s
 
     &.hovering

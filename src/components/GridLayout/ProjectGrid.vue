@@ -14,7 +14,6 @@ const onResize = () => {
 };
 
 const onLayout = (l: GridLayoutData) => {
-  console.log(l.items, projectData.gridItems.length);
   logMatrix(l.matrix);
 };
 </script>

@@ -132,10 +132,12 @@ export type Project_Raw = ApiItem<{
   thumbnail: ProjectThumbnail__Raw;
   type: ProjectType;
   date?: string;
+  archived: boolean;
   video: {
     data?: ProjectVideo__Raw;
   };
   Medias: (ProjectMediaComponent__Raw | ProjectMediaComponent__Partial)[];
+  index: number;
 }>;
 
 export type ApiProjectResponse = {
@@ -211,3 +213,25 @@ export type AboutData = {
   description: string;
   image: ApiMedia;
 };
+
+export type Token = string;
+
+export interface AdminUser {
+  id: identifier;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  email: string;
+  isActive: boolean;
+  blocked: boolean;
+  preferredLanguage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiError {
+  details: Record<string, string>;
+  message: string;
+  name: string;
+  status: number;
+}

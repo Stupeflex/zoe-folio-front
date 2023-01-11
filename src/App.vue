@@ -11,6 +11,7 @@ import GridOverlay from './components/GridOverlay.vue';
 import { useStudioData } from '@/store/studioData';
 import { setAppHeight } from '@/utils/format';
 import { useResponsiveData } from '@/store/responsiveData';
+import AdminNav from '@/components/admin/AdminNav.vue';
 
 let gestures: GestureHandler;
 const mouseData = useMouseData();
@@ -77,6 +78,7 @@ onMounted(() => {
   <!-- </transition> -->
 
   <NavBar v-if="!isAdminRoute" />
+  <AdminNav v-else />
   <GridOverlay />
 </template>
 
@@ -85,6 +87,7 @@ onMounted(() => {
 #app
   width: 100%
   height: 100%
+  overflow: hidden
 
 .fade-enter-active,
 .fade-leave-active

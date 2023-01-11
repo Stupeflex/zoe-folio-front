@@ -77,9 +77,8 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
 #section__studio
   @include grid(auto-fit, true, calc($rows - 1))
   display: inline-grid
-  padding-top: calc($cell-height + $unit + $unit)
-  padding-right: calc($cell-width * 2 + $unit * 2)
-
+  padding-top: calc($cell-height + $unit-d)
+  padding-right: calc($cell-width * 2 + $unit-d)
   height: 100%
   min-width: max-content
   position: relative
@@ -96,7 +95,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   grid-column-end: span $columns
 
   @media only screen and (max-width: $b-tablet)
-    grid-row: calc($rows - 5) / span 4
+    grid-row: calc($rows - 4) / span 4
     grid-template-rows: repeat(4, $cell-height)
 
   @media only screen and (max-width: $b-mobile)
@@ -121,6 +120,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   display: flex
   z-index: 2
 
+
   &#studio__photo0
     grid-column-start: 4
 
@@ -129,7 +129,8 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     grid-row-end: span calc($rows - 6)
 
   @media only screen and (max-width: $b-mobile)
-    grid-column-end: span 7
+    grid-row-start: 2
+    grid-column-end: span 8
     grid-row-end: span calc($rows - 8)
 
 
@@ -176,6 +177,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     grid-row: 3 / 3
     grid-column: 6 / -1
     transform: translateY(0)
+    align-self: start
 
 #studio__hook__container
   grid-column-start: -5
@@ -189,12 +191,16 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
 
   @media only screen and (max-width: $b-tablet)
     grid-column: -6 / -2
-    grid-row-start: 4
+    grid-row-start: 2
 
   @media only screen and (max-width: $b-mobile)
     grid-column: 2 / -2
     grid-row: 4 / -1
-    align-self: start
+    height: 100%
+    display: grid
+    grid-template-rows: repeat(3, 1fr)
+    grid-template-columns: 1fr
+    gap: $unit
     padding-top: calc($cell-height / 2 - $unit)
 
 
@@ -203,6 +209,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   @include process-step
   white-space: normal
   color: $c-grey
+
+  @media only screen and (max-width: $b-mobile)
+    @include detail
 
 
 #studio__cta
@@ -216,6 +225,8 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   position: relative
   cursor: pointer
 
+  @media only screen and (max-width: $b-mobile)
+    height: 100%
 
   span
     @include body

@@ -15,6 +15,7 @@ import GridLayout from '@/components/GridLayout/GridLayout.vue';
 import ProjectMediaItem from '@/components/ProjectMedia.vue';
 import { formatNumber } from '@/utils/format';
 import { useResponsiveData } from '@/store/responsiveData';
+import { useDropzone } from 'vue3-dropzone';
 
 type Props = {
   project?: Project | Partial<Project>;
@@ -28,9 +29,10 @@ const responsiveData = useResponsiveData();
 const { t } = useI18n();
 
 const props = defineProps<Props>();
-const emit = defineEmits(['deleteItem', 'gridLayout']);
+const emit = defineEmits(['deleteItem', 'gridLayout', 'editMedia']);
 
 const videoRef = ref<HTMLVideoElement>();
+const forceShowThumbnail = ref(!props.project?.videoUrl);
 
 const formattedDate = computed<string>(() => {
   if (!props.project?.date) return 'No date set';
@@ -94,7 +96,25 @@ const onPreview = (itemId: identifier) => {
   }
 };
 
+const toggleThumbnailPreview = (force: boolean) => {
+  forceShowThumbnail.value = force;
+};
+
 const gridColumns = computed(() => responsiveData.columns - 2);
+
+const onDrop = async (files: File[]) => {
+  if (files.length > 0 && props.project?.id) {
+    emit('editMedia', {
+      files,
+      type: forceShowThumbnail.value ? 'image' : 'video',
+    });
+  }
+};
+
+const { getInputProps, getRootProps } = useDropzone({
+  onDrop,
+  accept: 'image/*,video/*',
+});
 
 onMounted(() => {
   if (videoRef.value) {
@@ -118,7 +138,7 @@ onMounted(() => {
       data-scroll-target="#project__cover__target"
     >
       <video
-        v-if="project?.videoUrl"
+        v-if="project?.videoUrl && !forceShowThumbnail"
         crossorigin="anonymous"
         class="project__cover"
         id="project__video"
@@ -131,12 +151,15 @@ onMounted(() => {
         :muted="!projectData.soundActive"
       ></video>
       <img
-        v-else
+        v-else-if="project?.thumbnailUrl"
         crossorigin="anonymous"
         class="project__cover"
         :src="project?.thumbnailUrl"
         :alt="project?.title"
       />
+      <div v-else class="project__cover project__no__cover">
+        Missing thumbnail or video.
+      </div>
     </div>
     <span v-if="project?.type" id="project__type" class="project__info">{{
       type
@@ -155,6 +178,29 @@ onMounted(() => {
           >/{{ formatNumber(projectData.projects.length) }}</span
         >
       </span>
+    </div>
+
+    <div id="project__cover__toggle" v-if="editable">
+      <button
+        @click="toggleThumbnailPreview(false)"
+        :class="{
+          active: !forceShowThumbnail,
+        }"
+      >
+        Video
+      </button>
+      <button
+        @click="toggleThumbnailPreview(true)"
+        :class="{
+          active: forceShowThumbnail,
+        }"
+      >
+        Image
+      </button>
+      <div id="edit" v-bind="getRootProps()">
+        Edit
+        <input type="file" v-bind="getInputProps()" />
+      </div>
     </div>
 
     <div id="mute__toggle__container">
@@ -247,6 +293,74 @@ onMounted(() => {
     user-select: none
     -webkit-user-select: none
     z-index: 1
+
+  .project__no__cover
+    display: flex
+    align-items: center
+    justify-content: center
+    background: rgba(0,0,0,0.4)
+    color: $c-white
+    @include body
+
+  #project__cover__toggle
+    position: absolute
+    bottom: calc($cell-height - $unit * 3)
+    left: 0
+    right: 0
+    width: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    height: calc($unit * 3)
+    z-index: 100
+    transform: translateZ(0)
+
+    button
+      @include blur-bg()
+      padding: $unit
+      @include detail
+      pointer-events: all
+      cursor: pointer
+      height: calc($unit * 3)
+      transition: all 0.3s $bezier 0s
+      color: $c-white
+
+      &.active:not(.disabled)
+        background: $c-white
+        color: $c-black
+
+      &:not(.active):hover
+        font-variation-settings: "wght" 500
+
+      &.disabled
+        color: rgb(0, 0, 0, 0.4)
+
+      &:first-child
+        padding-left: calc($unit * 1.5)
+        border-top-left-radius: calc($unit * 1.5)
+        border-bottom-left-radius: calc($unit * 1.5)
+
+      &:nth-child(2)
+        padding-right: calc($unit * 1.5)
+        border-top-right-radius: calc($unit * 1.5)
+        border-bottom-right-radius: calc($unit * 1.5)
+
+    #edit
+      border-radius: calc($unit * 1.5)
+      font-variation-settings: "wght" 550
+      border: 1px solid $c-white
+      @include process-step
+      display: flex
+      align-items: center
+      justify-content: center
+      margin-left: $unit
+      height: calc($unit * 3)
+      width: calc($unit * 3)
+      background: $c-white
+      color: $c-black
+
+      input
+        display: none
 
   #project__type
     grid-column: 3 / span 2

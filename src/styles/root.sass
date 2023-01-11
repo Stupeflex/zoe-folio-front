@@ -31,7 +31,6 @@
   padding-#{$direction}: calc($cell-width * $length + $unit * ($length))
 
 
-// @mixin use-hover
 .hover__underline
   position: relative
   width: max-content
@@ -58,6 +57,10 @@
     transform: scaleX(1)
     transition: transform .2s ease-in 0s
 
+  &.hover__active:hover::after
+    transform-origin: bottom right
+    transform: scaleX(0)
+
 .hover__parent:hover .hover__underline:not(.hover__active)::after
   transform: scaleX(1)
   transition: transform .2s ease-in 0s
@@ -68,7 +71,45 @@
   transition: transform .2s ease-in 0s
   transform-origin: bottom right
 
-@mixin blur-bg
-  backdrop-filter: blur(20px) saturate(180%)
+@mixin blur-bg($blur: 20px, $saturation: 180%)
+  backdrop-filter: blur($blur) saturate($saturation)
   -webkit-backdrop-filter: blur(20px) saturate(180%)
   background-color: rgba(255, 255, 255, .1)
+
+@mixin input-style
+  @include blur-bg
+  @include body
+  background: rgba(0, 0, 0, 0.25)
+  color: $c-white
+  padding: $unit-h
+  width: 100%
+  border-radius: $unit-h
+  color-scheme: dark
+
+
+input, select, #dropzone
+  @include input-style
+
+  input[type="file"]
+    display: none
+
+  #dropzone
+    border: 1px solid $c-grey
+    height: calc($cell-height * 1)
+    @include detail
+    display: flex
+    align-items: center
+    justify-content: center
+    flex-grow: 1
+    backdrop-filter: blur(10px)
+    -webkit-backdrop-filter: blur(10px)
+    background: rgba(255, 255, 255, 0.1)
+
+  #dropzone__container
+    display: flex
+    gap: $unit-h
+    position: fixed
+    bottom: $unit-h
+    left: $unit-h
+    right: $unit-h
+    z-index: 10

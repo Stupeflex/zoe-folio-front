@@ -76,20 +76,24 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   grid-row-end: -2
   @include padding-x(4, right)
 
+  p
+    color: $c-grey
+    white-space: normal
+    @include body-big
+
   @media only screen and (max-width: $b-tablet)
     grid-column: 3 / $columns
     grid-row-start: 4
     @include padding-x(8, right)
+
+    p
+      @include body
 
   @media only screen and (max-width: $b-mobile)
     grid-column: 1 / $columns
     grid-row-start: 4
     @include padding-x(4, right)
 
-  p
-    color: $c-grey
-    white-space: normal
-    @include body-big
 
 #steps__limit
   grid-column-start: 10

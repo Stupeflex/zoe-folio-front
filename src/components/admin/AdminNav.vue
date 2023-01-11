@@ -12,10 +12,10 @@
         >hello@zoecandito.studio
       </a>
     </div>
-    <router-link to="/" id="nav__logo">
+    <router-link to="/admin" id="nav__logo">
       <Logo :height="20" />
-      zoë candito</router-link
-    >
+      <span id="nav__logo__text"> admin panel </span>
+    </router-link>
     <transition name="fade">
       <button
         v-if="displayBackButton"
@@ -48,7 +48,7 @@
           nav__link: true,
           hover__parent: true,
         }"
-        activeClass="active"
+        exactActiveClass="active"
       >
         <span class="link__index"> 0{{ index + 1 }} </span>
         <span
@@ -96,12 +96,13 @@
 
 <script setup lang="ts">
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { ScrollSectionId, useScrollData } from '@/store/scrollData';
 import ArrowBig from '@/components/icons/ArrowBig.vue';
 import { useI18n } from 'vue-i18n';
 import Arrow from '@/components/icons/Arrow.vue';
 import Logo from '@/components/icons/NavLogo.vue';
+import { adminPanelLinks } from '@/utils/navigation';
 
 type navLink = {
   title: string;
@@ -116,32 +117,10 @@ const route = useRoute();
 const { t } = useI18n();
 const router = useRouter();
 
-const links: navLink[] = [
-  {
-    title: t('nav.projectManagement'),
-    to: '/admin/projects',
-    identifier: '#section__projects',
-    id: 'projects',
-  },
-  {
-    title: t('nav.process'),
-    to: '/admin/process',
-    identifier: '#section__process',
-    id: 'process',
-  },
-  {
-    title: t('nav.studio'),
-    to: '/admin/studio',
-    identifier: '#section__studio',
-    id: 'studio',
-  },
-  {
-    title: t('nav.about'),
-    to: '/admin/about',
-    identifier: '#section__about',
-    id: 'about',
-  },
-];
+const links: navLink[] = adminPanelLinks.map(({ title, ...rest }) => ({
+  title: t(title),
+  ...rest,
+}));
 
 const clearRoutes = ['projectEditor', 'projectEditorCreate'];
 
@@ -178,17 +157,17 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
   top: 0
   left: 0
   right: 0
-  padding: 20px $unit
+  padding: $unit $unit 20px $unit
   min-height: max-content
   height: auto
   display: grid
-  grid-template-columns: repeat(19, $cell-width)
+  grid-template-columns: repeat($columns, $cell-width)
   grid-template-rows: repeat(3, $cell-height) auto
   grid-gap: $unit
   z-index: 10
   color: white
   transition: backdrop-filter 0.6s linear 0s, background-color 0.6s linear 0s, transform 0.6s $bezier 0s
-  @media screen and (max-width: 600px)
+  @media screen and (max-width: $b-mobile)
     padding: $unit
 
   &:not(.clear)
@@ -201,32 +180,64 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
       opacity: 0
 
   #nav__logo
-    font-family: 'Monument', sans-serif
-    font-weight: 500
-    color: $c-white
-    font-size: 18px
-    text-transform: uppercase
     align-self: end
-    grid-column: 2 / span 4
-    grid-row: -1 / -1
+    grid-column: 2 / span 6
+    grid-row: 4 / span 1
     transform: translateY(5px)
+
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 1
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column: 1 / span 1
+
+    #nav__logo__text
+      font-family: 'Monument', sans-serif
+      font-weight: 500
+      color: $c-white
+      font-size: 18px
+      text-transform: uppercase
+
+      @media only screen and (max-width: $b-mobile)
+        display: none
 
   #nav__goback
     grid-column: 7 / span 2
-    grid-row: -1 / -1
+    grid-row: 4 / span 1
     cursor: pointer
     width: max-content
+
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 6
+
+    @media only screen and (max-width: $b-mobile)
+      display: none
 
   #nav__links
     display: flex
     gap: $unit-d
     grid-column: 13 / -3
-    grid-row: -1 / -1
+    grid-row: 4 / span 1
+    padding-top: 20px
+
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 8
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column: 2 / -2
+      justify-content: center
+
+    &:hover .link__title
+      opacity: 0.7
+
 
   .nav__link
     display: flex
     flex-direction: column
     justify-content: flex-end
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column-end: span 2
 
     .link__index
       @include detail
@@ -238,7 +249,7 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
       color: $c-white
       position: relative
       transform: translateX(0)
-      transition: transform .3s $bezier
+      transition: transform .3s $bezier, opacity .3s $bezier
       text-decoration: none
 
       &:before
@@ -254,21 +265,36 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
         transform-origin: left center
         transition: transform .3s $bezier
 
+        @media only screen and (max-width: $b-mobile)
+          height: calc($unit * 0.75)
+          width: calc($unit * 0.75)
+          bottom: calc($unit * 0.6)
+          left: calc($unit * -1.25)
+
       &:after
-        bottom: 0px
+        bottom: 0
 
     &.active > .link__title
       transform: translateX(calc(0.75 * $unit))
 
+      @media only screen and (max-width: $b-mobile)
+        transform: translateX(calc($unit * 1.25))
+
       &:before
         transform: scale(1)
 
+    &:hover .link__title
+      opacity: 1 !important
+
   #nav__contact
     grid-column: -4 / -2
-    grid-row: -1 / -1
+    grid-row: 4 / span 1
     justify-self: end
     cursor: pointer
     outline: none
+
+    @media screen and (max-width: $b-mobile)
+      grid-column: -3 / -1
 
   #email__tagline
     @include body
@@ -277,12 +303,20 @@ const displayBackButton = computed(() => route.name === 'projectDetails');
     grid-row: 1 / 1
     align-self: end
 
+    @media screen and (max-width: $b-tablet)
+      grid-column: 2 / -2
+
   #email__container
     display: flex
     align-items: baseline
     gap: $unit
-    grid-column: 5 / -5
+    grid-column: 5 / -2
     grid-row: 2 / 2
+    transition: opacity 0.6s $bezier 0.3s
+
+    @media screen and (max-width: $b-tablet)
+      grid-column: 4 / -2
+      justify-self: start
 
   #email
     @include title-medium

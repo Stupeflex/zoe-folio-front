@@ -1,17 +1,23 @@
+/* eslint-disable prettier/prettier */
 import {
+  ApiError,
+  ApiItem,
   ApiProjectResponse,
   isFullyFetchedProjectMediaComponentArray,
   NullableSize,
   Project_Raw,
   ProjectMediaComponent__Raw,
+  Token,
 } from './types';
-import client, { baseUrl } from './client';
+import client, { authenticatedClientFactory, baseUrl, Methods } from './client';
 import {
   identifier,
   Project,
   MediaType,
   ProjectMedia,
 } from '@/store/projectData';
+
+const authenticatedClient = authenticatedClientFactory();
 
 export const fetchProjects = (): Promise<Project[] | Project> => {
   return client('/projects?populate=*')
@@ -54,11 +60,12 @@ export const formatProjects = (
   isFullData = false
 ): Project | Project[] => {
   const format = (raw: Project_Raw): Project => {
-    console.log(raw.attributes.Medias);
+    console.log(raw);
     return {
       id: raw.id,
       client: raw.attributes.client,
       title: raw.attributes.title,
+      archived: raw.attributes.archived,
       thumbnailUrl: baseUrl + raw.attributes.thumbnail.data.attributes.url,
       size: formatMediaSize(raw.attributes.size),
       informations: [],
@@ -74,7 +81,10 @@ export const formatProjects = (
       videoUrl: raw.attributes.video.data?.attributes?.url
         ? baseUrl + raw.attributes.video.data.attributes.url
         : undefined,
+      videoId: raw.attributes.video.data?.id ?? undefined,
+      thumbnailId: raw.attributes.thumbnail.data?.id ?? undefined,
       fullyFetched: isFullData,
+      index: raw.attributes.index,
     };
   };
 
@@ -87,77 +97,136 @@ export const formatProjects = (
 type Media = Omit<ProjectMedia, 'size'>;
 type MediaRaw = Omit<ProjectMediaComponent__Raw, 'size'>;
 
+/* eslint-disable prettier/prettier */
 export const formatRawMediaArray = <
   M extends MediaRaw,
   T extends Record<string, unknown>
 >(
-  medias: M[], // eslint-disable-line
-    dataExtractor?: (m: M) => T // eslint-disable-line
-  ): (Media & T)[] => // eslint-disable-line
+    medias: M[], 
+    dataExtractor?: (m: M) => T
+  ): (Media & T)[] =>  
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-    medias // eslint-disable-line prettier/prettier
-      .filter((m) => !m.pending) // eslint-disable-line prettier/prettier
-      .map((m) => ({ // eslint-disable-line prettier/prettier
-        id: m.id, // eslint-disable-line prettier/prettier
-        url: baseUrl + m.media.data.attributes.url, // eslint-disable-line prettier/prettier
-        type: MediaType.image, // eslint-disable-line prettier/prettier
-        ...(dataExtractor ? dataExtractor(m) : {}), // eslint-disable-line prettier/prettier
-      })); // eslint-disable-line prettier/prettier
+    medias
+      .filter((m) => !m.pending)
+      .map((m) => ({
+        id: m.id,
+        url: baseUrl + m.media.data.attributes.url,
+        type: MediaType.image,
+        ...(dataExtractor ? dataExtractor(m) : {}),
+      }));
 
-export const addMediasToProject = async (
-  projectId: identifier,
-  projectMediaCount: number,
-  files: File[]
-) => {
-  try {
-    const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append('file' + index, file);
-    });
-    const medias = client(`/projects/${projectId}/media/add`, {
-      method: 'POST',
-      body: formData,
-    });
-    console.log(medias);
-    return medias;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-};
+/* eslint-enable prettier/prettier */
 
-export const deleteProjectMedia = (
-  projectId: identifier,
-  mediaId: identifier
-) => {
-  console.log(projectId, mediaId);
-  return client(`/projects/${projectId}/media/delete/${mediaId}`, {
-    method: 'DELETE',
-  })
-    .then((res) => !!res)
-    .catch(() => false);
-};
-
-export const setMediaSizes = (
-  projectId: identifier,
-  projectMedias: {
-    id: identifier;
-    size: {
-      width: number;
-      height: number;
-      x: number;
-      y: number;
+/* eslint-disable prettier/prettier */
+export const addMediasToProject =
+  (token?: Token) =>
+    async (projectId: identifier, projectMediaCount: number, files: File[]) => {
+      try {
+        const formData = new FormData();
+        files.forEach((file, index) => {
+          formData.append('file' + index, file);
+        });
+        const medias = authenticatedClient(
+          `/projects/${projectId}/media/add`,
+          token,
+          {
+            method: Methods.post,
+            body: formData,
+          }
+        );
+        console.log(medias);
+        return medias;
+      } catch (e) {
+        console.error(e);
+        return false;
+      }
     };
-  }[]
-) => {
-  const sizes = projectMedias.map(({ id, size }) => ({
-    id,
-    size,
-  }));
-  return client(`/projects/${projectId}/media/sizes`, {
-    method: 'PATCH',
-    body: JSON.stringify({ sizes }),
+
+/* eslint-enable prettier/prettier */
+
+export const deleteProjectMedia =
+  (token?: Token) => (projectId: identifier, mediaId: identifier) => {
+    return authenticatedClient(
+      `/projects/${projectId}/media/delete/${mediaId}`,
+      token,
+      {
+        method: Methods.delete,
+      }
+    )
+      .then((res) => !!res)
+      .catch(() => false);
+  };
+
+/* eslint-disable prettier/prettier */
+export const setMediaSizes =
+  (token?: Token) =>
+    (
+      projectId: identifier,
+      projectMedias: {
+      id: identifier;
+      size: {
+        width: number;
+        height: number;
+        x: number;
+        y: number;
+      };
+    }[]
+    ) => {
+      const sizes = projectMedias.map(({ id, size }) => ({
+        id,
+        size,
+      }));
+      return authenticatedClient(`/projects/${projectId}/media/sizes`, token, {
+        method: Methods.patch,
+        body: JSON.stringify({ sizes }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => !!res)
+        .catch(() => false);
+    };
+/* eslint-enable prettier/prettier */
+
+/* eslint-disable prettier/prettier */
+export const updateProject =
+  (token?: Token) =>
+    async (
+      update: Pick<Project, 'id' | 'title' | 'type' | 'date' | 'client'>
+    ) => {
+      const payload = {
+        data: {
+          title: update.title,
+          client: update.client,
+          type: update.type,
+          date: update.date,
+        }
+      };
+    
+      return authenticatedClient(`/projects/${update.id}`, token, {
+        method: Methods.put,
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => !!res)
+        .catch(() => false);
+    };
+/* eslint-enable prettier/prettier */
+
+/* eslint-disable prettier/prettier */
+export const setArchived = (token?: Token) => (id: identifier, archived: boolean) => {
+  const payload = JSON.stringify({
+    data: {
+      archived,
+    }
+  });
+
+  return authenticatedClient(`/projects/${id}`, token, {
+    method: Methods.put,
+    body: payload,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -166,15 +235,88 @@ export const setMediaSizes = (
     .catch(() => false);
 };
 
-export const updateProject = async (
-  update: Pick<Project, 'id' | 'title' | 'type' | 'date' | 'client'>
-) => {
-  const payload = {
-    title: update.title,
-    client: update.client,
-    type: update.type,
-    date: update.date,
+interface CreateProjectResponse {
+  data?: ApiItem<Partial<Project>>
+  error?: ApiError;
+}
+
+/* eslint-enable prettier/prettier */
+export const createNewProject =
+  (token?: Token) => async (data: Partial<Project>) => {
+    const payload = {
+      data: {
+        ...data,
+        archived: true,
+      },
+    };
+
+    return authenticatedClient('/projects/?populate=*-nested', token, {
+      method: Methods.post,
+      body: payload,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res: CreateProjectResponse) => {
+        if (res.error || !res.data || !res.data.id) return null;
+        console.log(res);
+        return {
+          id: res.data.id,
+          ...res.data.attributes,
+        };
+      })
+      .catch((e) => {
+        console.error(e);
+        return null;
+      });
   };
 
-  console.log(payload);
-};
+export const setThumbnailData =
+  (token?: Token) =>
+    async (
+      id: identifier,
+      file: File,
+      isVideo: boolean,
+      previousFileId?: identifier
+    ) => {
+      const formData = new FormData();
+      formData.append('files', file);
+      formData.append('ref', 'api::project.project');
+      formData.append('refId', String(id));
+      formData.append('field', isVideo ? 'video' : 'thumbnail');
+      const endpoint =
+      previousFileId !== undefined ? `/upload?id=${previousFileId}` : '/upload';
+      console.log(previousFileId, endpoint);
+      return authenticatedClient(endpoint, token, {
+        method: Methods.post,
+        body: formData,
+      })
+        .then((res) => {
+          console.log(res);
+          return !!res;
+        })
+        .catch((e) => {
+          console.error(e);
+          return false;
+        });
+
+    //   return authenticatedClient(`/projects/${id}/media/thumbnail`, token, {
+    //     method: Methods.put,
+    //     body: formData,
+    //   })
+    //     .then((res) => !!res)
+    //     .catch((e) => {
+    //       console.error(e);
+    //       return false;
+    //     });
+    };
+
+export const adminProjectClient = (token?: Token) => ({
+  setMediaSizes: setMediaSizes(token),
+  deleteProjectMedia: deleteProjectMedia(token),
+  addMediasToProject: addMediasToProject(token),
+  updateProject: updateProject(token),
+  setArchived: setArchived(token),
+  createNewProject: createNewProject(token),
+  setThumbnail: setThumbnailData(token),
+});

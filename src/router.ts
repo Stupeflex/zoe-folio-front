@@ -5,6 +5,7 @@ import ProjectEditor from './views/admin/ProjectEditor.vue';
 import AdminPanel from './views/admin/AdminPanel.vue';
 import ProjectList from './views/admin/ProjectList.vue';
 import AdminDashboard from './views/admin/AdminDashboard.vue';
+import AdminLogin from './views/admin/AdminLogin.vue';
 
 import GridTest from './views/GridTest.vue';
 
@@ -20,9 +21,6 @@ const routes = [
     path: '/project/:id/:title',
     component: ProjectDetails,
     name: 'projectDetails',
-    // beforeEnter: (to: { params: { id: string }}) => {
-    //   console.log(to);
-    // },
   },
   {
     path: '/contact',
@@ -35,15 +33,17 @@ const routes = [
     name: 'AdminPanel',
     children: [
       {
-        path: 'projects',
-        component: ProjectList,
-      },
-      {
         path: '',
+        name: 'AdminDasboard',
         component: AdminDashboard,
       },
       {
-        path: 'media',
+        path: 'projects',
+        name: 'projectList',
+        component: ProjectList,
+      },
+      {
+        path: 'clients',
         component: ProjectList,
       },
       {
@@ -55,6 +55,11 @@ const routes = [
         path: 'project-editor/new',
         component: ProjectEditor,
         name: 'projectEditorCreate',
+      },
+      {
+        path: 'login',
+        component: AdminLogin,
+        name: 'AdminLogin',
       },
     ],
   },
@@ -74,7 +79,7 @@ router.afterEach((to, from) => {
   const betweenProjects =
     to.name === 'projectDetails' && from.name === 'projectDetails';
   to.meta.transitionName =
-    to?.meta?.transitionName ?? betweenProjects ? 'slide-up' : 'fade';
+    to?.meta?.transitionName ?? betweenProjects ? 'fade' : 'fade';
 });
 
 export default router;

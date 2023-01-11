@@ -16,6 +16,10 @@ onMounted(async () => {
   await aboutData.fetchAll();
   scrollData.update();
 });
+
+const clientColumnsCount = computed(
+  () => Math.ceil(aboutData.clients.length / 3) * 3 + 2
+);
 </script>
 
 <template>
@@ -41,7 +45,7 @@ onMounted(async () => {
       alt="Zoë Candito"
     />
     <div id="about__info" v-if="aboutData.loaded">
-      <p>
+      <p id="about__bio">
         Zoë Candito <br />
         Freelance colorist
       </p>
@@ -51,7 +55,13 @@ onMounted(async () => {
     <div id="about__description">
       <p>{{ aboutData.description }}</p>
     </div>
-    <div id="about__clients" v-if="aboutData.loaded">
+    <div
+      id="about__clients"
+      v-if="aboutData.loaded"
+      :style="{
+        gridColumnEnd: `span ${clientColumnsCount}`,
+      }"
+    >
       <h2 id="about__clients__title">{{ t('sections.about.clients') }}</h2>
       <article
         class="about__client"
@@ -78,7 +88,7 @@ $clients-start: 20
 $clients-row-start: 3
 
 #section__about
-  @include grid(39, true, calc($rows - 1))
+  @include grid(auto-fit, true, calc($rows - 1))
   display: inline-grid
   padding-top: calc($cell-height + $unit + $unit)
   height: 100%
@@ -107,10 +117,10 @@ $clients-row-start: 3
   grid-row: 1 / span 2
 
 #about__clients
-  grid-column: 19 / span calc($columns - 1)
+  grid-column: 19 / span 9
   grid-row-start: $clients-row-start
   grid-row-end: span 8
-  @include grid($columns, true, 8)
+  @include grid(auto-fit, true, 8)
   grid-auto-flow: column
   padding: 0
 
@@ -160,8 +170,8 @@ $clients-row-start: 3
       transition: transform 0.6s $bezier 0s, opacity 0.6s $bezier 0s
       z-index: 1
 
-      *
-        fill: $c-grey !important
+      path
+        fill: $c-white !important
 
     .client__name
       height: 100%
@@ -177,17 +187,20 @@ $clients-row-start: 3
 
       span
         @include body-big
-        color: $c-grey
+        color: $c-white
         transition: font-variation-settings 0.6s $bezier 0s
+
+        @media only screen and (max-width: $b-mobile)
+          @include body
 
 
     &:before
       position: absolute
       content: ""
       top: $unit
-      left: calc($cell-width * 0.75)
-      height: calc($cell-height * 2 - $unit-h * 2)
-      width: calc($cell-height * 2 - $unit-h * 2)
+      left: calc(50% - $cell-height + $unit-h)
+      height: calc($cell-height * 2 - $unit)
+      width: calc($cell-height * 2 - $unit)
       border-radius: 50%
       @include blur-bg
       transform: scale(0)
@@ -219,7 +232,7 @@ $clients-row-start: 3
         transform: translate(calc($unit * -1), calc($unit * -1))
 
 #about__info
-  grid-column: 9 / span 2
+  grid-column: 8 / span 2
   grid-row: 4 / -1
   display: grid
   grid-auto-rows: $cell-height
@@ -231,6 +244,18 @@ $clients-row-start: 3
     @include body
     color: $c-white
 
+
+  @media only screen and (max-width: $b-tablet)
+    grid-column: 8 / span 4
+
+    #about__bio
+      @include body-big
+      grid-row-end: span 2
+
+  @media only screen and (max-width: $b-mobile)
+    grid-row: 12 / -1
+    grid-column: 3 / span 4
+
 #about__description
   grid-column: 13 / span 4
   grid-row: 5 / -1
@@ -240,4 +265,11 @@ $clients-row-start: 3
     @include body
     color: $c-white
     white-space: normal
+
+  @media only screen and (max-width: $b-tablet)
+    grid-row-start: 6
+
+  @media only screen and (max-width: $b-mobile)
+    grid-row-start: 4
+    grid-column: 10 / span 5
 </style>

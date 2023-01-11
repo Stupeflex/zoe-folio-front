@@ -183,4 +183,20 @@ export const defaultPalette = [
   '#6F8982',
 ].map((hex) => hexToRgb(hex));
 
+export const aboutSectionPalette = [
+  '#6c0f7e',
+  '#3d6dfd',
+  '#c95c13',
+  '#f996a2',
+  '#d92ae9',
+].map((hex) => hexToRgb(hex));
+
+export const adminPanelPalette = [
+  '#165c80',
+  '#04948b',
+  '#98e9c2',
+  '#cbab69',
+  '#f23bd0',
+].map((hex) => hexToRgb(hex));
+
 export const palette1 = ['#8ab0ab', '#3e505b', '#26413c', '#1a1d1a', '#03120e'];

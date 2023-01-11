@@ -11,7 +11,6 @@ import { useGradientData } from '@/store/gradientData';
 import { extractPaletteFromUrl } from '@/utils/gradient';
 import { useScrollData } from '@/store/scrollData';
 import NextProject from '@/components/NextProject.vue';
-import { PartialGridItem } from '@/utils/grid';
 import ProjectContents from '@/components/Project/ProjectContents.vue';
 
 const projectData = useProjectData();
@@ -107,28 +106,6 @@ watch(
 );
 
 const project = computed(() => projectData?.selectedProject);
-
-const formattedDate = computed<string>(() => {
-  let m = project.value?.date?.getMonth();
-  const M = m && m < 10 ? `0${m}` : String(m);
-  return `${M}/${project.value?.date?.getFullYear()}`;
-});
-
-const projectMediaGridItems = computed<
-  PartialGridItem<{ media: ProjectMedia }>[]
->(() => {
-  return (project.value?.media ?? []).map((media) => ({
-    id: media.id,
-    ...media.size,
-    extraData: {
-      media: media,
-    },
-  }));
-});
-
-const scrollDown = () => {
-  scrollData.scrollTo(window.innerHeight);
-};
 
 watch(() => route.params.id, fetchProject);
 

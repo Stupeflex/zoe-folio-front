@@ -10,7 +10,6 @@ export const fetchStudio = (): Promise<StudioData> => {
 
 const formatStudioData = (raw: StudioData_Raw): StudioData => {
   const data = raw.data.attributes;
-  console.log(data);
 
   const photos = formatRawMediaArray(data.photos, (m) => ({ title: m.title }));
   return {

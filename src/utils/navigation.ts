@@ -131,3 +131,36 @@ export const sectionLinks: navLink[] = [
     id: 'about',
   },
 ];
+
+export const adminPanelLinks: navLink[] = [
+  {
+    title: 'nav.adminDashboard',
+    to: '/admin',
+    identifier: '#section__dashboard',
+    id: 'dashboard',
+  },
+  {
+    title: 'nav.projectManagement',
+    to: '/admin/projects',
+    identifier: '#section__projects',
+    id: 'projects',
+  },
+  {
+    title: 'nav.clients',
+    to: '/admin/clients',
+    identifier: '#section__clients',
+    id: 'clients',
+  },
+  {
+    title: 'nav.content',
+    to: '/admin/content',
+    identifier: '#section__content',
+    id: 'content',
+  },
+  {
+    title: 'nav.usage',
+    to: '/admin/usage',
+    identifier: '#section__usage',
+    id: 'usage',
+  },
+];

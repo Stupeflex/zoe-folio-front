@@ -179,6 +179,19 @@ const isFreeCell = (matrix: Matrix, pos: Vector2): boolean => {
   return cell === 0 || cell === 3;
 };
 
+const isFreeSpace = (matrix: Matrix, pos: Vector2, size: Size): boolean => {
+  let isFree = true;
+  for (let x = pos.x; x <= pos.x + size.width; x++) {
+    for (let y = pos.y; y <= pos.y + size.height; y++) {
+      const exists = x < matrix.length && y < (matrix[0]?.length ?? 0);
+      if (!exists) return false;
+      isFree = isFreeCell(matrix, { x, y });
+      if (!isFree) return false;
+    }
+  }
+  return true;
+};
+
 const findItemPosition = (
   matrix: Matrix,
   item: Size,
@@ -223,7 +236,7 @@ const findItemPosition = (
   // check if mixed pos is not already taken in grid
   if (x === undefined || y === undefined) return undefined;
 
-  const pos = isFreeCell(matrix, { x, y }) ? { x, y } : generatedPos;
+  const pos = isFreeSpace(matrix, { x, y }, item) ? { x, y } : generatedPos;
   if (pos === undefined) return undefined;
 
   return pos;

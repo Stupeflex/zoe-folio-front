@@ -4,35 +4,38 @@ import { computed, watch } from 'vue';
 import { reactive, ref } from 'vue';
 import Scroller from '../ScrollContainer.vue';
 import ProjectContents from '@/components/Project/ProjectContents.vue';
-import { useRoute } from 'vue-router';
-import {
-  addMediasToProject,
-  deleteProjectMedia,
-  fetchProjectById,
-  setMediaSizes,
-  updateProject,
-} from '@/api/projects';
+import { useRoute, useRouter } from 'vue-router';
+import { adminProjectClient, fetchProjectById } from '@/api/projects';
 import { useI18n } from 'vue-i18n';
 import { FileRejectReason, useDropzone } from 'vue3-dropzone';
 import ProjectMediaItem from '@/components/ProjectMedia.vue';
 import { formatNumber } from '@/utils/format';
 import { GridLayoutData } from '@/utils/grid';
+import { useAdminData } from '@/store/adminData';
 
 const route = useRoute();
+const router = useRouter();
 const projectData = useProjectData();
+const adminData = useAdminData();
 const { t } = useI18n();
 
 const mediaPanelOpen = ref(false);
 const infoPanelOpen = ref(false);
 const saving = ref(false);
 const saved = ref(false);
+const updating = ref(false);
+const updated = ref(false);
 const infoPanelRef = ref<HTMLElement>();
 const mediaPanelRef = ref<HTMLElement>();
 
+const isNewProject = () => route.path === '/admin/project-editor/new';
+
 const project = reactive<Partial<Project>>({
   title: 'New Project',
-  ...(projectData.selectedProject ?? {}),
+  ...(isNewProject() ? {} : projectData.selectedProject ?? {}),
 });
+
+const client = computed(() => adminProjectClient(adminData.token));
 
 const isInfoFilled = ({
   id,
@@ -40,8 +43,12 @@ const isInfoFilled = ({
   date,
   title,
   client,
-}: Partial<Project>): boolean =>
-  !!client && !!type && !!id && !!title && !!date && title?.length > 0;
+}: Partial<Project>): boolean => {
+  const baseInfoFilled =
+    !!client && !!type && !!title && !!date && title?.length > 0;
+  console.log(baseInfoFilled, date, type, title, client);
+  return isNewProject() ? baseInfoFilled : baseInfoFilled && !!id;
+};
 
 const infoSaveAllowed = computed(() => isInfoFilled(project));
 
@@ -54,7 +61,6 @@ const displayDate = computed({
     const d = D.getDate();
     const y = D.getFullYear();
     const s = `${y}-${formatNumber(m)}-${d}`;
-    console.log(s);
     return s;
   },
   set(newVal: string) {
@@ -70,17 +76,18 @@ const toggleMediaPanel = () => {
   mediaPanelOpen.value = !mediaPanelOpen.value;
 };
 
-const fetchProject = async (updateMedia?: boolean) => {
+const fetchProject = async (updateMedia?: boolean, updateInfo?: boolean) => {
   const ID: identifier | null = route?.params?.id
     ? String(route.params.id)
     : null;
-  if (ID) {
-    projectData.selectProject(Number(String(project.id ?? route.params.id)));
+  if (ID !== null) {
+    projectData.selectProject(Number(String(route.params.id ?? project.id)));
     let fetchedProject = projectData.selectedProject;
-    if (!fetchedProject?.fullyFetched || updateMedia) {
+    if (!fetchedProject?.fullyFetched || updateMedia || updateInfo) {
       console.warn('project ' + fetchedProject?.title + ' needs full fetch');
       const justFetched = await fetchProjectById(ID);
-      if (justFetched !== null && !Array.isArray(justFetched)) {
+      console.log(justFetched);
+      if (justFetched && !Array.isArray(justFetched)) {
         fetchedProject = justFetched;
       }
     }
@@ -89,26 +96,34 @@ const fetchProject = async (updateMedia?: boolean) => {
       fetchedProject?.id &&
       !Array.isArray(fetchedProject)
     ) {
-      console.log(fetchedProject, fetchedProject.media);
+      console.log(fetchedProject.title);
       projectData.updateProject(fetchedProject, true);
+      if (
+        updateInfo &&
+        (fetchedProject.thumbnailUrl || fetchedProject.videoUrl)
+      ) {
+        project.thumbnailUrl = fetchedProject.thumbnailUrl;
+        project.videoUrl = fetchedProject.videoUrl;
+      }
       if (updateMedia && fetchedProject.media) {
         project.media = fetchedProject.media;
       }
     }
     return fetchedProject;
+  } else {
+    console.log(ID, route.params.id);
   }
 };
 
-const onDrop = async (files: File[], rejectReasons: FileRejectReason[]) => {
-  console.log(rejectReasons);
+const onDrop = async (files: File[]) => {
   if (files.length > 0 && project.id) {
-    const response = await addMediasToProject(
+    const response = await client.value.addMediasToProject(
       project.id,
       project.media?.length ?? 0,
       files
     );
     if (response) {
-      fetchProject(true);
+      await fetchProject(true);
     }
   }
 };
@@ -116,6 +131,7 @@ const onDrop = async (files: File[], rejectReasons: FileRejectReason[]) => {
 const { getInputProps, getRootProps, isDragActive } = useDropzone({
   onDrop,
   accept: 'image/*',
+  multiple: true,
 });
 
 const onInfoPanelScroll = (e: WheelEvent) => {
@@ -130,15 +146,30 @@ const onMediaPanelScroll = (e: WheelEvent) => {
 
 const deleteMedia = async (mediaId: identifier) => {
   if (project.id) {
-    const res = await deleteProjectMedia(project.id, mediaId);
+    const res = await client.value.deleteProjectMedia(project.id, mediaId);
     if (res) {
-      fetchProject(true);
+      await fetchProject(true);
     }
   }
 };
 
 const onGridLayout = (l: GridLayoutData) => {
   gridLayout.value = l;
+};
+
+const unpinAll = () => {
+  if (project.media && (project.media ?? []).length > 0) {
+    project.media = project.media.map((media) => {
+      return {
+        ...media,
+        size: {
+          ...media.size,
+          x: undefined,
+          y: undefined,
+        },
+      };
+    });
+  }
 };
 
 const saveLayout = async () => {
@@ -161,7 +192,7 @@ const saveLayout = async () => {
         y: item.y,
       },
     }));
-    const res = await setMediaSizes(project.id, mediaSizes);
+    const res = await client.value.setMediaSizes(project.id, mediaSizes);
     if (res) {
       await fetchProject(true);
       saved.value = true;
@@ -170,23 +201,58 @@ const saveLayout = async () => {
   }
 };
 
+const createNewProject = async () => {
+  const res = await client.value.createNewProject({
+    ...project,
+    index: projectData.projects.length,
+    size: {
+      height: 4,
+      width: 5,
+    },
+  });
+  console.log(res);
+  if (!res) return;
+  // reload fetched projects
+  await projectData.fetch();
+
+  // set is new project to false
+  await router.replace(`/admin/project-editor/${res.id}`);
+  return res;
+};
+
+const onSaveClick = () =>
+  isNewProject() ? createNewProject() : saveProjectInfo();
+
 const saveProjectInfo = async () => {
   const p = Object.assign({}, project);
-  if (isInfoFilled(p)) {
+  if (isInfoFilled(p) && !updating.value) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    updateProject(p);
+    try {
+      updating.value = true;
+
+      const res = await client.value.updateProject(p as Project);
+      if (res) {
+        await fetchProject(false, true);
+        updated.value = true;
+      }
+      updating.value = false;
+    } catch (e) {
+      console.error(e);
+      updating.value = false;
+    }
   }
 };
 
-watch(
-  () => route.params.id,
-  () => fetchProject()
-);
+watch(route.params, (next) => {
+  console.warn(next);
+  fetchProject(true, true);
+});
 
 watch(
   () => projectData.selectedProject,
   (data) => {
+    if (isNewProject()) return;
     Object.entries(data ?? {}).forEach(([key, value]) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -200,7 +266,45 @@ watch(
   }
 );
 
-fetchProject();
+const setupNewProject = () => {
+  projectData.selectedId = 'default';
+  project.title = 'New project';
+  project.client = 'Unnamed client';
+  project.date = new Date(Date.now());
+};
+
+const onSetup = () => {
+  if (isNewProject()) {
+    console.log('runs');
+    setupNewProject();
+  } else {
+    fetchProject();
+  }
+};
+
+const onMediaEdit = async (payload: {
+  type: 'image' | 'video';
+  files: File[];
+}) => {
+  console.log(payload.type, payload.files);
+  try {
+    if (project.id === undefined) return;
+    const isVideo = payload.type === 'video';
+    const previousFileId = isVideo ? project.videoId : project.thumbnailId;
+    const res = await client.value.setThumbnail(
+      project.id,
+      payload.files[0],
+      isVideo,
+      previousFileId
+    );
+    console.log(res);
+    fetchProject(false, true);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+onSetup();
 </script>
 
 <template>
@@ -208,9 +312,13 @@ fetchProject();
     <div id="scroll__container">
       <project-contents
         :project="project"
+        :project-index="
+          isNewProject() ? projectData.projects.length : undefined
+        "
         editable
         @deleteItem="deleteMedia"
         @gridLayout="onGridLayout"
+        @editMedia="onMediaEdit"
       />
     </div>
   </Scroller>
@@ -241,7 +349,11 @@ fetchProject();
   >
     {{ saving ? 'Saving' : saved ? 'Saved!' : 'Save layout' }}
   </button>
-  <button id="btn__unpin" :class="{ active: mediaPanelOpen, edit__btn: true }">
+  <button
+    id="btn__unpin"
+    :class="{ active: mediaPanelOpen, edit__btn: true }"
+    @click="unpinAll"
+  >
     Unpin all
   </button>
 
@@ -253,9 +365,9 @@ fetchProject();
       disabled: saving || !infoSaveAllowed,
       edit__btn: true,
     }"
-    @click="saveProjectInfo"
+    @click="onSaveClick"
   >
-    {{ saving ? 'Saving' : saved ? 'Saved!' : 'Save info' }}
+    {{ updating ? 'Updating' : updated ? 'Updated!' : 'Update project info' }}
   </button>
   <aside
     id="edit__panel"
@@ -305,7 +417,7 @@ fetchProject();
     >
       Close
     </button>
-    <h2>Medias</h2>
+    <h2>Media</h2>
     <div class="edit__content" ref="mediaPanelRef">
       <div id="dropzone__container">
         <div id="dropzone" :class="{ isDragActive }" v-bind="getRootProps()">
@@ -454,6 +566,7 @@ aside
     position: relative
 
     .media__index
+      @include detail
       position: absolute
       top: $unit
       left: $unit

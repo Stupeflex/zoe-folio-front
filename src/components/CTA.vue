@@ -4,32 +4,53 @@ import Arrow from '@/components/icons/Arrow.vue';
 interface Props {
   to?: string;
   onClick?: (e: MouseEvent) => void;
+  internal?: boolean;
 }
 
 defineProps<Props>();
 </script>
 <template>
-  <a
-    :href="to"
-    class="cta hover__parent"
-    target="_blank"
-    rel="noopener noreferrer"
-    @click="onClick"
-  >
-    <div class="inner">
-      <slot name="icon">
-        <Arrow />
-      </slot>
-    </div>
-    <div class="cta__content">
-      <span class="hover__underline">
-        <slot></slot>
-      </span>
-    </div>
-  </a>
+  <template v-if="to">
+    <a
+      :href="to"
+      class="cta hover__parent"
+      target="_blank"
+      rel="noopener noreferrer"
+      @click="onClick"
+    >
+      <div class="inner">
+        <slot name="icon">
+          <Arrow />
+        </slot>
+      </div>
+      <div class="cta__content">
+        <span class="hover__underline">
+          <slot></slot>
+        </span>
+      </div>
+    </a>
+  </template>
+  <template v-else>
+    <button
+      class="cta hover__parent"
+      rel="noopener noreferrer"
+      @click="onClick"
+    >
+      <div class="inner">
+        <slot name="icon">
+          <Arrow />
+        </slot>
+      </div>
+      <div class="cta__content">
+        <span class="hover__underline">
+          <slot></slot>
+        </span>
+      </div>
+    </button>
+  </template>
 </template>
 
-<style lang="sass" scoped>
+<style lang="sass">
 
 .cta
   display: flex
@@ -80,7 +101,7 @@ defineProps<Props>();
       transform: scaleX(-1) !important
       height: $unit-d
 
-      *
+      & > *, path
         stroke: $c-black
         transition: stroke 0.3s $bezier 0s
 

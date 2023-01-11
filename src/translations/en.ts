@@ -1,6 +1,4 @@
-import type { Translation } from '@/translations/index';
-
-export const en: Translation = {
+export const en = {
   titles: {
     projects: 'Color grading\nprojects',
     process: 'Process',
@@ -20,7 +18,11 @@ export const en: Translation = {
     contact: 'Contact',
     back: 'Back',
     hook: 'Got a project for me? Let\'s get in touch!', // eslint-disable-line prettier/prettier
-    projectManagement: 'Project Management',
+    projectManagement: 'Projects',
+    usage: 'Usage',
+    clients: 'Clients',
+    content: 'Content',
+    adminDashboard: 'Dashboard',
   },
   sections: {
     studio: {
@@ -43,6 +45,31 @@ export const en: Translation = {
     sound: {
       on: 'Sound on',
       off: 'Sound off',
+    },
+  },
+  admin: {
+    dashboard: {
+      overview: 'Overview',
+      projects: 'Projects',
+      clients: 'Clients',
+      usage: 'Usage',
+      content: 'Text content',
+      totalProjects: 'Total projects',
+      archivedProjects: 'Archived',
+      mainSections: 'Main sections',
+    },
+    project: {
+      table: {
+        label: {
+          id: '#',
+          thumbnail: 'Thumbnail',
+          title: 'Title',
+          client: 'Client',
+          type: 'Type',
+          date: 'Date',
+          archived: 'Archived',
+        },
+      },
     },
   },
 };

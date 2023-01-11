@@ -46,6 +46,7 @@ export type ProjectPalette = {
 export type Project = {
   title: string;
   client?: string;
+  archived: boolean;
   id: identifier;
   thumbnailUrl: string;
   size: MediaSize;
@@ -55,7 +56,10 @@ export type Project = {
   type: ProjectType;
   date?: Date;
   videoUrl?: string;
+  videoId?: identifier;
+  thumbnailId?: identifier;
   fullyFetched?: boolean;
+  index: number;
 };
 
 const projectsToGridItems = (
@@ -131,10 +135,17 @@ export const useProjectData = defineStore('projectData', () => {
   const selectedProject = computed((): Project | undefined =>
     projects.value.find(({ id }) => id === selectedId.value)
   );
+
+  const visibleProjects = computed(() =>
+    projects.value.filter(({ archived }) => !archived)
+  );
+
   const filteredProjects = computed((): Project[] =>
     filters.value.length > 0
-      ? projects.value.filter((project) => filters.value.includes(project.type))
-      : projects.value
+      ? visibleProjects.value.filter((project) =>
+        filters.value.includes(project.type)
+      )
+      : visibleProjects.value
   );
   const gridItems = computed((): (Partial<GridItem> & { id: identifier })[] => {
     return normalizeGridItems(projectsToGridItems(filteredProjects.value));
@@ -199,6 +210,13 @@ export const useProjectData = defineStore('projectData', () => {
     }
   };
 
+  const setProjectArchived = (id: identifier, archived: boolean) => {
+    const i = projects.value.findIndex((p) => p.id === id);
+    if (i >= 0) {
+      projects.value[i].archived = archived;
+    }
+  };
+
   const setSound = (active: boolean) => {
     soundActive.value = active;
   };
@@ -225,6 +243,8 @@ export const useProjectData = defineStore('projectData', () => {
 
   return {
     projects,
+    visibleProjects,
+    filteredProjects,
     selectedId,
     filters,
     palettes,
@@ -244,5 +264,6 @@ export const useProjectData = defineStore('projectData', () => {
     toggleSound,
     replacePalette,
     toggleFilter,
+    setProjectArchived,
   };
 });

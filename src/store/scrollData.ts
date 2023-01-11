@@ -7,6 +7,7 @@ import {
   defaultPalette,
   processSectionPalette,
   studioSectionPalette,
+  aboutSectionPalette,
 } from '@/utils/gradient';
 import { reactive, ref, watch } from 'vue';
 import { gridLength } from '@/utils/grid';
@@ -150,6 +151,8 @@ export const useScrollData = defineStore('scrollData', () => {
         return setColorsRgb(processSectionPalette, true);
       case 'projects':
         return setColorsRgb(defaultPalette, true);
+      case 'about':
+        return setColorsRgb(aboutSectionPalette, true);
       default:
         return;
     }

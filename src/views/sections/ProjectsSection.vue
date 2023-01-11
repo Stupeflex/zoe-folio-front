@@ -68,7 +68,8 @@ const sectionStyle = computed(() => ({
 #section__projects
   @include grid(auto-fit, true, calc($rows - 1))
   display: inline-grid
-  padding-top: calc($cell-height + $unit + $unit)
+  padding-top: calc($cell-height + $unit-d)
+  padding-right: calc($cell-width * 2 + $unit-d)
   // min-width: 100%
   height: 100%
   min-width: max-content
@@ -102,7 +103,6 @@ const sectionStyle = computed(() => ({
   grid-column-end: span 9
 
   @media only screen and (max-width: $b-mobile)
-    background: red
     grid-column: 1 / span calc($columns)
     justify-content: space-between
 </style>

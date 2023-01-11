@@ -25,7 +25,6 @@ const generateDimensions = (): { width: number; height: number } => {
   const ratio = window.innerWidth / window.innerHeight;
   const width = Math.min(window.innerWidth, MaxCanvasWidth);
   const height = Math.min(window.innerHeight, MaxCanvasWidth / ratio);
-  console.log(ratio, width, height);
   return { width, height };
 };
 

@@ -3,13 +3,18 @@ import { computed } from 'vue';
 
 interface Props {
   rotation?: number;
+  flip?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   rotation: 0,
+  flip: false,
 });
 
-const style = computed(() => `transform: rotate(${props.rotation}deg);`);
+const style = computed(
+  () =>
+    `transform: rotate(${props.rotation}deg) scaleX(${props.flip ? -1 : 1});`
+);
 </script>
 
 <template>

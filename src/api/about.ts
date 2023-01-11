@@ -40,7 +40,6 @@ export const fetchAboutData = (): Promise<AboutData> =>
   );
 
 const formatAboutData = (raw: AboutData__Raw): AboutData => {
-  console.log(raw);
   const image = {
     type: MediaType.image,
     id: raw.data.id,

@@ -52,10 +52,9 @@ const onKey = (e: KeyboardEvent) => {
   if (e.key === '@') {
     const colors = Array(5)
       .fill('')
-      .map((_v) => generateRandomHexColor());
+      .map(() => generateRandomHexColor());
     console.log(colors);
     gradientData.setColors(colors, true);
-    console.log(gradientData.uniforms);
   }
 };
 
