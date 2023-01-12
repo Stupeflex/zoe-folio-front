@@ -1,6 +1,6 @@
 import { Token } from '@/api/types';
 
-export const baseUrl = 'http://localhost:1337';
+export const baseUrl = import.meta.env.VITE_API_URL;
 
 export enum ApiRoots {
   default = '/api',
@@ -29,23 +29,23 @@ export interface ClientOptions {
 /* eslint-disable prettier/prettier */
 export const clientFactory =
   (apiRoot: ApiRoots) =>
-    async (endpoint = '', options: ClientOptions = {}) => {
-      const url = baseUrl + apiRoot + endpoint;
-      console.log('fetching: ', url);
-      try {
-        const opts = {
-          ...options,
-          body: options?.body ? stringifyBody(options.body) : undefined,
-        };
-        const res = await fetch(url, opts);
-        if (res.json && res.body) return await res.json();
-        if (res.body) return res.body;
-        return res;
-      } catch (e) {
-        console.error(e);
-        throw new Error('client error on ' + url);
-      }
-    };
+  async (endpoint = '', options: ClientOptions = {}) => {
+    const url = baseUrl + apiRoot + endpoint;
+    console.log('fetching: ', url);
+    try {
+      const opts = {
+        ...options,
+        body: options?.body ? stringifyBody(options.body) : undefined,
+      };
+      const res = await fetch(url, opts);
+      if (res.json && res.body) return await res.json();
+      if (res.body) return res.body;
+      return res;
+    } catch (e) {
+      console.error(e);
+      throw new Error('client error on ' + url);
+    }
+  };
 /* eslint-enable prettier/prettier */
 
 export const authHeaders = (token: Token) => ({
@@ -93,6 +93,11 @@ export const authenticatedGuard = async <T>(
 /* eslint-disable prettier/prettier */
 export const authenticatedClientFactory =
   (apiRoot: ApiRoots = ApiRoots.default) =>
-    (endpoint = '', maybeToken: Token | undefined, options = {}) =>
-      authenticatedGuard(maybeToken, (token) => (clientFactory(apiRoot)(endpoint, mergeHeaders(options, authHeaders(token)))));
+  (endpoint = '', maybeToken: Token | undefined, options = {}) =>
+    authenticatedGuard(maybeToken, (token) =>
+      clientFactory(apiRoot)(
+        endpoint,
+        mergeHeaders(options, authHeaders(token))
+      )
+    );
 /* eslint-enable prettier/prettier */

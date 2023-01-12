@@ -21,7 +21,7 @@
   },
   "plugins": ["@typescript-eslint", "eslint-plugin-vue"],
   "rules": {
-    "indent": [2, 2, { "SwitchCase": 1 }],
+    // "indent": [2, 2, { "SwitchCase": 1 }],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
