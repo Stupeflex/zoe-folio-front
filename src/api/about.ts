@@ -1,4 +1,4 @@
-import client, { baseUrl } from '@/api/client';
+import client from '@/api/client';
 import {
   AboutData,
   AboutData__Raw,
@@ -23,10 +23,10 @@ const formatClients = (raw: ApiClientResponse): Client[] => {
     logo:
       !!c.attributes.logo.data && c.attributes.logo.data.attributes
         ? {
-          url: baseUrl + c.attributes.logo.data.attributes.url, // eslint-disable-line prettier/prettier
-          type: MediaType.image, // eslint-disable-line prettier/prettier
-          id: c.id, // eslint-disable-line prettier/prettier
-        } // eslint-disable-line prettier/prettier
+            url: c.attributes.logo.data.attributes.url, // eslint-disable-line prettier/prettier
+            type: MediaType.image, // eslint-disable-line prettier/prettier
+            id: c.id, // eslint-disable-line prettier/prettier
+          } // eslint-disable-line prettier/prettier
         : null,
   });
 
@@ -42,7 +42,7 @@ const formatAboutData = (raw: AboutData__Raw): AboutData => {
   const image = {
     type: MediaType.image,
     id: raw.data.id,
-    url: baseUrl + raw.data.attributes.image.data.attributes.url,
+    url: raw.data.attributes.image.data.attributes.url,
   };
 
   return {
