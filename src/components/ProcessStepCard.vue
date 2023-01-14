@@ -49,7 +49,7 @@ const props = defineProps<ProcessStepProps>();
 const width = computed(() =>
   responsiveData.getValue(
     {
-      mobile: 5,
+      mobile: 8,
       tablet: 8,
       default: 8,
     },
@@ -69,7 +69,11 @@ const startX = computed(() =>
 );
 
 const size = computed(() => ({
-  y: 3,
+  y: responsiveData.getValue({
+    default: 3,
+    tablet: 3,
+    mobile: 7,
+  }),
   x: props.index * width.value,
   width: width.value,
   height: 9,

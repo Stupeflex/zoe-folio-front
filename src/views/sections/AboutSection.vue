@@ -30,7 +30,13 @@ const clientColumnsCount = computed(
     data-scroll-call="section,about"
     data-scroll-id="about"
   >
-    <div id="about__title">
+    <div
+      id="about__title"
+      data-scroll
+      data-scroll-speed="-4"
+      data-scroll-sticky
+      data-scroll-target="#section__about"
+    >
       <h1
         class="section__title"
         :style="blurStyle"
@@ -41,7 +47,7 @@ const clientColumnsCount = computed(
     <img
       id="about__img"
       v-if="aboutData.loaded"
-      :src="aboutData.image.url"
+      :src="aboutData.image?.url"
       alt="Zoë Candito"
     />
     <div id="about__info" v-if="aboutData.loaded">
@@ -123,6 +129,9 @@ $clients-row-start: 3
   @include grid(auto-fit, true, 8)
   grid-auto-flow: column
   padding: 0
+
+  @media only screen and (max-width: $b-mobile)
+    grid-column-start: 15
 
   .about__client
     height: 100%
@@ -254,7 +263,7 @@ $clients-row-start: 3
 
   @media only screen and (max-width: $b-mobile)
     grid-row: 12 / -1
-    grid-column: 3 / span 4
+    grid-column: 2 / span 4
 
 #about__description
   grid-column: 13 / span 4
@@ -271,5 +280,5 @@ $clients-row-start: 3
 
   @media only screen and (max-width: $b-mobile)
     grid-row-start: 4
-    grid-column: 10 / span 5
+    grid-column: 8 / span 5
 </style>

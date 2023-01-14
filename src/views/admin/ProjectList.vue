@@ -70,12 +70,12 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
             </div>
           </td>
           <td>
-            {{ new Date(project.date).toLocaleDateString() }}
+            {{ new Date(project.date || Date.now()).toLocaleDateString() }}
           </td>
           <td>
             <CheckBox
               :checked="project.archived"
-              @toggle="(checked) => toggleArchived(project.id)(checked)"
+              @toggle="(checked: boolean) => toggleArchived(project.id)(checked)"
             />
           </td>
         </tr>

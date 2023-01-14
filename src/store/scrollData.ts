@@ -178,11 +178,12 @@ export const useScrollData = defineStore('scrollData', () => {
     );
 
     const l = responsiveData.getValue({
-      mobile: 6,
+      mobile: 2,
       tablet: 7,
       default: 9,
     });
     const visibleLength = unit() * 2 + gridLength(l, 'x');
+    console.log(visibleLength);
     const trackLength = gridLength(l - 1, 'x');
     cards.forEach((card) => {
       const deltaX = e.scroll.x + visibleLength - card.left;

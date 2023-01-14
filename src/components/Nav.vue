@@ -8,8 +8,8 @@
         class="hover__underline"
         target="_blank"
         rel="noopener noreferrer"
-        href="mailto:hello@zoecandito.studio"
-        >hello@zoecandito.studio
+        href="mailto:canditozoe@gmail.com"
+        >canditozoe@gmail.com
       </a>
     </div>
     <router-link to="/" id="nav__logo">

@@ -13,9 +13,16 @@ import { useMouseData } from '@/store/mouseData';
 import { useGradientData } from '@/store/gradientData';
 
 import fragmentShader from '../shaders/gradient.frag';
+import { useResponsiveData } from '@/store/responsiveData';
+
+const responsiveData = useResponsiveData();
 
 let app: Application;
-const MaxCanvasWidth = 3000;
+const MaxCanvasWidth = responsiveData.getValue({
+  default: 3000,
+  tablet: 1500,
+  mobile: 700,
+});
 let tick = 0;
 
 const mouseData = useMouseData();

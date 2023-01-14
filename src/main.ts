@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { Application } from '@pixi/app';
 import { TickerPlugin } from '@pixi/ticker';
-import { BatchRenderer, Renderer } from '@pixi/core';
+import { BatchRenderer, Renderer, extensions } from '@pixi/core';
 import { AccessibilityManager } from '@pixi/accessibility';
 import { InteractionManager } from '@pixi/interaction';
 import { Extract } from '@pixi/extract';
@@ -37,16 +37,18 @@ app.use(router);
 
 const initPixiPlugins = () => {
   // Install renderer plugins
-  Renderer.registerPlugin('accessibility', AccessibilityManager);
-  Renderer.registerPlugin('extract', Extract);
-  Renderer.registerPlugin('interaction', InteractionManager);
-  Renderer.registerPlugin('particle', ParticleRenderer);
-  Renderer.registerPlugin('prepare', Prepare);
-  Renderer.registerPlugin('batch', BatchRenderer);
+  extensions.add(
+    AccessibilityManager,
+    Extract,
+    InteractionManager,
+    ParticleRenderer,
+    Prepare,
+    BatchRenderer,
+    TickerPlugin,
+    AppLoaderPlugin
+  );
 
   // Install application plugins
-  Application.registerPlugin(TickerPlugin);
-  Application.registerPlugin(AppLoaderPlugin);
 };
 
 initPixiPlugins();

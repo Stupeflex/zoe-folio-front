@@ -14,6 +14,7 @@
     "@pixi/constants": "^6.3.2",
     "@pixi/core": "^6.3.2",
     "@pixi/display": "^6.3.2",
+    "@pixi/extensions": "6.5.8",
     "@pixi/extract": "^6.3.2",
     "@pixi/filter-kawase-blur": "^4.1.5",
     "@pixi/filter-noise": "^6.3.2",
