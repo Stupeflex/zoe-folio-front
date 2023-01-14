@@ -57,7 +57,7 @@ const resetErrorMessage = () => {
     <form id="form" @submit.prevent="onSubmit">
       <label id="email__label">
         Email address
-        <input type="email" name="email" id="email" v-bind="email" />
+        <input type="text" name="email" id="email" v-bind="email" />
       </label>
 
       <label id="password__label">
