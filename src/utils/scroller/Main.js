@@ -51,8 +51,6 @@ export class Main {
       this.scroll = new NativeScroll(this.options);
     }
 
-    console.log(this.scroll instanceof SmoothScroll);
-
     this.scroll.init();
 
     if (window.location.hash) {

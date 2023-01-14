@@ -67,7 +67,7 @@ export const defaultGridItemSize: Size = {
 
 export const borders = ['top', 'left', 'right', 'bottom'] as const;
 
-export type Border = typeof borders[number];
+export type Border = (typeof borders)[number];
 
 export const corners: Border[][] = [
   ['top', 'right'],

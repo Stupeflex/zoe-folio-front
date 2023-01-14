@@ -31,7 +31,6 @@ export const clientFactory =
   (apiRoot: ApiRoots) =>
   async (endpoint = '', options: ClientOptions = {}) => {
     const url = baseUrl + apiRoot + endpoint;
-    console.log('fetching: ', url);
     try {
       const opts = {
         ...options,
@@ -85,7 +84,6 @@ export const authenticatedGuard = async <T>(
   if (token) {
     return await cb(token);
   }
-  console.log(token);
   console.warn('Unauthenticated call to ' + endpoint);
   return null;
 };

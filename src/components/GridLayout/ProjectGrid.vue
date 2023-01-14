@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useProjectData } from '@/store/projectData';
 import { nextTick } from 'vue';
-import { GridLayoutData, logMatrix } from '@/utils/grid';
 import GridLayout from '@/components/GridLayout/GridLayout.vue';
 import { useScrollData } from '@/store/scrollData';
 import ProjectThumbnail from '@/components/ProjectThumbnail.vue';
@@ -12,10 +11,6 @@ const scrollData = useScrollData();
 const onResize = () => {
   nextTick(scrollData.update);
 };
-
-const onLayout = (l: GridLayoutData) => {
-  logMatrix(l.matrix);
-};
 </script>
 
 <template>
@@ -25,7 +20,6 @@ const onLayout = (l: GridLayoutData) => {
       data: projectData.gridLayout,
     }"
     @resize="onResize"
-    @layout="onLayout"
     allow-delete
   >
     <template v-slot="{ project }">

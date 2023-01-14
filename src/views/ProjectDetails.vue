@@ -21,8 +21,6 @@ const route = useRoute();
 const loaded = ref<boolean>(false);
 const index = ref<number>(0);
 
-const videoRef = ref<HTMLVideoElement>();
-
 const fetchProject = async () => {
   const ID: identifier | null = route?.params?.id
     ? String(route.params.id)
@@ -37,12 +35,10 @@ const fetchProject = async () => {
       preloadNextProject(projectIndex);
       // set display index
       index.value = projectIndex;
-      console.log(index.value);
 
       // don't reload data
       let fetchedProject = projectData.selectedProject;
       if (!fetchedProject?.fullyFetched) {
-        console.warn('project ' + fetchedProject?.title + ' needs full fetch');
         const justFetched = await fetchProjectById(ID);
         if (justFetched !== null && !Array.isArray(justFetched)) {
           fetchedProject = justFetched;
@@ -61,7 +57,6 @@ const fetchProject = async () => {
           ({ id }) => id === fetchedProject?.id
         );
         if (maybeProjectPalette && maybeProjectPalette.palette) {
-          console.log('set stored palette');
           gradientData.setColorsRgb(maybeProjectPalette.palette, true);
         } else {
           try {
@@ -69,7 +64,6 @@ const fetchProject = async () => {
               fetchedProject.thumbnailUrl
             );
             if (generatedPalette) {
-              console.log('set fetched palette');
               gradientData.setColorsRgb(generatedPalette, true);
             }
           } catch (e) {
@@ -87,14 +81,12 @@ const preloadNextProject = (projectIndex: number) => {
   const index =
     projectIndex < projectData.projects.length - 1 ? projectIndex + 1 : 0;
   const nextProject = projectData.projects[index];
-  console.log(nextProject.fullyFetched);
 };
 
 watch(
   () => loaded.value,
   (value) => {
     if (value) {
-      console.warn('NEW PROJECT');
       nextTick(() => {
         setTimeout(() => {
           scrollData.update();

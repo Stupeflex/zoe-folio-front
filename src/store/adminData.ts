@@ -20,7 +20,6 @@ export interface Credentials {
 }
 
 const storeLoginInfo = ({ token, user }: { token: Token; user: AdminUser }) => {
-  console.log(token);
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
 };
@@ -28,7 +27,6 @@ const storeLoginInfo = ({ token, user }: { token: Token; user: AdminUser }) => {
 const getStoredLoginInfo = (): { token: Token; user: AdminUser } | null => {
   const user = localStorage.getItem('user');
   const token = localStorage.getItem('token');
-  console.log(user, token);
   if (user && token)
     return {
       user: JSON.parse(user) as AdminUser,
@@ -52,9 +50,7 @@ export const useAdminData = defineStore('adminData', () => {
     options: CallbackOptions = {}
   ) => {
     const response = await loginAsAdmin(credentials);
-    console.log(response);
     if (response.user === null || response.token === null) {
-      console.log('error');
       options.onError && options.onError(response.error.message);
       return response.error;
     }
@@ -68,7 +64,7 @@ export const useAdminData = defineStore('adminData', () => {
   const isLoggedIn = (): boolean => {
     if (token.value && user.value) return true;
     const stored = getStoredLoginInfo();
-    console.log(stored);
+
     if (stored !== null) {
       token.value = stored.token;
       user.value = stored.user;

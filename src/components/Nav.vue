@@ -148,7 +148,6 @@ const clear = computed<boolean>(
 const onNavLinkClick = (identifier: string) => {
   open.value = false;
   if (route.path === '/' || links.some((link) => link.to === route.fullPath)) {
-    console.log('should scroll');
     scrollData.scrollTo(identifier, {
       duration: 1000,
     });
@@ -160,7 +159,6 @@ const toggleContactOpen = () => {
 };
 
 const close = () => {
-  console.log('close');
   open.value = false;
 };
 
@@ -170,7 +168,6 @@ const setNavHeight = () => {
   if (navRef.value) {
     const h = navRef.value?.getBoundingClientRect().height;
     const height = h - cellHeight() * 3 - responsiveData.unit * 4;
-    console.log(height);
     responsiveData.setNavHeight(height);
   }
 };

@@ -22,7 +22,6 @@ const onSubmit = async (e: SubmitEvent) => {
   if (credentials.email.length === 0 || credentials.password.length === 0) {
     return setErrorMessage('Email or password is empty.');
   }
-  console.log(credentials);
   await adminData.login(credentials, {
     onSuccess: () => {
       resetErrorMessage();

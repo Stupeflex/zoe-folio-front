@@ -78,11 +78,9 @@ export const useGradientData = defineStore('gradientData', {
             });
           });
         } else {
-          console.log('setColors no transition');
           this.colors = colors.map((hex) => hexToRgb(hex));
         }
       } else {
-        console.warn('#######');
         throw new Error('color count not matched');
       }
     },
@@ -107,11 +105,9 @@ export const useGradientData = defineStore('gradientData', {
             });
           });
         } else {
-          console.log('setColors no transition');
           this.colors = colors;
         }
       } else {
-        console.warn('#######');
         throw new Error('color count not matched');
       }
     },
@@ -136,7 +132,6 @@ export const useGradientData = defineStore('gradientData', {
           });
         });
       } else {
-        console.log('resetDefaultColors no transition');
         this.colors = [...this.defaultColors];
       }
     },

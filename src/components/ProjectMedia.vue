@@ -10,8 +10,6 @@ const props = defineProps<ProjectMediaProps>();
 
 const emit = defineEmits(['preview']);
 
-console.log(props.media.size);
-
 const togglePreview = () => {
   emit('preview', props.media.id);
 };

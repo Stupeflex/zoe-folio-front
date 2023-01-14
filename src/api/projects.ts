@@ -60,7 +60,6 @@ export const formatProjects = (
   isFullData = false
 ): Project | Project[] => {
   const format = (raw: Project_Raw): Project => {
-    console.log(raw);
     return {
       id: raw.id,
       client: raw.attributes.client,
@@ -121,27 +120,27 @@ export const formatRawMediaArray = <
 /* eslint-disable prettier/prettier */
 export const addMediasToProject =
   (token?: Token) =>
-  async (projectId: identifier, projectMediaCount: number, files: File[]) => {
-    try {
-      const formData = new FormData();
-      files.forEach((file, index) => {
-        formData.append('file' + index, file);
-      });
-      const medias = authenticatedClient(
-        `/projects/${projectId}/media/add`,
-        token,
-        {
-          method: Methods.post,
-          body: formData,
-        }
-      );
-      console.log(medias);
-      return medias;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  };
+
+    async (projectId: identifier, projectMediaCount: number, files: File[]) => {
+      try {
+        const formData = new FormData();
+        files.forEach((file, index) => {
+          formData.append('file' + index, file);
+        });
+        const medias = authenticatedClient(
+          `/projects/${projectId}/media/add`,
+          token,
+          {
+            method: Methods.post,
+            body: formData,
+          }
+        );
+        return medias;
+      } catch (e) {
+        console.error(e);
+        return false;
+      }
+    };
 
 /* eslint-enable prettier/prettier */
 
@@ -260,7 +259,6 @@ export const createNewProject =
     })
       .then((res: CreateProjectResponse) => {
         if (res.error || !res.data || !res.data.id) return null;
-        console.log(res);
         return {
           id: res.data.id,
           ...res.data.attributes,
@@ -287,29 +285,17 @@ export const setThumbnailData =
     formData.append('field', isVideo ? 'video' : 'thumbnail');
     const endpoint =
       previousFileId !== undefined ? `/upload?id=${previousFileId}` : '/upload';
-    console.log(previousFileId, endpoint);
     return authenticatedClient(endpoint, token, {
       method: Methods.post,
       body: formData,
     })
       .then((res) => {
-        console.log(res);
         return !!res;
       })
       .catch((e) => {
         console.error(e);
         return false;
       });
-
-    //   return authenticatedClient(`/projects/${id}/media/thumbnail`, token, {
-    //     method: Methods.put,
-    //     body: formData,
-    //   })
-    //     .then((res) => !!res)
-    //     .catch((e) => {
-    //       console.error(e);
-    //       return false;
-    //     });
   };
 
 export const adminProjectClient = (token?: Token) => ({

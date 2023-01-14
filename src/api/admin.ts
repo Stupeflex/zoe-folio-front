@@ -32,10 +32,7 @@ export const loginAsAdmin = async (
     },
   })
     .then((response: LoginResponse) => {
-      console.log(response);
-
       if (response.user !== undefined && response.jwt !== undefined) {
-        console.log('login success');
         return { user: response.user, token: response.jwt };
       }
       return {

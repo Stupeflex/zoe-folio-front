@@ -19,9 +19,9 @@ const responsiveData = useResponsiveData();
 
 let app: Application;
 const MaxCanvasWidth = responsiveData.getValue({
-  default: 3000,
-  tablet: 1500,
-  mobile: 700,
+  default: 1500,
+  tablet: 1000,
+  mobile: 500,
 });
 let tick = 0;
 
@@ -115,8 +115,6 @@ const onResize = () => {
   gradientFilter.uniforms.iResolution.y = dimensions.value.height;
   app.renderer.render(app.stage);
 };
-
-console.log(mouseData.normalizedMousePos);
 
 const onFrame = () => {
   // cursorShape.clear();

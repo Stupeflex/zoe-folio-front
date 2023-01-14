@@ -87,8 +87,7 @@ export const vec3ArrayToUniforms = (vectors: Vec3[]): number[] => {
 
 export const rgba2hex = (color: string): string => {
   const rgba = color.replace(/^rgba?\(|\s+|\)$/g, '').split(',');
-  console.log(rgba);
-  const hex = `#${(
+  return `#${(
     (1 << 24) +
     (parseInt(rgba[0]) << 16) +
     (parseInt(rgba[1]) << 8) +
@@ -96,7 +95,6 @@ export const rgba2hex = (color: string): string => {
   )
     .toString(16)
     .slice(1)}`;
-  return hex;
 };
 
 const thief = new ColorThief();
@@ -118,7 +116,7 @@ export const extractPalette = (
       if (shuffle) return palette.sort(() => 0.5 - Math.random());
       return palette;
     } catch (e) {
-      console.warn('get palette failed', e);
+      return null;
     }
   }
   return null;
