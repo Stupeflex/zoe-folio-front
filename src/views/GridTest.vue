@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { GridItem, GridLayoutData, logMatrix } from '@/utils/grid';
+import { GridItem } from '@/utils/grid';
 import GridLayout from '@/components/GridLayout/GridLayout.vue';
 import ScrollContainer from '@/views/ScrollContainer.vue';
 import { useScrollData } from '@/store/scrollData';
@@ -21,10 +21,6 @@ const items: Partial<GridItem<{ string: string }>>[] = Array.from(
 const onReSize = () => {
   nextTick(scrollData.update);
 };
-
-const onLayout = (l: GridLayoutData) => {
-  logMatrix(l.matrix);
-};
 </script>
 
 <template>
@@ -40,7 +36,6 @@ const onLayout = (l: GridLayoutData) => {
         editable
         allow-delete
         @resize="onReSize"
-        @layout="onLayout"
       >
       </GridLayout>
     </section>

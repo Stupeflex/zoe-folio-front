@@ -61,7 +61,7 @@ interface Scroller {
 }
 
 const sectionIds = ['process', 'projects', 'studio', 'about'];
-export type ScrollSectionId = typeof sectionIds[number];
+export type ScrollSectionId = (typeof sectionIds)[number];
 
 const getCurrentActiveSection = (
   e: scrollEvent
@@ -183,7 +183,6 @@ export const useScrollData = defineStore('scrollData', () => {
       default: 9,
     });
     const visibleLength = unit() * 2 + gridLength(l, 'x');
-    console.log(visibleLength);
     const trackLength = gridLength(l - 1, 'x');
     cards.forEach((card) => {
       const deltaX = e.scroll.x + visibleLength - card.left;

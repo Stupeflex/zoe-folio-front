@@ -27,8 +27,6 @@ export default class Core {
     this.checkResize = this.checkResize.bind(this);
     this.checkEvent = this.checkEvent.bind(this);
 
-    console.dir(this.el);
-
     this.instance = {
       scroll: {
         x: 0,

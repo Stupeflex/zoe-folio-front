@@ -23,8 +23,6 @@ const dragging = ref(false);
 
 const initLocomotive = () => {
   if (mainRef.value) {
-    // document.addEventListener('DOMContentLoaded', () => {
-    console.log(props.direction);
     scrollData.init({
       el: mainRef.value,
       smooth: true,
@@ -53,7 +51,6 @@ const initLocomotive = () => {
 
     nextTick(() => {
       setTimeout(() => {
-        console.log('update scroll');
         scrollData.update();
       }, 300);
     });
@@ -63,10 +60,8 @@ if (props.dependencies) {
   watch(
     () => props?.dependencies,
     () => {
-      console.log('scroller dependency changed');
       if (scrollData.scroller) {
         setTimeout(() => {
-          console.log('update scroll');
           scrollData.update();
         }, 300);
       }
@@ -75,10 +70,8 @@ if (props.dependencies) {
 }
 
 // setupUpdateDeps();
-
 onBeforeUnmount(() => {
   if (scrollData.scroller) {
-    console.log('destroy scroll');
     scrollData.destroy();
   }
 });
@@ -120,7 +113,6 @@ const onDragMove = (e: MouseEvent) => {
 };
 
 onMounted(() => {
-  console.log('onMounted scroller');
   if (props.delay) {
     setTimeout(initLocomotive, props.delay);
   } else {
@@ -130,8 +122,6 @@ onMounted(() => {
   window.addEventListener('pointerup', onDragEnd);
   window.addEventListener('pointercancel', onDragEnd);
   window.addEventListener('pointermove', onDragMove);
-
-  // setupUpdateDeps();
 });
 
 const onHoverLeave = () => {

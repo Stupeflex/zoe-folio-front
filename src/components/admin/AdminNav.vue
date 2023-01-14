@@ -144,7 +144,6 @@ const toggleContactOpen = () => {
 };
 
 const close = () => {
-  console.log('close');
   open.value = false;
 };
 

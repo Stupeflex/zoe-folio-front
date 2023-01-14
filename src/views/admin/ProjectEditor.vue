@@ -46,7 +46,6 @@ const isInfoFilled = ({
 }: Partial<Project>): boolean => {
   const baseInfoFilled =
     !!client && !!type && !!title && !!date && title?.length > 0;
-  console.log(baseInfoFilled, date, type, title, client);
   return isNewProject() ? baseInfoFilled : baseInfoFilled && !!id;
 };
 
@@ -60,8 +59,7 @@ const displayDate = computed({
     const m = D.getMonth() + 1;
     const d = D.getDate();
     const y = D.getFullYear();
-    const s = `${y}-${formatNumber(m)}-${d}`;
-    return s;
+    return `${y}-${formatNumber(m)}-${d}`;
   },
   set(newVal: string) {
     project.date = new Date(newVal);
@@ -80,39 +78,31 @@ const fetchProject = async (updateMedia?: boolean, updateInfo?: boolean) => {
   const ID: identifier | null = route?.params?.id
     ? String(route.params.id)
     : null;
-  if (ID !== null) {
-    projectData.selectProject(Number(String(route.params.id ?? project.id)));
-    let fetchedProject = projectData.selectedProject;
-    if (!fetchedProject?.fullyFetched || updateMedia || updateInfo) {
-      console.warn('project ' + fetchedProject?.title + ' needs full fetch');
-      const justFetched = await fetchProjectById(ID);
-      console.log(justFetched);
-      if (justFetched && !Array.isArray(justFetched)) {
-        fetchedProject = justFetched;
-      }
+
+  if (ID === null) return null;
+
+  projectData.selectProject(Number(String(route.params.id ?? project.id)));
+  let fetchedProject = projectData.selectedProject;
+  if (!fetchedProject?.fullyFetched || updateMedia || updateInfo) {
+    const justFetched = await fetchProjectById(ID);
+    if (justFetched && !Array.isArray(justFetched)) {
+      fetchedProject = justFetched;
     }
-    if (
-      fetchedProject &&
-      fetchedProject?.id &&
-      !Array.isArray(fetchedProject)
-    ) {
-      console.log(fetchedProject.title);
-      projectData.updateProject(fetchedProject, true);
-      if (
-        updateInfo &&
-        (fetchedProject.thumbnailUrl || fetchedProject.videoUrl)
-      ) {
-        project.thumbnailUrl = fetchedProject.thumbnailUrl;
-        project.videoUrl = fetchedProject.videoUrl;
-      }
-      if (updateMedia && fetchedProject.media) {
-        project.media = fetchedProject.media;
-      }
-    }
-    return fetchedProject;
-  } else {
-    console.log(ID, route.params.id);
   }
+  if (fetchedProject && fetchedProject?.id && !Array.isArray(fetchedProject)) {
+    projectData.updateProject(fetchedProject, true);
+    if (
+      updateInfo &&
+      (fetchedProject.thumbnailUrl || fetchedProject.videoUrl)
+    ) {
+      project.thumbnailUrl = fetchedProject.thumbnailUrl;
+      project.videoUrl = fetchedProject.videoUrl;
+    }
+    if (updateMedia && fetchedProject.media) {
+      project.media = fetchedProject.media;
+    }
+  }
+  return fetchedProject;
 };
 
 const onDrop = async (files: File[]) => {
@@ -173,7 +163,6 @@ const unpinAll = () => {
 };
 
 const saveLayout = async () => {
-  console.log('save btn press', gridLayout.value);
   if (
     gridLayout.value &&
     project.media &&
@@ -181,7 +170,6 @@ const saveLayout = async () => {
     project.id &&
     !saving.value
   ) {
-    console.log('saving');
     saving.value = true;
     const mediaSizes = (gridLayout.value?.items ?? []).map((item) => ({
       id: item.id,
@@ -210,7 +198,6 @@ const createNewProject = async () => {
       width: 5,
     },
   });
-  console.log(res);
   if (!res) return;
   // reload fetched projects
   await projectData.fetch();
@@ -245,7 +232,6 @@ const saveProjectInfo = async () => {
 };
 
 watch(route.params, (next) => {
-  console.warn(next);
   fetchProject(true, true);
 });
 
@@ -275,7 +261,6 @@ const setupNewProject = () => {
 
 const onSetup = () => {
   if (isNewProject()) {
-    console.log('runs');
     setupNewProject();
   } else {
     fetchProject();
@@ -286,7 +271,6 @@ const onMediaEdit = async (payload: {
   type: 'image' | 'video';
   files: File[];
 }) => {
-  console.log(payload.type, payload.files);
   try {
     if (project.id === undefined) return;
     const isVideo = payload.type === 'video';
@@ -297,7 +281,6 @@ const onMediaEdit = async (payload: {
       isVideo,
       previousFileId
     );
-    console.log(res);
     fetchProject(false, true);
   } catch (e) {
     console.error(e);

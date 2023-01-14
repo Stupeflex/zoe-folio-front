@@ -73,7 +73,6 @@ const applyPalette = (e: MouseEvent) => {
   if (palette?.palette) {
     gradientData.setColorsRgb(palette.palette, true);
   } else {
-    console.warn('use fallback palette hover');
     extractPaletteFallback(e);
   }
 };
@@ -89,7 +88,6 @@ const onLeave = () => {
   );
   if (isDifferent && !inTransition.value) {
     gradientData.resetDefaultColors(true);
-    console.log('reset gradient');
   }
   projectData.hoveringId = null;
 };

@@ -60,7 +60,6 @@ export const formatProjects = (
   isFullData = false
 ): Project | Project[] => {
   const format = (raw: Project_Raw): Project => {
-    console.log(raw);
     return {
       id: raw.id,
       client: raw.attributes.client,
@@ -135,7 +134,6 @@ export const addMediasToProject =
             body: formData,
           }
         );
-        console.log(medias);
         return medias;
       } catch (e) {
         console.error(e);
@@ -259,7 +257,6 @@ export const createNewProject =
     })
       .then((res: CreateProjectResponse) => {
         if (res.error || !res.data || !res.data.id) return null;
-        console.log(res);
         return {
           id: res.data.id,
           ...res.data.attributes,
@@ -273,43 +270,31 @@ export const createNewProject =
 
 export const setThumbnailData =
   (token?: Token) =>
-    async (
-      id: identifier,
-      file: File,
-      isVideo: boolean,
-      previousFileId?: identifier
-    ) => {
-      const formData = new FormData();
-      formData.append('files', file);
-      formData.append('ref', 'api::project.project');
-      formData.append('refId', String(id));
-      formData.append('field', isVideo ? 'video' : 'thumbnail');
-      const endpoint =
+  async (
+    id: identifier,
+    file: File,
+    isVideo: boolean,
+    previousFileId?: identifier
+  ) => {
+    const formData = new FormData();
+    formData.append('files', file);
+    formData.append('ref', 'api::project.project');
+    formData.append('refId', String(id));
+    formData.append('field', isVideo ? 'video' : 'thumbnail');
+    const endpoint =
       previousFileId !== undefined ? `/upload?id=${previousFileId}` : '/upload';
-      console.log(previousFileId, endpoint);
-      return authenticatedClient(endpoint, token, {
-        method: Methods.post,
-        body: formData,
+    return authenticatedClient(endpoint, token, {
+      method: Methods.post,
+      body: formData,
+    })
+      .then((res) => {
+        return !!res;
       })
-        .then((res) => {
-          console.log(res);
-          return !!res;
-        })
-        .catch((e) => {
-          console.error(e);
-          return false;
-        });
-
-    //   return authenticatedClient(`/projects/${id}/media/thumbnail`, token, {
-    //     method: Methods.put,
-    //     body: formData,
-    //   })
-    //     .then((res) => !!res)
-    //     .catch((e) => {
-    //       console.error(e);
-    //       return false;
-    //     });
-    };
+      .catch((e) => {
+        console.error(e);
+        return false;
+      });
+  };
 
 export const adminProjectClient = (token?: Token) => ({
   setMediaSizes: setMediaSizes(token),

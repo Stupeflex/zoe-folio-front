@@ -25,7 +25,6 @@ const goToProject = (id: identifier) => {
 };
 
 const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
-  console.log(id, newArchived);
   if (!updating.value) {
     updating.value = true;
     const res = await client.value.setArchived(id, newArchived);

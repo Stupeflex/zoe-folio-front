@@ -79,8 +79,8 @@ const internalItems = ref(
   props.staticLayout
     ? props.staticLayout.items
     : props.items
-      ? normalizeItems(props.items)
-      : []
+    ? normalizeItems(props.items)
+    : []
 );
 const layout = computed(() =>
   props.staticLayout
@@ -97,12 +97,10 @@ const containerStyle = computed(() => ({
 }));
 
 const onMoveStart = (itemId: identifier) => {
-  console.log('move start', itemId);
   movingId.value = itemId;
 };
 
 const onMoveEnd = () => {
-  console.log('move end');
   lastEditedId.value = movingId.value;
   movingId.value = null;
 };

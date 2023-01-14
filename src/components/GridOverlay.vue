@@ -34,7 +34,6 @@ const colCount = ref(columns());
 
 const onKey = (e: KeyboardEvent) => {
   if (e.key === 'g' || e.key === 'G') {
-    console.log('toggle grid');
     show.value = !show.value;
   }
   if (e.key === 'r' || e.key === 'R') {
@@ -53,14 +52,12 @@ const onKey = (e: KeyboardEvent) => {
     const colors = Array(5)
       .fill('')
       .map(() => generateRandomHexColor());
-    console.log(colors);
     gradientData.setColors(colors, true);
   }
 };
 
 const onResize = () => {
   rowCount.value = rows();
-  console.log(rowCount.value);
   colCount.value = columns();
 };
 

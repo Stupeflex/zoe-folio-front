@@ -11,7 +11,6 @@ export const useAboutData = defineStore('aboutData', () => {
 
   const getClients = async () => {
     clients.value = await fetchClients();
-    console.log(clients.value);
     return true;
   };
 
@@ -19,12 +18,10 @@ export const useAboutData = defineStore('aboutData', () => {
     const res = await fetchAboutData();
     description.value = res.description;
     image.value = res.image;
-    console.log(res.image);
     return true;
   };
 
   const fetchAll = async () => {
-    console.log('fetch all');
     if (!loaded.value) {
       await Promise.all([getClients(), getAboutData()]);
     }

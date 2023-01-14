@@ -15,7 +15,6 @@ const route = useRoute();
 
 onMounted(() => {
   scrollData.update();
-  console.log(route);
 });
 </script>
 

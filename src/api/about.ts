@@ -12,7 +12,6 @@ export const fetchClients = (): Promise<Client[]> => {
   return client('/clients?populate=*-nested')
     .then((raw: ApiClientResponse) => formatClients(raw))
     .catch((e) => {
-      console.error(e);
       return [];
     });
 };
