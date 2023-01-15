@@ -1,4 +1,5 @@
 import { identifier, MediaType } from '@/store/projectData';
+import { Vector2 } from '@/utils/gestures';
 
 export type defaultAttributes = {
   [k: string]: unknown;
@@ -156,6 +157,7 @@ export interface ProcessStep {
     width?: number;
   };
   animation: Record<string, unknown>;
+  translate: Vector2;
 }
 
 export interface StudioMedia_Raw {
@@ -208,6 +210,22 @@ export type AboutData__Raw = ApiData<{
   description: string;
   image: ApiMedia__Raw;
 }>;
+
+export type ProcessData__Raw = ApiData<{
+  hook: string;
+  steps: ProcessStep__Raw[];
+}>;
+
+export type ProcessStep__Raw = {
+  title: string;
+  content: string;
+  id: string;
+};
+
+export type ProcessData = {
+  hook: string;
+  steps: ProcessStep[];
+};
 
 export type AboutData = {
   description: string;

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import ProcessStepCard from '@/components/ProcessStepCard.vue';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useScrollData } from '@/store/scrollData';
 import { scrollSpeedToBlurStyle } from '@/utils/effects';
 import { useI18n } from 'vue-i18n';
@@ -9,6 +9,11 @@ import { useProcessData } from '@/store/processData';
 const processData = useProcessData();
 const scrollData = useScrollData();
 const { t } = useI18n();
+
+onMounted(async () => {
+  await processData.fetch();
+  scrollData.update();
+});
 
 const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
 </script>
@@ -39,10 +44,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
       data-scroll-target="#section__process"
     >
       <p>
-        Soluta autem sit rerum reiciendis odit in. Voluptas nulla ea repellat
-        mollitia est molestias velit corporis necessitatibus. Architecto optio
-        dolorem. Voluptas nulla ea repellat mollitia est molestias velit
-        corporis necessitatibus.
+        {{ processData.hook }}
       </p>
     </div>
 
