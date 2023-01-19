@@ -66,7 +66,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
       data-scroll-speed="1"
       :data-scroll-delay="String((0.5 + index / 2).toFixed(2))"
     >
-      <img :src="photo.url" :alt="photo.title" />
+      <img :src="photo.url" :alt="photo.title" crossorigin="anonymous" />
       <span class="studio__count">0{{ index + 1 }}</span>
       <p>{{ photo.title }}</p>
     </div>
