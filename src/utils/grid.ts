@@ -496,7 +496,12 @@ export const formatItemStyle = (dimensions: ItemDimensions) => ({
 });
 
 export const getMatrixMaxSize = (
-  sizes: Size[],
+  sizes: {
+    width: number;
+    height: number;
+    x?: number;
+    y?: number;
+  }[],
   axis: Axis,
   rows: number,
   columns: number,
@@ -506,8 +511,8 @@ export const getMatrixMaxSize = (
 ): Size => {
   const maximums = [...sizes, ...reservedSpace].reduce(
     (acc, size) => ({
-      width: acc.width + size.width + marginX,
-      height: acc.height + size.height + marginY,
+      width: acc.width + size.width + (size.x ?? 0) + marginX,
+      height: acc.height + size.height + (size.y ?? 0) + marginY,
     }),
     {
       height: marginY,
