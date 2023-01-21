@@ -65,7 +65,7 @@ export const formatProjects = (
       client: raw.attributes.client,
       title: raw.attributes.title,
       archived: raw.attributes.archived,
-      thumbnailUrl: raw.attributes.thumbnail.data.attributes.url,
+      thumbnailUrl: raw.attributes.thumbnail.data?.attributes?.url ?? 'https://dummyimage.com/640x360/ddd/aaa',
       size: formatMediaSize(raw.attributes.size),
       informations: [],
       media:
@@ -120,14 +120,13 @@ export const formatRawMediaArray = <
 /* eslint-disable prettier/prettier */
 export const addMediasToProject =
   (token?: Token) =>
-
     async (projectId: identifier, projectMediaCount: number, files: File[]) => {
       try {
         const formData = new FormData();
         files.forEach((file, index) => {
           formData.append('file' + index, file);
         });
-        const medias = authenticatedClient(
+        return await authenticatedClient(
           `/projects/${projectId}/media/add`,
           token,
           {
@@ -135,7 +134,6 @@ export const addMediasToProject =
             body: formData,
           }
         );
-        return medias;
       } catch (e) {
         console.error(e);
         return false;
