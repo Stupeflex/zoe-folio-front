@@ -34,6 +34,8 @@ export const transitionProjectThumbnail = (
   tl: gsap.core.Timeline
 ) => {
   const rect = img.getBoundingClientRect();
+  // remove pointer events
+  img.style.pointerEvents = 'none';
   // generate needed scale and position to fill screen;
   img.style.minHeight = rect.height + 'px';
   const scaleX = window.innerWidth / rect.width;
@@ -60,6 +62,7 @@ export const transitionProjectInfo = (
 ) => {
   const rect = info.getBoundingClientRect();
   info.classList.add('transition');
+  info.style.pointerEvents = 'none';
 
   const rows = responsiveValue({
     default: 7,
