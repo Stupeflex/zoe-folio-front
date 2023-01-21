@@ -118,6 +118,8 @@ $clients-row-start: 3
   width: 100%
   height: 100%
   align-self: end
+  border-radius: $unit
+  object-position: top center
 
 #about__clients__title
   grid-column: 1 / span 9
