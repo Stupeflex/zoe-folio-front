@@ -6,12 +6,15 @@ import { computed } from 'vue';
 import { formatNumber } from '@/utils/format';
 import { RouterLink } from 'vue-router';
 import { useAdminData } from '@/store/adminData';
+import { useAboutData } from '@/store/aboutData';
 
 const { t } = useI18n();
 const projectData = useProjectData();
+const aboutData = useAboutData();
 const adminData = useAdminData();
 
 const projectCount = computed(() => formatNumber(projectData.projects.length));
+const clientCount = computed(() => formatNumber(aboutData.clients.length));
 const archivedProjectCount = computed(() =>
   formatNumber(projectData.projects.filter(({ archived }) => archived).length)
 );
@@ -42,19 +45,26 @@ const archivedProjectCount = computed(() =>
       Find shortcuts to dedicated editing utilities and see usage statistics.
     </p>
     <h4>Shortcuts</h4>
-    <router-link
-      to="/admin/clients"
+    <a
+      href="https://zoe-candito-backend.herokuapp.com/admin/content-manager/collectionType/api::client.client?page=1&pageSize=10&sort=name:ASC"
       class="admin__panel__card hover__parent"
       id="c__clients"
     >
-      <div class="c__inner"></div>
+      <div class="c__inner">
+        <span class="number">{{ clientCount }}</span>
+        <div class="stat">
+          {{ t('admin.dashboard.totalClients') }}
+        </div>
+
+        <p class="description">Add, edit and remove selected clients.</p>
+      </div>
       <div class="row">
         <h5 class="hover__underline">{{ t('admin.dashboard.clients') }}</h5>
         <span class="icon__container">
           <Arrow flip />
         </span>
       </div>
-    </router-link>
+    </a>
     <router-link
       to="/admin/projects"
       class="admin__panel__card hover__parent hover__parent"
