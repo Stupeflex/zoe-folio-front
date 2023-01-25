@@ -62,7 +62,7 @@ export type Project = {
   index: number;
 };
 
-const projectsToGridItems = (
+export const projectsToGridItems = (
   projects: Project[]
 ): Partial<GridItem<{ project: Project }>>[] =>
   projects.map((project) => ({
@@ -75,7 +75,7 @@ const projectsToGridItems = (
 
 const projectGridReservedSpace = (b: Breakpoint) => {
   const titleHeight = b == 'mobile' ? 4 : b === 'tablet' ? 4 : 3;
-  const titleWidth = b === 'mobile' ? columns() - 2 : b === 'tablet' ? 11 : 9;
+  const titleWidth = b === 'mobile' ? columns() - 2 : b === 'tablet' ? 11 : 10;
   let spaces = [
     {
       x: 0,
@@ -110,7 +110,7 @@ const projectGridReservedSpace = (b: Breakpoint) => {
   return spaces;
 };
 
-const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
+export const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
   marginX: 2,
   marginY: b === 'mobile' ? 2 : 1,
   rows: responsiveMap.rows[b] - 2,
@@ -143,8 +143,8 @@ export const useProjectData = defineStore('projectData', () => {
   const filteredProjects = computed((): Project[] =>
     filters.value.length > 0
       ? visibleProjects.value.filter((project) =>
-        filters.value.includes(project.type)
-      )
+          filters.value.includes(project.type)
+        )
       : visibleProjects.value
   );
   const gridItems = computed((): (Partial<GridItem> & { id: identifier })[] => {
