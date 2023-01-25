@@ -89,6 +89,11 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
         >New Project</c-t-a
       >
     </div>
+    <div id="layout__cta">
+      <c-t-a :onClick="() => $router.push('/admin/project-list-editor')"
+        >Edit list layout</c-t-a
+      >
+    </div>
   </div>
 </template>
 
@@ -206,5 +211,11 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
     position: fixed
     bottom: $unit
     right: $unit
+    width: calc($cell-width * 3 + $unit * 2)
+
+  #layout__cta
+    position: fixed
+    bottom: $unit
+    left: $unit
     width: calc($cell-width * 3 + $unit * 2)
 </style>
