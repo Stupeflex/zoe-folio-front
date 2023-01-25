@@ -20,7 +20,6 @@ const onResize = () => {
       data: projectData.gridLayout,
     }"
     @resize="onResize"
-    allow-delete
   >
     <template v-slot="{ project }">
       <ProjectThumbnail :project="project" />
