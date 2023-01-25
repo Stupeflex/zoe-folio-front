@@ -10,6 +10,7 @@ import AdminLogin from './views/admin/AdminLogin.vue';
 import GridTest from './views/GridTest.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
+import ProjectListEditor from '@/views/admin/ProjectListEditor.vue';
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
         path: 'login',
         component: AdminLogin,
         name: 'AdminLogin',
+      },
+      {
+        path: 'project-list-editor',
+        component: ProjectListEditor,
+        name: 'ProjectListEditor',
       },
     ],
   },
