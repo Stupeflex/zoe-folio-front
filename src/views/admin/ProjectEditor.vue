@@ -7,7 +7,7 @@ import ProjectContents from '@/components/Project/ProjectContents.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { adminProjectClient, fetchProjectById } from '@/api/projects';
 import { useI18n } from 'vue-i18n';
-import { FileRejectReason, useDropzone } from 'vue3-dropzone';
+import { useDropzone } from 'vue3-dropzone';
 import ProjectMediaItem from '@/components/ProjectMedia.vue';
 import { formatNumber } from '@/utils/format';
 import { GridLayoutData } from '@/utils/grid';
@@ -27,6 +27,7 @@ const updating = ref(false);
 const updated = ref(false);
 const infoPanelRef = ref<HTMLElement>();
 const mediaPanelRef = ref<HTMLElement>();
+const projectContentRef = ref<typeof ProjectContents>();
 
 const isNewProject = () => route.path === '/admin/project-editor/new';
 
@@ -231,7 +232,7 @@ const saveProjectInfo = async () => {
   }
 };
 
-watch(route.params, (next) => {
+watch(route.params, () => {
   fetchProject(true, true);
 });
 
@@ -275,13 +276,16 @@ const onMediaEdit = async (payload: {
     if (project.id === undefined) return;
     const isVideo = payload.type === 'video';
     const previousFileId = isVideo ? project.videoId : project.thumbnailId;
-    const res = await client.value.setThumbnail(
+    await client.value.setThumbnail(
       project.id,
       payload.files[0],
       isVideo,
       previousFileId
     );
-    fetchProject(false, true);
+    await fetchProject(false, true);
+    if (projectContentRef.value) {
+      projectContentRef.value.reloadVideoAndThumbnail();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -294,6 +298,7 @@ onSetup();
   <Scroller direction="vertical" :delay="600">
     <div id="scroll__container">
       <project-contents
+        ref="projectContentRef"
         :project="project"
         :project-index="
           isNewProject() ? projectData.projects.length : undefined
