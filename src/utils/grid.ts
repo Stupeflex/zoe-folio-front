@@ -45,7 +45,9 @@ export interface ItemPosition extends Vector2 {
   pinnedY?: number;
 }
 
-export interface GridItemWithPosition extends GridItem, ItemPosition {
+export interface GridItemWithPosition<TData = unknown>
+  extends GridItem<TData>,
+    ItemPosition {
   isPinned?: boolean;
 }
 
@@ -344,7 +346,7 @@ const trimMatrix = (matrix: Matrix, axis: Axis) => {
   }
   switch (axis) {
     case 'y':
-      matrix.splice(endIndex);
+      matrix.splice(endIndex + 1);
       break;
     case 'x':
       for (let i = 0; i < matrix.length; i++) {

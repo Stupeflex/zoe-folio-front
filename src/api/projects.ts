@@ -296,6 +296,34 @@ export const setThumbnailData =
       });
   };
 
+export interface ProjectSize {
+  id: identifier;
+  size: {
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+  };
+}
+
+export const setProjectSizes =
+  (token?: Token) => async (projectSizes: ProjectSize[]) => {
+    return authenticatedClient('/projects/sizes', token, {
+      method: Methods.patch,
+      body: JSON.stringify({ projectSizes }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        return !!res;
+      })
+      .catch((e) => {
+        console.error(e);
+        return false;
+      });
+  };
+
 export const adminProjectClient = (token?: Token) => ({
   setMediaSizes: setMediaSizes(token),
   deleteProjectMedia: deleteProjectMedia(token),
@@ -304,4 +332,5 @@ export const adminProjectClient = (token?: Token) => ({
   setArchived: setArchived(token),
   createNewProject: createNewProject(token),
   setThumbnail: setThumbnailData(token),
+  setProjectSizes: setProjectSizes(token),
 });

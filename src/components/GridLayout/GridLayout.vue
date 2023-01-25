@@ -63,7 +63,13 @@ const props = withDefaults(defineProps<GridLayoutProps>(), {
   axis: 'x',
 });
 
-const emit = defineEmits(['layout', 'resize', 'deleteItem', 'endPreview']);
+const emit = defineEmits([
+  'layout',
+  'firstLayout',
+  'resize',
+  'deleteItem',
+  'endPreview',
+]);
 
 const movingId = ref<identifier | null>(null);
 const lastEditedId = ref<identifier | null>(null);
@@ -195,6 +201,7 @@ const onUnpin = (itemId: identifier) => {
   unpinItem(item);
 };
 
+emit('firstLayout', layout.value);
 watch(layout, (l) => {
   emit('layout', l);
 });

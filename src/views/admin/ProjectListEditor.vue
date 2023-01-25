@@ -1,29 +1,38 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import GridLayout from '@/components/GridLayout/GridLayout.vue';
 import {
   projectGridOptions,
   projectsToGridItems,
   useProjectData,
+  Project,
 } from '@/store/projectData';
 import { useResponsiveData } from '@/store/responsiveData';
 import ProjectThumbnail from '@/components/ProjectThumbnail.vue';
 import { useI18n } from 'vue-i18n';
 import { tr } from '@/translations';
-import { GridItem, GridLayoutData } from '@/utils/grid';
+import { GridItemWithPosition, GridLayoutData } from '@/utils/grid';
+import { adminProjectClient, ProjectSize } from '@/api/projects';
+import { useAdminData } from '@/store/adminData';
+
 const projectData = useProjectData();
 const responsiveData = useResponsiveData();
+const adminData = useAdminData();
+
+const client = computed(() => adminProjectClient(adminData.token));
+
 const containerRef = ref<HTMLElement>();
 
 const { t } = useI18n();
 
 const items = ref(projectsToGridItems(projectData.projects));
 
-const gridItems = ref<GridItem[]>([]);
+const gridItems = ref<GridItemWithPosition<{ project: Project }>[]>([]);
 
 const gridOptions = projectGridOptions(responsiveData.breakpoint);
 
 const edited = ref(false);
+const saving = ref(false);
 
 onMounted(() => {
   window.onbeforeunload = function (e) {
@@ -56,9 +65,45 @@ const pinAll = () => {
   });
 };
 
+const saveLayout = async () => {
+  if (saving.value) return;
+  saving.value = true;
+  const projectSizes: ProjectSize[] = gridItems.value
+    .filter((gridItem) => gridItem.extraData?.project.id !== undefined)
+    .map((gridItem) => {
+      return {
+        id: gridItem.extraData?.project.id,
+        x: gridItem.x,
+        y: gridItem.y,
+        width: gridItem.width,
+        height: gridItem.height,
+      } as unknown as ProjectSize;
+    });
+
+  try {
+    await client.value.setProjectSizes(projectSizes);
+    await projectData.fetch();
+    items.value = projectsToGridItems(projectData.projects);
+  } catch (e) {
+    console.error(e);
+  }
+  saving.value = false;
+  edited.value = false;
+};
+
+const updateGridItems = (layout: GridLayoutData) => {
+  gridItems.value = layout.items as GridItemWithPosition<{
+    project: Project;
+  }>[];
+};
+
 const onLayout = (layout: GridLayoutData) => {
   edited.value = true;
-  gridItems.value = layout.items;
+  updateGridItems(layout);
+};
+
+const onFirstLayout = (layout: GridLayoutData) => {
+  updateGridItems(layout);
 };
 </script>
 
@@ -74,6 +119,7 @@ const onLayout = (layout: GridLayoutData) => {
         editable: true,
       }"
       @layout="onLayout"
+      @firstLayout="onFirstLayout"
     >
       <template v-slot="{ project }">
         <ProjectThumbnail :project="project" display />
@@ -117,9 +163,10 @@ const onLayout = (layout: GridLayoutData) => {
 
     <button
       id="save__cta"
-      :class="{ edit__btn: true, active: true, disabled: !edited }"
+      :class="{ edit__btn: true, active: true, disabled: !edited || saving }"
+      @click="saveLayout"
     >
-      Save list layout
+      {{ saving ? 'Saving...' : 'Save list layout' }}
     </button>
   </section>
 </template>
