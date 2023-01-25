@@ -116,10 +116,6 @@ class GestureHandler {
     this.target.addEventListener('touchmove', this._onTouchMove_bound, {
       passive: false,
     });
-
-    this.target.addEventListener('wheel', this._onWheel_bound, {
-      passive: false,
-    });
   }
 
   destroy() {
@@ -132,7 +128,6 @@ class GestureHandler {
     this.target.removeEventListener('touchcancel', this._onTouchCancel_bound);
     this.target.removeEventListener('touchleave', this._onTouchEnd_bound);
     this.target.removeEventListener('touchmove', this._onTouchMove_bound);
-    this.target.removeEventListener('wheel', this._onWheel_bound);
   }
 
   private prevent(e: Event) {
