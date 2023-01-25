@@ -14,6 +14,7 @@ type ProjectThumbnailProps = {
   project: Project;
   x?: number;
   y?: number;
+  display?: boolean;
 };
 
 const gradientData = useGradientData();
@@ -79,6 +80,7 @@ const applyPalette = (e: MouseEvent) => {
 
 const onHover = (e: MouseEvent) => {
   applyPalette(e);
+  if (props.display) return;
   projectData.hoveringId = props.project.id;
 };
 
@@ -94,6 +96,7 @@ const onLeave = () => {
 
 const onClick = (e: MouseEvent) => {
   e.preventDefault();
+  if (props.display) return;
   scrollData.stop();
   scrollData.destroy();
   projectData.inTransitionId = props.project.id;
@@ -125,7 +128,10 @@ const onClick = (e: MouseEvent) => {
   >
     <a
       :href="generateProjectLink(project)"
-      class="project__thumbnail"
+      :class="{
+        project__thumbnail: true,
+        display,
+      }"
       @mouseover="onHover"
       @mouseleave="onLeave"
       @mouseout="onLeave"
@@ -219,6 +225,9 @@ const onClick = (e: MouseEvent) => {
   cursor: pointer
   transition: border-radius 0.3s $bezier 0s, opacity 0.6s $bezier 0s, filter 0.6s $bezier 0s
   animation: appear $bezier
+
+  &.display
+    cursor: grab
 
   img
     object-fit: cover
