@@ -7,7 +7,6 @@ import { useProjectData } from './store/projectData';
 import GestureHandler, { Vector2 } from './utils/gestures';
 import NavBar from './components/Nav.vue';
 
-import GridOverlay from './components/GridOverlay.vue';
 import { useStudioData } from '@/store/studioData';
 import { setAppHeight } from '@/utils/format';
 import { useResponsiveData } from '@/store/responsiveData';
@@ -79,7 +78,6 @@ onMounted(() => {
 
   <NavBar v-if="!isAdminRoute" />
   <AdminNav v-else />
-  <GridOverlay />
 </template>
 
 <style lang="sass">

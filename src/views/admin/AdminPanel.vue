@@ -3,6 +3,7 @@
     <section id="admin__content">
       <router-view />
     </section>
+    <GridOverlay />
   </main>
 </template>
 
@@ -12,6 +13,7 @@ import { onMounted, watch } from 'vue';
 import { useGradientData } from '@/store/gradientData';
 import { adminPanelPalette } from '@/utils/gradient';
 import { useAdminData } from '@/store/adminData';
+import GridOverlay from '@/components/GridOverlay.vue';
 
 const gradientData = useGradientData();
 const adminData = useAdminData();
