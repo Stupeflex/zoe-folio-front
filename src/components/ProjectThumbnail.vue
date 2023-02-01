@@ -123,7 +123,6 @@ const onClick = (e: MouseEvent) => {
     }"
     :data-scroll-speed="speed"
     data-scroll
-    :data-scroll-delay="speed"
     :id="`project__thumbnail__${project.id}`"
   >
     <a
