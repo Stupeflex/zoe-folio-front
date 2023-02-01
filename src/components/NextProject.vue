@@ -109,7 +109,7 @@ const onLeave = () => {
   opacity: 0.7
 
 #next__project
-  @include grid(19, true, 5)
+  @include grid($columns, true, 5)
   width: 100%
   min-width: 100%
   text-align: left
@@ -117,6 +117,9 @@ const onLeave = () => {
   z-index: 0
   position: relative
   margin-top: calc($cell-height + $unit)
+
+  @media only screen and (max-width: $b-mobile)
+    @include grid($columns, true, 8)
 
   &::before
     @include blur-bg
@@ -152,6 +155,13 @@ const onLeave = () => {
     overflow: hidden
     transition: all 0.9s $bezier 0s, border-radius 0.3s $bezier 0s
 
+    @media only screen and (max-width: $b-tablet)
+      grid-column-end: span 6
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column-end: span 7
+      grid-row-end: span 4
+
     img#thumbnail
       height: 100%
       width: 100%
@@ -159,7 +169,7 @@ const onLeave = () => {
       transition: transform 0.6s $bezier 0s
 
   #next__project__index__container
-    grid-column: 18 / -1
+    grid-column: $columns / -1
     grid-row: 1 / span 1
     padding-top: $unit
     z-index: 1
@@ -178,6 +188,13 @@ const onLeave = () => {
     padding-bottom: $unit
     z-index: 1
 
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 7
+
+    @media only screen and (max-width: $b-tablet)
+      grid-column-start: 1
+      grid-row-end: -2
+
     #next__project__cta
       display: flex
       align-items: baseline
@@ -187,6 +204,12 @@ const onLeave = () => {
 
       svg
         width: 52px
+
+      @media only screen and (max-width: $b-mobile)
+        margin-left: calc($cell-width)
+
+        h2
+          @include title-medium-tablet
 
     #next__project__info
       @include grid(4, true, 1)
