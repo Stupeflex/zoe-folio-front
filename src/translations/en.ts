@@ -55,6 +55,7 @@ export const en = {
       usage: 'Usage',
       content: 'Text content',
       totalProjects: 'Total projects',
+      totalClients: 'Total clients',
       archivedProjects: 'Archived',
       mainSections: 'Main sections',
     },
