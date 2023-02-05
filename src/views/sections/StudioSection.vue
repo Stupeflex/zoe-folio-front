@@ -135,6 +135,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     grid-row-start: 2
     grid-column-end: span $columns
     grid-row-end: span 7
+    margin-bottom: calc($cell-height / 2)
 
 
   .studio__count
@@ -176,7 +177,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   transform: translateY(calc($cell-height * 0.06))
 
   @media only screen and (max-width: $b-tablet)
-    grid-column-start: 7
+    grid-column-start: 9
 
   @media only screen and (max-width: $b-mobile)
     @include process-step
@@ -196,16 +197,22 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   gap: $unit
 
   @media only screen and (max-width: $b-tablet)
-    grid-column: -5 / -1
-    grid-row-start: 3
+    display: grid
+    grid-template-columns: repeat(auto-fill, $cell-width)
+    grid-template-rows: 1fr
+    grid-column: 2 / -1
+    grid-row-start: 4
+    grid-row-end: span 2
+    flex-direction: row
+    align-items: center
+    height: 100%
 
   @media only screen and (max-width: $b-mobile)
     grid-column: 2 / -2
     grid-row: 4 / -1
     align-self: start
-    display: grid
+    height: unset
     grid-template-rows: repeat(4, $cell-height)
-    grid-template-columns: repeat(auto-fill, $cell-width)
     gap: $unit
 
 #studio__hook
@@ -213,11 +220,15 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   white-space: normal
   color: $c-grey
 
+  @media only screen and (max-width: $b-tablet)
+    grid-column: 3 / span 5
+
   @media only screen and (max-width: $b-mobile)
     @include detail
     grid-column: 1 / span 4
     grid-row: 1 / span 2
-    align-self: end
+    align-self: start
+    margin-top: calc($cell-height / -2 + $unit)
 
 
 #studio__cta
@@ -230,6 +241,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   height: calc($unit * 4)
   position: relative
   cursor: pointer
+
+  @media only screen and (max-width: $b-tablet)
+    grid-column: 8 / -1
 
   @media only screen and (max-width: $b-mobile)
     height: $cell-height
