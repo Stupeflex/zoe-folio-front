@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import GridLayout from '@/components/GridLayout/GridLayout.vue';
+import GridLayout from '@/components/GridLayout/v2/GridLayout.vue';
 import {
   projectGridOptions,
   projectsToGridItems,
