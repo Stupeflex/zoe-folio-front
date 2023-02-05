@@ -68,7 +68,7 @@ const startX = computed(() =>
 const size = computed(() => ({
   y: responsiveData.getValue({
     default: 3,
-    tablet: 3,
+    tablet: 4,
     mobile: 5,
   }),
   x: props.index * width.value,
