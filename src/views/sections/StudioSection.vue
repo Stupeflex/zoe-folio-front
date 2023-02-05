@@ -95,12 +95,14 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   grid-column-end: span $columns
 
   @media only screen and (max-width: $b-tablet)
-    grid-row: calc($rows - 4) / span 4
-    grid-template-rows: repeat(4, $cell-height)
+    grid-row: calc($rows - 5) / span 5
+    grid-template-rows: repeat(5, $cell-height)
+    grid-template-columns: repeat(calc($columns - 1), $cell-width)
 
   @media only screen and (max-width: $b-mobile)
-    grid-row: -7 / span 6
-    grid-template-rows: repeat(6, $cell-height)
+    grid-row: 10 / span 7
+    grid-template-columns: repeat(calc($columns), $cell-width)
+    grid-template-rows: repeat(7, $cell-height)
 
 #studio__title
   grid-column-start: 2
@@ -111,6 +113,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
 
   @media only screen and (max-width: $b-mobile)
     grid-column: 1 / -1
+    grid-row-end: span 2
 
 .studio__photo
   grid-column-end: span 7
@@ -125,13 +128,13 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     grid-column-start: 4
 
   @media only screen and (max-width: $b-tablet)
-    grid-column-end: span 6
+    grid-column-end: span 9
     grid-row-end: span calc($rows - 6)
 
   @media only screen and (max-width: $b-mobile)
     grid-row-start: 2
-    grid-column-end: span 8
-    grid-row-end: span calc($rows - 8)
+    grid-column-end: span $columns
+    grid-row-end: span 7
 
 
   .studio__count
@@ -150,6 +153,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     bottom: calc($unit * -2.6666)
     left: 0
     z-index: 2
+
+    @media only screen and (max-width: $b-mobile)
+      @include process-step
 
   img
     height: 100%
@@ -190,20 +196,17 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   gap: $unit
 
   @media only screen and (max-width: $b-tablet)
-    grid-column: -6 / -2
-    grid-row-start: 2
+    grid-column: -5 / -1
+    grid-row-start: 3
 
   @media only screen and (max-width: $b-mobile)
     grid-column: 2 / -2
     grid-row: 4 / -1
-    height: 100%
+    align-self: start
     display: grid
-    grid-template-rows: repeat(3, 1fr)
-    grid-template-columns: 1fr
+    grid-template-rows: repeat(4, $cell-height)
+    grid-template-columns: repeat(auto-fill, $cell-width)
     gap: $unit
-    padding-top: calc($cell-height / 2 - $unit)
-
-
 
 #studio__hook
   @include process-step
@@ -212,6 +215,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
 
   @media only screen and (max-width: $b-mobile)
     @include detail
+    grid-column: 1 / span 4
+    grid-row: 1 / span 2
+    align-self: end
 
 
 #studio__cta
@@ -226,7 +232,10 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   cursor: pointer
 
   @media only screen and (max-width: $b-mobile)
-    height: 100%
+    height: $cell-height
+    border-radius: calc($cell-height / 2)
+    grid-column: 1 / -1
+    grid-row: 3 / span 1
 
   span
     @include body
@@ -244,6 +253,11 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     z-index: 2
     border-radius: 50%
     transition: filter 0.6s $bezier 0s, background-color 0.6s $bezier 0s
+
+    @media only screen and (max-width: $b-mobile)
+      height: $cell-height
+      width: $cell-height
+
 
     svg
       transform: scaleX(-1) !important
@@ -264,6 +278,10 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     background-color: $c-white
     padding: 0 $unit
     transition: filter 0.6s $bezier 0s, background-color 0.6s $bezier 0s
+
+    @media only screen and (max-width: $b-mobile)
+      border-radius: calc($cell-height / 2)
+
 
   &:hover
     .cta__content
