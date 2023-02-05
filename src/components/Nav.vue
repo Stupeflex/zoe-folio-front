@@ -2,7 +2,8 @@
   <nav id="nav" :class="{ clear, open }" ref="navRef">
     <span id="email__tagline">{{ t('nav.hook') }}</span>
     <div id="email__container">
-      <arrow-big />
+      <arrow v-if="responsiveData.breakpoint === 'mobile'" flip :size="24" />
+      <arrow-big v-else />
       <a
         id="email"
         class="hover__underline"
@@ -193,15 +194,21 @@ onMounted(() => {
   grid-gap: $unit
   z-index: 10
   color: white
+  transform: translateY(0px)
   transition: backdrop-filter 0.6s linear 0s, background-color 0.6s linear 0s, transform 0.6s $bezier 0s
-  @media screen and (max-width: 600px)
-    padding: $unit
+
+  @media screen and (max-width: $b-mobile)
+    grid-template-rows: repeat(4, $cell-height) auto
+    padding-bottom: $unit
 
   &:not(.clear)
     @include blur-bg
 
   &:not(.open)
     transform: translateY(calc(($cell-height * 3 + $unit * 4) * -1))
+
+    @media screen and (max-width: $b-mobile)
+      transform: translateY(calc(($cell-height * 4 + $unit * 5) * -1))
 
     #email__container
       opacity: 0
@@ -216,7 +223,10 @@ onMounted(() => {
       grid-column-start: 1
 
     @media only screen and (max-width: $b-mobile)
+      padding-top: $unit
+      grid-row-start: 5
       grid-column: 1 / span 1
+      align-self: center
 
     #nav__logo__text
       font-family: 'Monument', sans-serif
@@ -251,8 +261,9 @@ onMounted(() => {
       grid-column-start: 8
 
     @media only screen and (max-width: $b-mobile)
-      grid-column: 2 / -2
-      justify-content: center
+      grid-row-start: 5
+      grid-column: 2 / -3
+      padding-top: $unit
 
 
   .nav__link
@@ -317,6 +328,8 @@ onMounted(() => {
 
     @media screen and (max-width: $b-mobile)
       grid-column: -3 / -1
+      grid-row-start: 5
+      justify-self: start
 
   #email__tagline
     @include body
@@ -328,6 +341,11 @@ onMounted(() => {
     @media screen and (max-width: $b-tablet)
       grid-column: 2 / -2
 
+    @media screen and (max-width: $b-mobile)
+      grid-column: 1 / -1
+      @include process-step
+      grid-row: 2 / 2
+
   #email__container
     display: flex
     align-items: baseline
@@ -336,14 +354,21 @@ onMounted(() => {
     grid-row: 2 / 2
     transition: opacity 0.6s $bezier 0.3s
 
-    @media screen and (max-width: $b-tablet)
-      grid-column: 4 / -2
-      justify-self: start
+    @media only screen and (max-width: $b-tablet)
+      grid-column: 2 / -2
+      justify-self: center
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column: 1 / -1
+      grid-row: 3 / 3
 
   #email
     @include title-medium
     text-decoration: none
     color: $c-white
+
+    @media only screen and (max-width: $b-mobile)
+      @include body-big
 
 #close__trigger
   width: 100%

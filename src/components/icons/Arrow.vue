@@ -4,12 +4,16 @@ import { computed } from 'vue';
 interface Props {
   rotation?: number;
   flip?: boolean;
+  size?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   rotation: 0,
   flip: false,
+  size: 13,
 });
+const ratio = 13 / 10;
+const height = props.size ?? 13 / ratio;
 
 const style = computed(
   () =>
@@ -19,8 +23,8 @@ const style = computed(
 
 <template>
   <svg
-    width="13"
-    height="10"
+    :width="size ?? 13"
+    :height="height"
     viewBox="0 0 13 10"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
