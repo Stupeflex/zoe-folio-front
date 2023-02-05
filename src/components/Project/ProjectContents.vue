@@ -11,11 +11,12 @@ import Arrow from '@/components/icons/Arrow.vue';
 import { useI18n } from 'vue-i18n';
 import { useScrollData } from '@/store/scrollData';
 import { GridLayoutData, gridPosition, PartialGridItem } from '@/utils/grid';
-import GridLayout from '@/components/GridLayout/GridLayout.vue';
+import GridLayout from '@/components/GridLayout/v2/GridLayout.vue';
 import ProjectMediaItem from '@/components/ProjectMedia.vue';
 import { formatNumber } from '@/utils/format';
 import { useResponsiveData } from '@/store/responsiveData';
 import { useDropzone } from 'vue3-dropzone';
+import { convertSizeToResponsive } from '@/utils/grid.v2/position/responsive';
 
 type Props = {
   project?: Project | Partial<Project>;
@@ -53,7 +54,9 @@ const title = computed<string>(() => {
 
 const index = computed<string>(() => {
   return formatNumber(
-    props.projectIndex ? props.projectIndex + 1 : projectData.projects.length
+    props.projectIndex !== undefined
+      ? props.projectIndex + 1
+      : projectData.projects.length
   );
 });
 
@@ -61,7 +64,11 @@ const projectMediaGridItems = computed<
   PartialGridItem<{ media: ProjectMedia }>[]
 >(() => {
   return (props.project?.media ?? []).map((media) => ({
-    ...media.size,
+    ...convertSizeToResponsive(
+      media.size,
+      gridColumns.value,
+      responsiveData.rows
+    ),
     id: media.id,
     extraData: {
       media: media,
@@ -100,7 +107,11 @@ const toggleThumbnailPreview = (force: boolean) => {
   forceShowThumbnail.value = force;
 };
 
-const gridColumns = computed(() => responsiveData.columns - 2);
+const gridColumns = computed(() =>
+  responsiveData.breakpoint === 'mobile'
+    ? responsiveData.columns
+    : responsiveData.columns - 2
+);
 
 const onDrop = async (files: File[]) => {
   if (files.length > 0 && props.project?.id) {
@@ -175,7 +186,7 @@ onMounted(() => {
       <span id="project__index__container">
         <span class="project__info project__index">{{ index }}</span>
         <span class="project__count"
-          >/{{ formatNumber(projectData.projects.length) }}</span
+          >/{{ formatNumber(projectData.visibleProjects.length) }}</span
         >
       </span>
     </div>
@@ -232,7 +243,7 @@ onMounted(() => {
       :columns="gridColumns"
       :marginY="0"
       :marginX="0"
-      axis="x"
+      axis="y"
       :editable="editable"
       :allow-delete="editable"
       @layout="onLayout"
@@ -492,4 +503,7 @@ onMounted(() => {
   width: 100%
   padding: calc($cell-height * 0.5 + $unit * 2) calc($cell-width + $unit * 2) $unit calc($cell-width + $unit * 2)
   height: auto
+
+  @media only screen and (max-width: $b-mobile)
+    padding: calc($cell-height * 0.5 + $unit * 2) $unit $unit $unit
 </style>
