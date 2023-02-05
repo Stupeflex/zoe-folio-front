@@ -40,17 +40,23 @@ const togglePreview = () => {
     object-fit: contain
     width: auto
     height: 100%
-    object-position: top left
+    object-position: center
     transition: object-position 0.6s $bezier 0s
 
-    @media only screen and (max-width: $b-mobile)
+    @media only screen and (max-width: $b-tablet)
+      height: 100%
       width: 100%
-      height: auto
+      object-fit: cover
+
+    @media only screen and (max-width: $b-mobile)
+      //object-fit: contain
+      //object-position: top left
 
   &.preview img
     height: 100%
     width: 100%
     object-position: center center
+    object-fit: contain
 
   &.blur
     opacity: 0.7
