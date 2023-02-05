@@ -12,11 +12,12 @@ const gradientData = useGradientData();
 const { t } = useI18n();
 
 const index = computed<number>(
-  () => projectData.getIndexOfId(projectData.selectedId) + 1
+  () => projectData.getVisibleIndexOfId(projectData.selectedId) + 1
 );
 
 const nextProject = computed<Project>(
-  () => projectData.projects[index.value] || projectData.projects[0]
+  () =>
+    projectData.visibleProjects[index.value] || projectData.visibleProjects[0]
 );
 
 const onHover = () => {
@@ -61,7 +62,7 @@ const onLeave = () => {
         formatNumber(index + 1)
       }}</span>
       <span class="project__count"
-        >/{{ formatNumber(projectData.projects.length) }}</span
+        >/{{ formatNumber(projectData.visibleProjects.length) }}</span
       >
     </span>
     <div id="next__project__content">
@@ -173,11 +174,13 @@ const onLeave = () => {
     grid-row: 1 / span 1
     padding-top: $unit
     z-index: 1
+    @media only screen and (max-width: $b-mobile)
+      grid-column-start: calc($columns - 3)
+      text-align: right
 
   #next__project__content
     display: flex
     flex-direction: column
-    margin-left: $unit
     align-items: flex-start
     justify-content: flex-end
     gap: $unit-d
@@ -186,14 +189,16 @@ const onLeave = () => {
     width: 100%
     height: 100%
     padding-bottom: $unit
+    padding-left: $unit
     z-index: 1
 
     @media only screen and (max-width: $b-tablet)
       grid-column-start: 7
 
-    @media only screen and (max-width: $b-tablet)
+    @media only screen and (max-width: $b-mobile)
       grid-column-start: 1
       grid-row-end: -2
+      padding-left: 0
 
     #next__project__cta
       display: flex
@@ -206,7 +211,9 @@ const onLeave = () => {
         width: 52px
 
       @media only screen and (max-width: $b-mobile)
-        margin-left: calc($cell-width)
+        width: 100%
+        justify-content: center
+        margin-left: -26px
 
         h2
           @include title-medium-tablet
@@ -218,9 +225,17 @@ const onLeave = () => {
       align-items: end
       z-index: 1
 
+      @media only screen and (max-width: $b-mobile)
+        @include grid(7, true, 1)
+        padding: 0
+
+
       #next__project__credits
         grid-column: 1 / -1
         grid-row: 1 / 1
+
+        @media only screen and (max-width: $b-mobile)
+          align-self: start
 
         #next__project__client
           font-weight: 350
@@ -230,9 +245,14 @@ const onLeave = () => {
         text-transform: capitalize
         color: $c-white
         font-weight: 200
-        grid-column: 4 / -1
+        grid-column: 4 / 6
         grid-row: 1 / 1
         margin-left: $unit-n
+
+        @media only screen and (max-width: $b-mobile)
+          grid-column: 6 / -1
+          justify-self: end
+          align-self: start
 
   &:hover #next__project__cta
     transform: translateX($unit-d)
