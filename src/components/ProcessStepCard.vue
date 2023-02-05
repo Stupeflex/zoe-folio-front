@@ -47,7 +47,7 @@ const width = computed(() =>
   responsiveData.getValue(
     {
       mobile: 10,
-      tablet: 8,
+      tablet: 10,
       default: 8,
     },
     responsiveData.breakpoint
@@ -58,7 +58,7 @@ const startX = computed(() =>
   responsiveData.getValue(
     {
       mobile: 6,
-      tablet: 9,
+      tablet: 20,
       default: 12,
     },
     responsiveData.breakpoint
@@ -68,14 +68,14 @@ const startX = computed(() =>
 const size = computed(() => ({
   y: responsiveData.getValue({
     default: 3,
-    tablet: 4,
+    tablet: 5,
     mobile: 5,
   }),
   x: props.index * width.value,
   width: width.value,
   height: responsiveData.getValue({
     default: 9,
-    tablet: 9,
+    tablet: 8,
     mobile: 11,
   }),
 }));
@@ -83,7 +83,7 @@ const size = computed(() => ({
 const animationHeight = computed(() =>
   responsiveData.getValue({
     default: '50%',
-    tablet: '50%',
+    tablet: '40%',
     mobile: '30%',
   })
 );
@@ -130,7 +130,7 @@ const content = computed(() =>
   position: relative
   max-height: max-content
 
-  @media only screen and (max-width: $b-mobile)
+  @media only screen and (max-width: $b-tablet)
     padding-left: $unit-d
     padding-right: $unit-d
 
@@ -175,7 +175,7 @@ const content = computed(() =>
 
     align-items: baseline
 
-    @media only screen and (max-width: $b-mobile)
+    @media only screen and (max-width: $b-tablet)
       grid-template-columns: calc($cell-width * 3 - ($unit * 3)) 1fr
 
     .process__step__number

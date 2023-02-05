@@ -179,7 +179,7 @@ export const useScrollData = defineStore('scrollData', () => {
 
     const l = responsiveData.getValue({
       mobile: 1,
-      tablet: 6,
+      tablet: 4,
       default: 8,
     });
     const windowHeight = responsiveData.getValue({
