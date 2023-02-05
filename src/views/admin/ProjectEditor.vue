@@ -27,7 +27,6 @@ const updating = ref(false);
 const updated = ref(false);
 const infoPanelRef = ref<HTMLElement>();
 const mediaPanelRef = ref<HTMLElement>();
-const projectContentRef = ref<typeof ProjectContents>();
 
 const isNewProject = () => route.path === '/admin/project-editor/new';
 
@@ -283,9 +282,6 @@ const onMediaEdit = async (payload: {
       previousFileId
     );
     await fetchProject(false, true);
-    if (projectContentRef.value) {
-      projectContentRef.value.reloadVideoAndThumbnail();
-    }
   } catch (e) {
     console.error(e);
   }
@@ -298,7 +294,6 @@ onSetup();
   <Scroller direction="vertical" :delay="600">
     <div id="scroll__container">
       <project-contents
-        ref="projectContentRef"
         :project="project"
         :project-index="
           isNewProject() ? projectData.projects.length : undefined
