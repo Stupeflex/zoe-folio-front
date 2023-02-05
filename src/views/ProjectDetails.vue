@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { identifier, ProjectMedia, useProjectData } from '@/store/projectData';
+import { identifier, useProjectData } from '@/store/projectData';
 import { useRoute } from 'vue-router';
-import { watch, nextTick } from 'vue';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 import { fetchProjectById } from '@/api/projects';
 
@@ -26,61 +25,51 @@ const fetchProject = async () => {
     ? String(route.params.id)
     : null;
   try {
-    if (ID) {
-      loaded.value = false;
-      projectData.selectProject(Number(ID));
-      projectData.inTransitionId = null;
-      projectData.hoveringId = null;
-      const projectIndex = projectData.getIndexOfId(Number(ID));
-      preloadNextProject(projectIndex);
-      // set display index
-      index.value = projectIndex;
-
-      // don't reload data
-      let fetchedProject = projectData.selectedProject;
-      if (!fetchedProject?.fullyFetched) {
-        const justFetched = await fetchProjectById(ID);
-        if (justFetched !== null && !Array.isArray(justFetched)) {
-          fetchedProject = justFetched;
-        }
+    if (ID === null) return null;
+    loaded.value = false;
+    projectData.selectProject(Number(ID));
+    projectData.inTransitionId = null;
+    projectData.hoveringId = null;
+    // set display index
+    index.value = projectData.getVisibleIndexOfId(Number(ID));
+    // don't reload data
+    let fetchedProject = projectData.selectedProject;
+    if (!fetchedProject?.fullyFetched) {
+      const justFetched = await fetchProjectById(ID);
+      if (justFetched !== null && !Array.isArray(justFetched)) {
+        fetchedProject = justFetched;
       }
-      if (
-        fetchedProject &&
-        fetchedProject?.id &&
-        !Array.isArray(fetchedProject)
-      ) {
-        projectData.updateProject(fetchedProject, true);
+    }
+    if (
+      fetchedProject &&
+      fetchedProject?.id &&
+      !Array.isArray(fetchedProject)
+    ) {
+      projectData.updateProject(fetchedProject, true);
 
-        loaded.value = true;
-        // generate new color palette only if project palette not already generated
-        const maybeProjectPalette = projectData.palettes.find(
-          ({ id }) => id === fetchedProject?.id
-        );
-        if (maybeProjectPalette && maybeProjectPalette.palette) {
-          gradientData.setColorsRgb(maybeProjectPalette.palette, true);
-        } else {
-          try {
-            const generatedPalette = await extractPaletteFromUrl(
-              fetchedProject.thumbnailUrl
-            );
-            if (generatedPalette) {
-              gradientData.setColorsRgb(generatedPalette, true);
-            }
-          } catch (e) {
-            console.error(e);
+      loaded.value = true;
+      // generate new color palette only if project palette not already generated
+      const maybeProjectPalette = projectData.palettes.find(
+        ({ id }) => id === fetchedProject?.id
+      );
+      if (maybeProjectPalette && maybeProjectPalette.palette) {
+        gradientData.setColorsRgb(maybeProjectPalette.palette, true);
+      } else {
+        try {
+          const generatedPalette = await extractPaletteFromUrl(
+            fetchedProject.thumbnailUrl
+          );
+          if (generatedPalette) {
+            gradientData.setColorsRgb(generatedPalette, true);
           }
+        } catch (e) {
+          console.error(e);
         }
       }
     }
   } catch (e) {
     console.error(e);
   }
-};
-
-const preloadNextProject = (projectIndex: number) => {
-  const index =
-    projectIndex < projectData.projects.length - 1 ? projectIndex + 1 : 0;
-  const nextProject = projectData.projects[index];
 };
 
 watch(
