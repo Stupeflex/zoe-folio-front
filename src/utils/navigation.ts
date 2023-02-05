@@ -73,8 +73,8 @@ export const transitionProjectInfo = (
 
   const rows = responsiveValue({
     default: 7,
-    tablet: 4,
-    mobile: 2,
+    tablet: 2,
+    mobile: 1,
   });
 
   const columns = responsiveValue({
@@ -87,7 +87,7 @@ export const transitionProjectInfo = (
     responsiveValue({
       default: 12,
       tablet: 12,
-      mobile: 7,
+      mobile: 10,
     }),
     'x'
   );

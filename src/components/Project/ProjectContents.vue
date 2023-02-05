@@ -383,9 +383,10 @@ onMounted(() => {
 
     @media screen and (max-width: $b-tablet)
       grid-column-start: 2
+      grid-column-end: span 3
 
     @media only screen and (max-width: $b-mobile)
-      grid-column: 2 / span 4
+      grid-column: 1 / span 4
       grid-row-start: 6
       @include process-step
 
@@ -399,12 +400,13 @@ onMounted(() => {
     -webkit-backface-visibility: hidden
 
     @media screen and (max-width: $b-tablet)
-      grid-column-start: 4
+      grid-column-start: 5
+      grid-column-end: span 3
 
     @media screen and (max-width: $b-mobile)
-      grid-column: -6 / span 4
+      grid-column: 4 / -1
       grid-row-start: 6
-      justify-self: end
+      justify-self: start
       @include process-step
 
   #project__title__container
@@ -426,11 +428,12 @@ onMounted(() => {
     -webkit-backface-visibility: hidden
 
     @media screen and (max-width: $b-tablet)
-      grid-column-start: 4
+      grid-column-start: 2
       grid-row: 8 / span 3
 
     @media screen and (max-width: $b-mobile)
-      grid-column-start: 2
+      grid-column-start: 1
+      grid-column-end: -1
       grid-row-start: 7
 
   #project__index__container
@@ -478,6 +481,9 @@ onMounted(() => {
     &:hover .icon__container
       transform: translateY($unit-h)
 
+    @media only screen and (max-width: $b-mobile)
+      grid-column-end: -1
+
   #mute__toggle__container
     grid-column-start: 2
     grid-column-end: 5
@@ -485,6 +491,9 @@ onMounted(() => {
     z-index: 2
     -webkit-transform: translateZ(0)
     -webkit-backface-visibility: hidden
+
+    @media only screen and (max-width: $b-mobile)
+      grid-column-start: 1
 
 .project__info
   @include body
