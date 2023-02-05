@@ -197,7 +197,7 @@
   @media only screen and (max-width: $b-mobile)
     font-size: 28px
 
-@mixin title-medium
+@mixin title-medium-desktop
   font-family: 'Neue', sans-serif
   font-size: 76px
   font-variation-settings: "wght" 450
@@ -205,9 +205,16 @@
   letter-spacing: -0.02em
   line-height: 79.8px
 
+@mixin title-medium-tablet
+  @include title-medium-desktop
+  font-size: 55px
+  line-height: 52px
+
+@mixin title-medium
+  @include title-medium-desktop
+
   @media only screen and (max-width: $b-tablet)
-    font-size: 55px
-    line-height: 52px
+    @include title-medium-tablet
 
   @media only screen and (max-width: $b-mobile)
     font-size: 38px
