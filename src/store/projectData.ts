@@ -3,15 +3,15 @@ import { defineStore } from 'pinia';
 import { fetchProjects } from '@/api/projects';
 import { extractPaletteFromUrl, rgbColor } from '@/utils/gradient';
 import { computed, ref } from 'vue';
+import { Breakpoint, columns, responsiveMap, rows } from '@/utils/responsive';
+import { useResponsiveData } from '@/store/responsiveData';
 import {
-  generateGridLayout,
   GridItem,
   GridLayoutData,
   GridLayoutOptions,
-  normalizeGridItems,
-} from '@/utils/grid';
-import { Breakpoint, columns, responsiveMap, rows } from '@/utils/responsive';
-import { useResponsiveData } from '@/store/responsiveData';
+} from '@/utils/grid.v2/types';
+import { normalizeGridItems } from '@/utils/grid.v2/items';
+import { generateGridLayout } from '@/utils/grid.v2';
 
 export type MediaSize = {
   width: number;
@@ -115,8 +115,9 @@ export const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
   marginY: b === 'mobile' ? 2 : 1,
   rows: responsiveMap.rows[b] - 2,
   columns: responsiveMap.columns[b],
-  axis: 'y',
+  axis: 'x',
   reservedSpace: projectGridReservedSpace(b),
+  fillAvailable: false,
 });
 
 export const useProjectData = defineStore('projectData', () => {
@@ -200,6 +201,10 @@ export const useProjectData = defineStore('projectData', () => {
     return projects.value.findIndex((p) => p.id === projectId);
   };
 
+  const getVisibleIndexOfId = (projectId: identifier): number => {
+    return visibleProjects.value.findIndex((p) => p.id === projectId);
+  };
+
   const updateProject = (project: Project, setAsSelected = false) => {
     const i = projects.value.findIndex((p) => p.id === project.id);
     if (i >= 0) {
@@ -259,6 +264,7 @@ export const useProjectData = defineStore('projectData', () => {
     fetch,
     selectProject,
     getIndexOfId,
+    getVisibleIndexOfId,
     updateProject,
     setSound,
     toggleSound,
