@@ -5,7 +5,7 @@ import {
   ProjectMedia,
   useProjectData,
 } from '@/store/projectData';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
 import MuteToggle from '@/components/MuteToggle.vue';
 import Arrow from '@/components/icons/Arrow.vue';
 import { useI18n } from 'vue-i18n';
@@ -17,6 +17,7 @@ import { formatNumber } from '@/utils/format';
 import { useResponsiveData } from '@/store/responsiveData';
 import { useDropzone } from 'vue3-dropzone';
 import { convertSizeToResponsive } from '@/utils/grid.v2/position/responsive';
+import { GridItemWithPosition } from '@/utils/grid.v2/types';
 
 type Props = {
   project?: Project | Partial<Project>;
@@ -60,10 +61,16 @@ const index = computed<string>(() => {
   );
 });
 
-const projectMediaGridItems = computed<
-  PartialGridItem<{ media: ProjectMedia }>[]
->(() => {
-  return (props.project?.media ?? []).map((media) => ({
+const gridColumns = computed(() =>
+  responsiveData.breakpoint === 'mobile'
+    ? responsiveData.columns
+    : responsiveData.columns - 2
+);
+
+const placedItems = ref<GridItemWithPosition[]>([]);
+
+const projectMediaGridItems = ref<PartialGridItem<{ media: ProjectMedia }>[]>(
+  (props.project?.media ?? []).map((media) => ({
     ...convertSizeToResponsive(
       media.size,
       gridColumns.value,
@@ -73,7 +80,36 @@ const projectMediaGridItems = computed<
     extraData: {
       media: media,
     },
-  }));
+  }))
+);
+
+watchEffect(() => {
+  if (props.project?.media) {
+    const sameLength =
+      props.project.media.length === projectMediaGridItems.value.length;
+
+    if (sameLength) return;
+    // merge incoming medias into current ones while conserving size
+    projectMediaGridItems.value = props.project.media.map((media) => {
+      const maybePlacedItem = placedItems.value.find(
+        (item) => item.id === media.id
+      );
+      // use new medias as is if no changes in length
+      const baseSize = maybePlacedItem ?? media.size;
+      const size = convertSizeToResponsive(
+        baseSize,
+        gridColumns.value,
+        responsiveData.rows
+      );
+      return {
+        ...size,
+        id: media.id,
+        extraData: {
+          media: media,
+        },
+      };
+    });
+  }
 });
 
 const previewId = ref<identifier | null>(null);
@@ -86,6 +122,7 @@ const scrollDown = () => {
 
 const onLayout = (l: GridLayoutData) => {
   scrollData.update();
+  placedItems.value = l.items;
   emit('gridLayout', l);
 };
 
@@ -106,12 +143,6 @@ const onPreview = (itemId: identifier) => {
 const toggleThumbnailPreview = (force: boolean) => {
   forceShowThumbnail.value = force;
 };
-
-const gridColumns = computed(() =>
-  responsiveData.breakpoint === 'mobile'
-    ? responsiveData.columns
-    : responsiveData.columns - 2
-);
 
 const onDrop = async (files: File[]) => {
   if (files.length > 0 && props.project?.id) {
