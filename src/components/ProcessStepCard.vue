@@ -13,7 +13,11 @@
         </div>
       </header>
 
-      <Vue3Lottie :animation-data="card.animation" :speed="0.75" height="50%" />
+      <Vue3Lottie
+        :animation-data="card.animation"
+        :speed="0.75"
+        :height="animationHeight"
+      />
 
       <div class="process__step__text__container">
         <span class="process__step__number">0{{ index + 1 }}</span>
@@ -37,19 +41,12 @@ const processData = useProcessData();
 const responsiveData = useResponsiveData();
 const card = computed(() => processData.getCard(props.index));
 
-interface Size {
-  x: number | undefined;
-  y: number | undefined;
-  height: number | undefined;
-  width: number | undefined;
-}
-
 const props = defineProps<ProcessStepProps>();
 
 const width = computed(() =>
   responsiveData.getValue(
     {
-      mobile: 8,
+      mobile: 10,
       tablet: 8,
       default: 8,
     },
@@ -72,12 +69,24 @@ const size = computed(() => ({
   y: responsiveData.getValue({
     default: 3,
     tablet: 3,
-    mobile: 7,
+    mobile: 5,
   }),
   x: props.index * width.value,
   width: width.value,
-  height: 9,
+  height: responsiveData.getValue({
+    default: 9,
+    tablet: 9,
+    mobile: 11,
+  }),
 }));
+
+const animationHeight = computed(() =>
+  responsiveData.getValue({
+    default: '50%',
+    tablet: '50%',
+    mobile: '30%',
+  })
+);
 
 const style = computed(() => ({
   gridColumnStart: size.value.x + startX.value,
@@ -91,7 +100,7 @@ const cardStyle = computed(() => ({
 }));
 
 const content = computed(() =>
-  (card.value.content ?? '').replace(/(?:\r\n|\r|\n)/g, '<br/>')
+  (card.value.content ?? '').replace(/\r\n|\r|\n/g, '<br/>')
 );
 </script>
 
@@ -120,6 +129,10 @@ const content = computed(() =>
   z-index: 1
   position: relative
   max-height: max-content
+
+  @media only screen and (max-width: $b-mobile)
+    padding-left: $unit-d
+    padding-right: $unit-d
 
   header
     display: flex
@@ -161,6 +174,9 @@ const content = computed(() =>
     padding-right: calc($cell-width - $unit-d)
 
     align-items: baseline
+
+    @media only screen and (max-width: $b-mobile)
+      grid-template-columns: calc($cell-width * 3 - ($unit * 3)) 1fr
 
     .process__step__number
       @include title-medium

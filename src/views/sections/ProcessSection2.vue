@@ -51,7 +51,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
     <process-step-card
       v-for="(step, index) in processData.cards"
       :index="index"
-      :key="'step' + index"
+      :key="'step' + step.id ?? index"
     />
   </section>
 </template>
@@ -71,6 +71,9 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   grid-row-end: 3
   align-self: end
   margin-left: calc($cell-width + $unit)
+
+  @media only screen and (max-width: $b-tablet)
+    grid-column-end: $columns
 
 #process__hook
   grid-column: 4 / span 9

@@ -178,15 +178,20 @@ export const useScrollData = defineStore('scrollData', () => {
     );
 
     const l = responsiveData.getValue({
-      mobile: 2,
-      tablet: 7,
-      default: 9,
+      mobile: 1,
+      tablet: 6,
+      default: 8,
+    });
+    const windowHeight = responsiveData.getValue({
+      mobile: window.innerHeight,
+      tablet: window.innerHeight,
+      default: window.innerHeight,
     });
     const visibleLength = unit() * 2 + gridLength(l, 'x');
-    const trackLength = gridLength(l - 1, 'x');
+    const trackLength = gridLength(l, 'x');
     cards.forEach((card) => {
       const deltaX = e.scroll.x + visibleLength - card.left;
-      const height = window.innerHeight - card.top;
+      const height = windowHeight - card.top;
       const x = Math.max(deltaX, 0);
       const yRatio = x / trackLength;
       const coef = clamp(yRatio, 0, 1);
