@@ -34,9 +34,9 @@ export const convertSizeToResponsive = (
     const responsiveY = gridWidth * yRatio;
     // return full dimensions
     return {
-      width: (isMobile ? Math.round : Math.floor)(responsiveWidth),
-      height: Math.round(responsiveHeight - gridHeightRatio),
-      x: roundFn(responsiveX),
+      width: roundFn(responsiveWidth),
+      height: roundFn(responsiveHeight - gridHeightRatio),
+      x: initialSize.x === 0 ? 0 : Math.round(responsiveX),
       y: Math.ceil(responsiveY),
     };
   }
