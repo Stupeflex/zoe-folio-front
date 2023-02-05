@@ -14,6 +14,7 @@
       </header>
 
       <Vue3Lottie
+        v-if="responsiveData.breakpoint !== 'mobile'"
         :animation-data="card.animation"
         :speed="0.75"
         :height="animationHeight"
@@ -46,7 +47,7 @@ const props = defineProps<ProcessStepProps>();
 const width = computed(() =>
   responsiveData.getValue(
     {
-      mobile: 10,
+      mobile: 9,
       tablet: 10,
       default: 8,
     },
@@ -57,7 +58,7 @@ const width = computed(() =>
 const startX = computed(() =>
   responsiveData.getValue(
     {
-      mobile: 6,
+      mobile: 8,
       tablet: 20,
       default: 12,
     },
