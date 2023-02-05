@@ -32,7 +32,7 @@ const generateHexComponent = () => {
 export const generateRandomHexColor = () => {
   const components = Array(6)
     .fill('')
-    .map((_v) => generateHexComponent());
+    .map(() => generateHexComponent());
   return '#' + components.join('');
 };
 
@@ -174,11 +174,14 @@ export const studioSectionPalette = [
 ].map((hex) => hexToRgb(hex));
 
 export const defaultPalette = [
-  '#D8CFAF',
-  '#E6B89C',
-  '#ED9390',
-  '#F374AE',
-  '#6F8982',
+  '#161518',
+  '#2D2E3B',
+  '#020215',
+  '#c2d8b9',
+  '#111114',
+  // '#D18D24',
+  // '#E6F589',
+  // '#3A3E41',
 ].map((hex) => hexToRgb(hex));
 
 export const aboutSectionPalette = [
