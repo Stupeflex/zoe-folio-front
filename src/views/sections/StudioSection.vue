@@ -243,7 +243,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   cursor: pointer
 
   @media only screen and (max-width: $b-tablet)
-    grid-column: 8 / -1
+    grid-column: 10 / -1
 
   @media only screen and (max-width: $b-mobile)
     height: $cell-height
