@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useProjectData } from '@/store/projectData';
 import { nextTick } from 'vue';
-import GridLayout from '@/components/GridLayout/GridLayout.vue';
+import GridLayout from '@/components/GridLayout/v2/GridLayout.vue';
 import { useScrollData } from '@/store/scrollData';
 import ProjectThumbnail from '@/components/ProjectThumbnail.vue';
 
