@@ -38,17 +38,24 @@ export const transitionProjectThumbnail = (
   img.style.pointerEvents = 'none';
   // generate needed scale and position to fill screen;
   img.style.minHeight = rect.height + 'px';
-  const scaleX = window.innerWidth / rect.width;
-  const scaleY =
-    (window.innerHeight - cellHeight() * 2 - unit() * 3) / rect.height;
-  const scale = Math.max(scaleX, scaleY);
+  const width = window.innerWidth;
+  const height = Math.round(
+    responsiveValue({
+      default: cellHeight() * 10 + unit() * 9,
+      tablet: cellHeight() * 12 + unit() * 11,
+      mobile: cellHeight() * 13 + unit() * 12,
+    }) + unit()
+  );
   img.classList.add('transition');
   tl.to(
     img,
     {
       x: -rect.x,
       y: -rect.y,
-      scale,
+      width,
+      height,
+      minHeight: height,
+      maxHeight: height,
       duration: 0.9,
       ease: Power3.easeInOut,
     },
@@ -73,7 +80,7 @@ export const transitionProjectInfo = (
   const columns = responsiveValue({
     default: 7,
     tablet: 8,
-    mobile: 2,
+    mobile: 7,
   });
 
   const width = gridLength(
