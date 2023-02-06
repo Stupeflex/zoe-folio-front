@@ -5,7 +5,7 @@ import {
   ProjectMedia,
   useProjectData,
 } from '@/store/projectData';
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import MuteToggle from '@/components/MuteToggle.vue';
 import Arrow from '@/components/icons/Arrow.vue';
 import { useI18n } from 'vue-i18n';
@@ -101,6 +101,7 @@ watchEffect(() => {
         gridColumns.value,
         responsiveData.rows
       );
+      console.log(size);
       return {
         ...size,
         id: media.id,
@@ -111,6 +112,28 @@ watchEffect(() => {
     });
   }
 });
+
+watch(
+  () => gridColumns.value,
+  () => {
+    if (props.editable || props.project?.media === undefined) return;
+    projectMediaGridItems.value = props.project.media.map((media) => {
+      // use new medias as is if no changes in length
+      const size = convertSizeToResponsive(
+        media.size,
+        gridColumns.value,
+        responsiveData.rows
+      );
+      return {
+        ...size,
+        id: media.id,
+        extraData: {
+          media: media,
+        },
+      };
+    });
+  }
+);
 
 const previewId = ref<identifier | null>(null);
 
