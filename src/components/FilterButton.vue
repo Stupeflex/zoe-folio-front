@@ -28,6 +28,7 @@ const isSelected = computed(() => projectData.filters.includes(props.filter));
 .filter
   @include blur-bg
   @include process-step
+  background: rgba(255, 255, 255, 0.2)
   height: $unit-d
   padding: $unit-h
   display: flex
@@ -39,7 +40,7 @@ const isSelected = computed(() => projectData.filters.includes(props.filter));
   color: $c-grey
   user-select: none
   cursor: pointer
-  z-index: 5
+  z-index: 10000
   pointer-events: all
   transition: filter 0.4s $bezier 0s, color .4s $bezier 0s
 

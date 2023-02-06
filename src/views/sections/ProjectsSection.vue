@@ -50,6 +50,7 @@ const sectionStyle = computed(() => ({
         v-html="tr(t, 'titles.projects')"
       />
     </div>
+    <ProjectGrid />
     <div
       id="filters"
       data-scroll
@@ -60,7 +61,6 @@ const sectionStyle = computed(() => ({
       <filter-button filter="pub">{{ t('filters.pubs') }}</filter-button>
       <filter-button filter="fiction">{{ t('filters.fiction') }}</filter-button>
     </div>
-    <ProjectGrid />
   </section>
 </template>
 
