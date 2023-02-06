@@ -83,8 +83,8 @@ const size = computed(() => ({
 
 const animationHeight = computed(() =>
   responsiveData.getValue({
-    default: '50%',
-    tablet: '40%',
+    default: '40%',
+    tablet: '30%',
     mobile: '30%',
   })
 );

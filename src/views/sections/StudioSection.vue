@@ -118,7 +118,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
 .studio__photo
   grid-column-end: span 7
   grid-row-start: 1
-  grid-row-end: span calc($rows - 5)
+  grid-row-end: span calc($rows - 6)
   position: relative
   display: flex
   z-index: 2
