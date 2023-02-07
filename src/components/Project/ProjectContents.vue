@@ -101,7 +101,6 @@ watchEffect(() => {
         gridColumns.value,
         responsiveData.rows
       );
-      console.log(size);
       return {
         ...size,
         id: media.id,
