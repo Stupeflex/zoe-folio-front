@@ -140,7 +140,7 @@ const onClick = (e: MouseEvent) => {
       <img
         :src="project.thumbnailUrl"
         :alt="project.title"
-        crossorigin="anonymous"
+        crossorigin="use-credentials"
       />
     </a>
     <div class="project__info" ref="info">

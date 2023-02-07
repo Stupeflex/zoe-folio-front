@@ -20,7 +20,11 @@ const togglePreview = () => {
     :class="{ project__media: true, hover__parent: true, preview, blur }"
     @click="togglePreview"
   >
-    <img :src="media.url" :alt="'media ' + media.id" crossorigin="anonymous" />
+    <img
+      :src="media.url"
+      :alt="'media ' + media.id"
+      crossorigin="use-credentials"
+    />
   </div>
 </template>
 
