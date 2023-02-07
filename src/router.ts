@@ -1,16 +1,12 @@
-import Index from './views/SectionIndex.vue';
-import ProjectDetails from './views/ProjectDetails.vue';
-import Contact from './views/Contact.vue';
-import ProjectEditor from './views/admin/ProjectEditor.vue';
-import AdminPanel from './views/admin/AdminPanel.vue';
-import ProjectList from './views/admin/ProjectList.vue';
-import AdminDashboard from './views/admin/AdminDashboard.vue';
-import AdminLogin from './views/admin/AdminLogin.vue';
-
-import GridTest from './views/GridTest.vue';
-
 import { createRouter, createWebHistory } from 'vue-router';
-import ProjectListEditor from '@/views/admin/ProjectListEditor.vue';
+import Index from './views/SectionIndex.vue';
+const ProjectDetails = () => import('@/views/ProjectDetails.vue');
+const AdminPanel = () => import('@/views/admin/AdminPanel.vue');
+const AdminDashboard = () => import('@/views/admin/AdminDashboard.vue');
+const ProjectList = () => import('@/views/admin/ProjectList.vue');
+const ProjectEditor = () => import('@/views/admin/ProjectEditor.vue');
+const ProjectListEditor = () => import('@/views/admin/ProjectListEditor.vue');
+const AdminLogin = () => import('@/views/admin/AdminLogin.vue');
 
 const routes = [
   {
@@ -24,27 +20,18 @@ const routes = [
     name: 'projectDetails',
   },
   {
-    path: '/contact',
-    component: Contact,
-    name: 'contact',
-  },
-  {
     path: '/admin',
     component: AdminPanel,
     name: 'AdminPanel',
     children: [
       {
         path: '',
-        name: 'AdminDasboard',
+        name: 'AdminDashboard',
         component: AdminDashboard,
       },
       {
         path: 'projects',
         name: 'projectList',
-        component: ProjectList,
-      },
-      {
-        path: 'clients',
         component: ProjectList,
       },
       {
@@ -68,11 +55,6 @@ const routes = [
         name: 'ProjectListEditor',
       },
     ],
-  },
-  {
-    path: '/grid-test',
-    component: GridTest,
-    name: 'GridTest',
   },
 ];
 
