@@ -131,7 +131,7 @@ export const extractPaletteFromUrl = (
 ): Promise<rgbColor[] | null> =>
   new Promise((resolve, reject) => {
     const i = new Image();
-    i.crossOrigin = 'Anonymous';
+    i.crossOrigin = 'use-credentials';
 
     i.addEventListener('load', () => {
       try {
