@@ -42,7 +42,7 @@ const sectionStyle = computed(() => ({
       data-scroll-speed="-4"
       data-scroll-sticky
       data-scroll-target="#section__projects"
-      :class="{ blur: doBlur }"
+      :class="{ blur: doBlur, hidden: !!projectData.inTransitionId }"
     >
       <h1
         class="section__title"
@@ -84,6 +84,7 @@ const sectionStyle = computed(() => ({
   display: grid
   grid-template-columns: repeat(11, $cell-width)
   gap: $unit
+  transition: opacity 0.6s $bezier 0s
 
   h1
     align-self: end
@@ -92,6 +93,9 @@ const sectionStyle = computed(() => ({
   @media only screen and (max-width: $b-mobile)
     grid-row-end: -3
     grid-column-end: span calc($columns - 1)
+
+  &.hidden
+    opacity: 0
 
 #filters
   display: flex
