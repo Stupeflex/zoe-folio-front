@@ -155,7 +155,7 @@ const onResize = (itemId: identifier, borders: BorderEditData) => {
     switch (side) {
       case 'bottom': {
         const limit =
-          props.axis === 'y' ? props.rows - positionedItem.y : Infinity;
+          props.axis === 'y' ? Infinity : props.rows - positionedItem.y;
         item.height = Math.min(Math.max(value, 1), limit);
         break;
       }
