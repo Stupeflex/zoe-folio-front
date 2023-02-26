@@ -131,7 +131,7 @@ export const extractPaletteFromUrl = (
 ): Promise<rgbColor[] | null> =>
   new Promise((resolve, reject) => {
     const i = new Image();
-    i.crossOrigin = 'use-credentials';
+    i.crossOrigin = 'anonymous';
 
     i.addEventListener('load', () => {
       try {
@@ -161,8 +161,8 @@ export const processSectionPalette = [
   '#738290',
   '#a1b5d8',
   '#223',
-  '#e4f0d0',
-  '#c2d8b9',
+  '#ced9bd',
+  '#b3c7ab',
 ].map((hex) => hexToRgb(hex));
 
 export const studioSectionPalette = [
