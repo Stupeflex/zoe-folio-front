@@ -174,8 +174,8 @@ export const studioSectionPalette = [
 ].map((hex) => hexToRgb(hex));
 
 export const defaultPalette = [
-  '#3d374f',
   '#322f3b',
+  '#3d374f',
   '#121221',
   '#c2d8b9',
   '#2c2833',
