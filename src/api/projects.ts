@@ -46,6 +46,10 @@ interface NormalizedSize {
   height: number;
 }
 
+export const randomImgQuery = (url: string): string => {
+  return url + '?ts=' +  String((Math.random() * 1000).toFixed(0));
+};
+
 export const formatMediaSize = <T extends NullableSize>(
   size: T
 ): NormalizedSize => ({
@@ -65,7 +69,7 @@ export const formatProjects = (
       client: raw.attributes.client,
       title: raw.attributes.title,
       archived: raw.attributes.archived,
-      thumbnailUrl: raw.attributes.thumbnail.data?.attributes?.url ?? 'https://zoecandito.s3.eu-west-3.amazonaws.com/no_thumbnail_74019aaea9.png',
+      thumbnailUrl: randomImgQuery(raw.attributes.thumbnail.data?.attributes?.url ?? 'https://zoecandito.s3.eu-west-3.amazonaws.com/no_thumbnail_74019aaea9.png'),
       size: formatMediaSize(raw.attributes.size),
       informations: [],
       media:
@@ -110,7 +114,7 @@ export const formatRawMediaArray = <
     .filter((m) => !m.pending)
     .map((m) => ({
       id: m.id,
-      url: m.media.data.attributes.url,
+      url: randomImgQuery(m.media.data.attributes.url),
       type: MediaType.image,
       ...(dataExtractor ? dataExtractor(m) : {}),
     }));
