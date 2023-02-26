@@ -49,7 +49,7 @@ const clientColumnsCount = computed(
       v-if="aboutData.loaded"
       :src="aboutData.image?.url"
       alt="Zoë Candito"
-      crossorigin="use-credentials"
+      crossorigin="anonymous"
     />
     <div id="about__info" v-if="aboutData.loaded">
       <p id="about__bio">

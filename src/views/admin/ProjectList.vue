@@ -57,7 +57,7 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
               <img
                 :src="project.thumbnailUrl"
                 :alt="project.title"
-                crossorigin="use-credentials"
+                crossorigin="anonymous"
               />
             </div>
           </td>
