@@ -55,6 +55,7 @@ const onLeave = () => {
         :src="nextProject.thumbnailUrl"
         :alt="nextProject.title"
         id="thumbnail"
+        crossorigin="anonymous"
       />
     </div>
     <span id="next__project__index__container">
