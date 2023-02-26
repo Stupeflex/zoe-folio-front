@@ -412,9 +412,6 @@ watch(scrollData.scrollPos, (pos) => {
       z-index: 10
       box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4)
 
-    .grid__item__corner
-      height: $unit
-      width: $unit
 
     .grid__item__border, .grid__item__corner
       position: absolute
@@ -464,6 +461,11 @@ watch(scrollData.scrollPos, (pos) => {
 
       &:hover
         background-color: rgba(255, 255, 255, .5)
+
+    .grid__item__corner
+      height: $unit-d
+      width: $unit-d
+      z-index: 101
 
     .grid__item__delete, .grid__item__unpin
       @include body
