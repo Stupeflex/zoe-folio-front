@@ -426,25 +426,25 @@ watch(scrollData.scrollPos, (pos) => {
         left: 0
         right: 0
         top: 0
-        height: $unit-h
+        height: $unit
 
       &.border__bottom
         left: 0
         right: 0
         bottom: 0
-        height: $unit-h
+        height: $unit
 
       &.border__left
         left: 0
         bottom: 0
         top: 0
-        width: $unit-h
+        width: $unit
 
       &.border__right
         bottom: 0
         right: 0
         top: 0
-        width: $unit-h
+        width: $unit
 
       &.corner__top__right
         top: 0
