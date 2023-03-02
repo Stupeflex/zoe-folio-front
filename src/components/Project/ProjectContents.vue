@@ -73,11 +73,7 @@ const gridColumns = computed(() =>
 const placedItems = ref<GridItemWithPosition<{ media: ProjectMedia }>[]>([]);
 
 const projectMediaGridItems = ref<PartialGridItem<{ media: ProjectMedia }>[]>(
-  convertMediasResponsive(
-    props.project?.media ?? [],
-    gridColumns.value,
-    responsiveData.rows
-  )
+  convertMediasResponsive(props.project?.media ?? [], gridColumns.value)
 );
 
 watchEffect(() => {
@@ -102,11 +98,7 @@ watchEffect(() => {
             y: maybePlacedItem.y,
           }
         : media;
-      const size = convertSizeToResponsive(
-        baseMedia,
-        gridColumns.value,
-        responsiveData.rows
-      );
+      const size = convertSizeToResponsive(baseMedia, gridColumns.value);
       return {
         ...size,
         id: media.id,
@@ -124,8 +116,7 @@ watch(
     if (props.editable || props.project?.media === undefined) return;
     projectMediaGridItems.value = convertMediasResponsive(
       props.project?.media ?? [],
-      gridColumns.value,
-      responsiveData.rows
+      gridColumns.value
     );
   }
 );
