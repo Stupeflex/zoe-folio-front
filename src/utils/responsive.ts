@@ -2,7 +2,7 @@ export type Breakpoint = 'mobile' | 'tablet' | 'default';
 
 export const breakpoints: { [key in Breakpoint]: number } = {
   mobile: 700,
-  tablet: 1440,
+  tablet: 1300,
   default: 1920,
 };
 

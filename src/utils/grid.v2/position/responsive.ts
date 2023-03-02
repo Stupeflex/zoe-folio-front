@@ -1,55 +1,54 @@
 import { Dimensions, Size } from '@/utils/grid.v2/types';
 import { responsiveMap } from '@/utils/responsive';
-import { isDefined } from '@/utils/math';
 import { ProjectMedia } from '@/store/projectData';
 import { PartialGridItem } from '@/utils/grid';
 
 export const convertSizeToResponsive = (
   media: ProjectMedia,
-  gridWidth: number,
-  gridHeight: number
+  gridWidth: number
 ): Dimensions | Size => {
   // assume layout was made for desktop in project editor
-  const initialSize = media.size;
-  const desktopGridWidth = responsiveMap.columns.default - 2;
-  const desktopGridHeight = responsiveMap.rows.default;
-  // return early if no conversion necessary
-  if (gridWidth === desktopGridWidth) return initialSize;
-  // define decimal to fixed number conversion function
-  const isMobile = gridWidth === responsiveMap.columns.mobile;
+  // const initialSize = media.size;
+  const isDesktop = gridWidth === responsiveMap.columns.default - 2;
+  if (isDesktop) return media.size;
 
-  if (isMobile) return getMobileMediaSize(media);
+  return getMobileMediaSize(media, gridWidth);
 
-  const roundFn = isMobile ? Math.floor : Math.round;
-  // compute new width and height based on current grid width
-  const widthRatio = initialSize.width / desktopGridWidth;
-  const heightRatio = initialSize.height / gridHeight;
-  const responsiveWidth = gridWidth * widthRatio;
-  const responsiveHeight = desktopGridHeight * heightRatio;
-  const gridHeightRatio = desktopGridHeight / gridHeight;
-  // if x and y are defined, compute responsive values for those as well
-  if (isDefined(initialSize.x) && isDefined(initialSize.y)) {
-    const xRatio = initialSize.x / desktopGridWidth;
-    const yRatio = initialSize.y / desktopGridWidth;
-    const responsiveX = gridWidth * xRatio;
-    const responsiveY = gridWidth * yRatio;
-    // return full dimensions
-    return {
-      width: roundFn(responsiveWidth),
-      height: roundFn(responsiveHeight - gridHeightRatio),
-      x: initialSize.x === 0 ? 0 : Math.round(responsiveX),
-      y: Math.ceil(responsiveY),
-    };
-  }
-  // return only size
-  return {
-    width: roundFn(responsiveWidth),
-    height: roundFn(responsiveHeight),
-  };
+  // const roundFn = (n: number): number => {
+  //   const decimal = n - Math.floor(n);
+  //   if (decimal < 0.3) return Math.floor(n);
+  //   return Math.ceil(n);
+  // };
+  // // compute new width and height based on current grid width
+  // const widthRatio = initialSize.width / desktopGridWidth;
+  // const heightRatio = initialSize.height / gridHeight;
+  // const responsiveWidth = gridWidth * widthRatio;
+  // const gridWidthRatio = desktopGridWidth / gridWidth;
+  // const responsiveHeight = desktopGridHeight * heightRatio;
+  // const gridHeightRatio = desktopGridHeight / gridHeight;
+  // // if x and y are defined, compute responsive values for those as well
+  // if (isDefined(initialSize.x) && isDefined(initialSize.y)) {
+  //   const xRatio = initialSize.x / desktopGridWidth;
+  //   const yRatio = initialSize.y / desktopGridWidth;
+  //   const responsiveX = gridWidth * xRatio;
+  //   const responsiveY = gridWidth * yRatio;
+  //   // return full dimensions
+  //   return {
+  //     width: Math.max(roundFn(responsiveWidth - gridWidthRatio), 1),
+  //     height: roundFn(responsiveHeight - gridHeightRatio),
+  //     x: initialSize.x === 0 ? 0 : Math.round(responsiveX),
+  //     y: Math.ceil(responsiveY),
+  //   };
+  // }
+  // // return only size
+  // return {
+  //   width: roundFn(responsiveWidth),
+  //   height: roundFn(responsiveHeight),
+  // };
 };
 
-const getMobileMediaSize = (media: ProjectMedia): Size => {
-  const width = responsiveMap.columns.mobile;
+const getMobileMediaSize = (media: ProjectMedia, gridWidth: number): Size => {
+  const width = gridWidth;
   const height =
     media.mediaHeight && media.mediaWidth
       ? Math.round((media.mediaHeight / media.mediaWidth) * width)
@@ -63,8 +62,7 @@ const getMobileMediaSize = (media: ProjectMedia): Size => {
 
 export const convertMediasResponsive = (
   medias: ProjectMedia[],
-  gridWidth: number,
-  gridHeight: number
+  gridWidth: number
 ): PartialGridItem<{ media: ProjectMedia }>[] => {
   const isTablet = gridWidth === responsiveMap.columns.tablet - 2;
   const isMobile = gridWidth === responsiveMap.columns.mobile;
@@ -88,7 +86,7 @@ export const convertMediasResponsive = (
         return 0;
       })
       .map((media) => {
-        const size = getMobileMediaSize(media);
+        const size = getMobileMediaSize(media, gridWidth);
         return {
           id: media.id,
           ...size,
@@ -101,7 +99,7 @@ export const convertMediasResponsive = (
 
   const responsiveMedias = medias.map((media) => {
     const size = isTablet
-      ? convertSizeToResponsive(media, gridWidth, gridHeight)
+      ? convertSizeToResponsive(media, gridWidth)
       : media.size;
     return {
       id: media.id,
