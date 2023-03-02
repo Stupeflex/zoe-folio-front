@@ -77,6 +77,8 @@ export const formatProjects = (
         isFullyFetchedProjectMediaComponentArray(raw.attributes.Medias)
           ? formatRawMediaArray(raw.attributes.Medias, (m) => ({
               size: formatMediaSize(m.size), // eslint-disable-line prettier/prettier
+              mediaHeight: m.media.data.attributes.height,
+              mediaWidth: m.media.data.attributes.width,
             })) // eslint-disable-line prettier/prettier
           : undefined,
       type: raw.attributes.type,

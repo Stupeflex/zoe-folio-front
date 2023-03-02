@@ -16,7 +16,10 @@ import ProjectMediaItem from '@/components/ProjectMedia.vue';
 import { formatNumber } from '@/utils/format';
 import { useResponsiveData } from '@/store/responsiveData';
 import { useDropzone } from 'vue3-dropzone';
-import { convertSizeToResponsive } from '@/utils/grid.v2/position/responsive';
+import {
+  convertMediasResponsive,
+  convertSizeToResponsive,
+} from '@/utils/grid.v2/position/responsive';
 import { GridItemWithPosition } from '@/utils/grid.v2/types';
 
 type Props = {
@@ -67,20 +70,14 @@ const gridColumns = computed(() =>
     : responsiveData.columns - 2
 );
 
-const placedItems = ref<GridItemWithPosition[]>([]);
+const placedItems = ref<GridItemWithPosition<{ media: ProjectMedia }>[]>([]);
 
 const projectMediaGridItems = ref<PartialGridItem<{ media: ProjectMedia }>[]>(
-  (props.project?.media ?? []).map((media) => ({
-    ...convertSizeToResponsive(
-      media.size,
-      gridColumns.value,
-      responsiveData.rows
-    ),
-    id: media.id,
-    extraData: {
-      media: media,
-    },
-  }))
+  convertMediasResponsive(
+    props.project?.media ?? [],
+    gridColumns.value,
+    responsiveData.rows
+  )
 );
 
 watchEffect(() => {
@@ -95,9 +92,18 @@ watchEffect(() => {
         (item) => item.id === media.id
       );
       // use new medias as is if no changes in length
-      const baseSize = maybePlacedItem ?? media.size;
+      const baseMedia = maybePlacedItem
+        ? {
+            ...maybePlacedItem,
+            ...(maybePlacedItem.extraData?.media as ProjectMedia),
+            height: maybePlacedItem.height,
+            width: maybePlacedItem.width,
+            x: maybePlacedItem.x,
+            y: maybePlacedItem.y,
+          }
+        : media;
       const size = convertSizeToResponsive(
-        baseSize,
+        baseMedia,
         gridColumns.value,
         responsiveData.rows
       );
@@ -116,21 +122,11 @@ watch(
   () => gridColumns.value,
   () => {
     if (props.editable || props.project?.media === undefined) return;
-    projectMediaGridItems.value = props.project.media.map((media) => {
-      // use new medias as is if no changes in length
-      const size = convertSizeToResponsive(
-        media.size,
-        gridColumns.value,
-        responsiveData.rows
-      );
-      return {
-        ...size,
-        id: media.id,
-        extraData: {
-          media: media,
-        },
-      };
-    });
+    projectMediaGridItems.value = convertMediasResponsive(
+      props.project?.media ?? [],
+      gridColumns.value,
+      responsiveData.rows
+    );
   }
 );
 
@@ -144,7 +140,9 @@ const scrollDown = () => {
 
 const onLayout = (l: GridLayoutData) => {
   scrollData.update();
-  placedItems.value = l.items;
+  placedItems.value = l.items as GridItemWithPosition<{
+    media: ProjectMedia;
+  }>[];
   emit('gridLayout', l);
 };
 
@@ -294,7 +292,7 @@ onMounted(() => {
       :items="projectMediaGridItems"
       :rows="12"
       :columns="gridColumns"
-      :marginY="0"
+      :marginY="responsiveData.breakpoint === 'mobile' ? 1 : 0"
       :marginX="0"
       axis="y"
       :editable="editable"

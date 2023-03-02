@@ -30,6 +30,8 @@ export interface ProjectMedia {
   type: MediaType;
   size: MediaSize;
   id: identifier;
+  mediaHeight?: number;
+  mediaWidth?: number;
 }
 
 export interface ProjectInfo {
