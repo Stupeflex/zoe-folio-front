@@ -192,7 +192,7 @@ onMounted(() => {
     >
       <video
         v-if="project?.videoUrl && !forceShowThumbnail"
-        crossorigin="anonymous"
+        crossorigin="use-credentials"
         class="project__cover"
         id="project__video"
         :src="project.videoUrl"
@@ -205,7 +205,7 @@ onMounted(() => {
       ></video>
       <img
         v-else-if="project?.thumbnailUrl"
-        crossorigin="anonymous"
+        crossorigin="use-credentials"
         class="project__cover"
         :src="project?.thumbnailUrl"
         :alt="project?.title"
