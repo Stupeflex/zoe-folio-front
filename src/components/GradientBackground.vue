@@ -19,9 +19,9 @@ const responsiveData = useResponsiveData();
 
 let app: Application;
 const MaxCanvasWidth = responsiveData.getValue({
-  default: 1500,
-  tablet: 1000,
-  mobile: 500,
+  default: 1024,
+  tablet: 512,
+  mobile: 256,
 });
 let tick = 0;
 
