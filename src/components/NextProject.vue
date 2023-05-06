@@ -37,6 +37,8 @@ const onLeave = () => {
     gradientData.setColorsRgb(palette.palette, true);
   }
 };
+
+const nextProjectType = t(`project.type.${nextProject.value.type}`);
 </script>
 
 <template>
@@ -85,7 +87,7 @@ const onLeave = () => {
         </div>
         <span id="next__project__type">
           [
-          <em>{{ nextProject.type }}</em>
+          <em>{{ nextProjectType }}</em>
           ]
         </span>
       </div>
@@ -226,7 +228,7 @@ const onLeave = () => {
       align-items: end
       z-index: 1
 
-      @media only screen and (max-width: $b-mobile)
+      @media only screen and (max-width: $b-tablet)
         @include grid(7, true, 1)
         padding: 0
 
@@ -246,9 +248,10 @@ const onLeave = () => {
         text-transform: capitalize
         color: $c-white
         font-weight: 200
-        grid-column: 4 / 6
+        grid-column: 5 / -1
         grid-row: 1 / 1
         margin-left: $unit-n
+        white-space: nowrap
 
         @media only screen and (max-width: $b-mobile)
           grid-column: 6 / -1
