@@ -69,7 +69,7 @@ export const formatProjects = (
       client: raw.attributes.client,
       title: raw.attributes.title,
       archived: raw.attributes.archived,
-      thumbnailUrl: randomImgQuery(raw.attributes.thumbnail.data?.attributes?.url ?? 'https://zoecandito.s3.eu-west-3.amazonaws.com/no_thumbnail_74019aaea9.png'),
+      thumbnailUrl: randomImgQuery(raw.attributes.thumbnail.data.attributes.formats?.large?.url ?? raw.attributes.thumbnail.data?.attributes?.url ?? 'https://zoecandito.s3.eu-west-3.amazonaws.com/no_thumbnail_74019aaea9.png'),
       size: formatMediaSize(raw.attributes.size),
       informations: [],
       media:
