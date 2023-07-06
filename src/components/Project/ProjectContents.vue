@@ -135,6 +135,13 @@ const onLayout = (l: GridLayoutData) => {
   emit('gridLayout', l);
 };
 
+const onFirstLayout = (l: GridLayoutData) => {
+  placedItems.value = l.items as GridItemWithPosition<{
+    media: ProjectMedia;
+  }>[];
+  emit('gridLayout', l);
+};
+
 const onDeleteItem = (itemId: identifier) => {
   if (props.editable) {
     emit('deleteItem', itemId);
@@ -287,7 +294,7 @@ onMounted(() => {
       :editable="editable"
       :allow-delete="editable"
       @layout="onLayout"
-      @first-layout="onLayout"
+      @first-layout="onFirstLayout"
       @deleteItem="onDeleteItem"
       :preview-allowed="!editable"
       :preview-id="previewId"
