@@ -141,7 +141,7 @@ const trimMatrixAxisX = (matrix: GridMatrix, matrixSize: Size): Size => {
 export const trimMatrix = (
   matrix: GridMatrix,
   matrixSize: Size,
-  { axis }: GridLayoutOptions
+  { axis, bottomPadding, rows }: GridLayoutOptions
 ): Size => {
   // start counting from the end
   if (axis === 'x') {
@@ -160,7 +160,7 @@ export const trimMatrix = (
         matrix.splice(firstEmptyIndex);
         return {
           width: matrixSize.width,
-          height: y + 1,
+          height: y + 1 + (bottomPadding ? rows : 0),
         };
       }
     }

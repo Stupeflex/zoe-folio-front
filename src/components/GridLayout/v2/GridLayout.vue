@@ -52,6 +52,7 @@ interface GridLayoutProps {
   previewAllowed?: boolean;
   previewId?: identifier;
   fillAvailable?: boolean;
+  bottomPadding?: boolean;
 }
 
 const props = withDefaults(defineProps<GridLayoutProps>(), {
@@ -62,6 +63,7 @@ const props = withDefaults(defineProps<GridLayoutProps>(), {
   marginY: 0,
   axis: 'x',
   fillAvailable: false,
+  bottomPadding: false,
 });
 
 const selectedItemId = ref<identifier | null>(null);
@@ -91,6 +93,8 @@ const internalItems = ref(
     ? normalizeItems(props.items)
     : []
 );
+
+console.log(props);
 
 const layout = computed(() =>
   props.staticLayout

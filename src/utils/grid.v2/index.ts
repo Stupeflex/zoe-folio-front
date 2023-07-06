@@ -26,6 +26,7 @@ export const defaultGridOptions: GridLayoutOptions = {
   axis: 'x',
   reservedSpace: [],
   fillAvailable: false,
+  bottomPadding: false,
 };
 
 const prefillReservedSpace = (
@@ -66,6 +67,7 @@ export const generateGridLayout = (
     normalizedItems,
     options
   );
+  console.log(options);
   matrixSize = trimMatrix(matrix, matrixSize, options);
   // logMatrix(matrix, matrixSize);
   const layoutDimensions = getGridLayoutDimensions(matrixSize);

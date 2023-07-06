@@ -290,6 +290,7 @@ onMounted(() => {
       :marginX="0"
       axis="y"
       :editable="editable"
+      :bottom-padding="editable"
       :allow-delete="editable"
       @layout="onLayout"
       @first-layout="onFirstLayout"

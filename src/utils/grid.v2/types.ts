@@ -32,6 +32,7 @@ export interface GridProps {
   axis?: Axis;
   reservedSpace?: Dimensions[];
   fillAvailable?: boolean;
+  bottomPadding?: boolean;
 }
 
 export interface ItemPosition extends Vector2 {
