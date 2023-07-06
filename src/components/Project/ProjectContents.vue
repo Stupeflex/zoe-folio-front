@@ -84,20 +84,10 @@ watchEffect(() => {
     if (sameLength) return;
     // merge incoming medias into current ones while conserving size
     projectMediaGridItems.value = props.project.media.map((media) => {
-      const maybePlacedItem = placedItems.value.find(
-        (item) => item.id === media.id
-      );
-      // use new medias as is if no changes in length
-      const baseMedia = maybePlacedItem
-        ? {
-            ...maybePlacedItem,
-            ...(maybePlacedItem.extraData?.media as ProjectMedia),
-            height: maybePlacedItem.height,
-            width: maybePlacedItem.width,
-            x: maybePlacedItem.x,
-            y: maybePlacedItem.y,
-          }
-        : media;
+      const baseMedia = {
+        ...media,
+        size: keepMediaPosition(media),
+      };
       const size = convertSizeToResponsive(baseMedia, gridColumns.value);
       return {
         ...size,
@@ -109,6 +99,14 @@ watchEffect(() => {
     });
   }
 });
+
+const keepMediaPosition = (newMedia: ProjectMedia) => {
+  const oldSize = placedItems.value.find(({ id }) => id === newMedia.id);
+  if (!oldSize) return newMedia.size;
+  const { height, width, x, y } = oldSize;
+  console.log(oldSize);
+  return { height, width, x, y };
+};
 
 watch(
   () => gridColumns.value,
@@ -289,6 +287,7 @@ onMounted(() => {
       :editable="editable"
       :allow-delete="editable"
       @layout="onLayout"
+      @first-layout="onLayout"
       @deleteItem="onDeleteItem"
       :preview-allowed="!editable"
       :preview-id="previewId"
