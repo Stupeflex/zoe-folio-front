@@ -1,4 +1,3 @@
-import { fr } from './fr';
 import { en } from './en';
 
 export interface Translation {
@@ -7,7 +6,7 @@ export interface Translation {
 
 export const translations = {
   en,
-  fr,
+  // fr,
 };
 
 export const tr = (translate: (s: string) => string, s: string) =>
