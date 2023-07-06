@@ -131,7 +131,10 @@ export const extractPaletteFromUrl = (
 ): Promise<rgbColor[] | null> =>
   new Promise((resolve, reject) => {
     const i = new Image();
-    i.crossOrigin = 'anonymous';
+    const prefix = imgUrl.indexOf('?') > -1 ? '&' : '?';
+    const cacheBurstUrl = imgUrl + prefix + 'ts=' + new Date().getTime();
+
+    i.crossOrigin = 'Anonymous';
 
     i.addEventListener('load', () => {
       try {
@@ -146,7 +149,7 @@ export const extractPaletteFromUrl = (
       }
     });
     i.addEventListener('error', (e) => console.error(e));
-    i.src = imgUrl;
+    i.src = cacheBurstUrl;
   });
 
 export const defaultPaletteOld = [
