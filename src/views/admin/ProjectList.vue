@@ -54,11 +54,7 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
           <td>{{ project.id }}</td>
           <td>
             <div class="thumbnail">
-              <img
-                :src="project.thumbnailUrl"
-                :alt="project.title"
-                crossorigin="use-credentials"
-              />
+              <img :src="project.thumbnailUrl" :alt="project.title" />
             </div>
           </td>
           <td>

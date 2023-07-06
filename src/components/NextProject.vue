@@ -57,7 +57,6 @@ const nextProjectType = t(`project.type.${nextProject.value.type}`);
         :src="nextProject.thumbnailUrl"
         :alt="nextProject.title"
         id="thumbnail"
-        crossorigin="use-credentials"
       />
     </div>
     <span id="next__project__index__container">

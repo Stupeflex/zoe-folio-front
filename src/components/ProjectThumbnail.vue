@@ -137,11 +137,7 @@ const onClick = (e: MouseEvent) => {
       @click="onClick"
       ref="img"
     >
-      <img
-        :src="project.thumbnailUrl"
-        :alt="project.title"
-        crossorigin="use-credentials"
-      />
+      <img :src="project.thumbnailUrl" :alt="project.title" />
     </a>
     <div class="project__info" ref="info">
       <h5 v-if="project.client" class="project__client">
