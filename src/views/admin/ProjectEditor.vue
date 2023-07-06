@@ -239,9 +239,12 @@ const saveProjectInfo = async () => {
   }
 };
 
-watch(route.params, () => {
-  fetchProject(true, true);
-});
+watch(
+  () => route.params,
+  () => {
+    fetchProject(true, true);
+  }
+);
 
 watch(
   () => projectData.selectedProject,
