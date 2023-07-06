@@ -104,7 +104,7 @@ $clients-row-start: 3
 
   @media only screen and (max-width: $b-mobile)
     margin-left: calc($cell-width * 4 + $unit * 4)
-
+    padding-right: calc($cell-width * 12 + $unit * 12)
 
 #about__title
   grid-row-start: 1
@@ -117,7 +117,6 @@ $clients-row-start: 3
   grid-column: 1 / span 6
   grid-row: 4 / span 8
   object-fit: cover
-  //height: calc(100% - $cell-height / 2)
   width: 100%
   height: 100%
   align-self: end
