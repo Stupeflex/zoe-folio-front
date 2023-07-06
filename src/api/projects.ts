@@ -47,7 +47,8 @@ interface NormalizedSize {
 }
 
 export const randomImgQuery = (url: string): string => {
-  return url + '?ts=' +  String((Math.random() * 1000).toFixed(0));
+  return url;
+  // return url + '?ts=' +  String((Math.random() * 1000).toFixed(0));
 };
 
 export const formatMediaSize = <T extends NullableSize>(
