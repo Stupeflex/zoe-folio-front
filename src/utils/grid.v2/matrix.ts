@@ -100,7 +100,11 @@ export const fillMatrix = (
   return matrix;
 };
 
-const trimMatrixAxisX = (matrix: GridMatrix, matrixSize: Size): Size => {
+const trimMatrixAxisX = (
+  matrix: GridMatrix,
+  matrixSize: Size,
+  { bottomPadding, columns }: GridLayoutOptions
+): Size => {
   for (let x = matrixSize.width - 1; x > 0; x--) {
     // check for non-empty column
     const columnIsFilled = Array(matrixSize.height)
@@ -110,16 +114,6 @@ const trimMatrixAxisX = (matrix: GridMatrix, matrixSize: Size): Size => {
         return cell !== 0 && cell !== 3;
       });
     if (columnIsFilled) {
-      // const firstEmptyIndex = getMatrixIndexForPosition(matrixSize, {
-      //   x: x + 1,
-      //   y: matrixSize.height - 1,
-      // });
-      // console.log(x, firstEmptyIndex);
-      // matrix.splice(firstEmptyIndex);
-      // return {
-      //   height: matrixSize.height,
-      //   width: x + 1,
-      // };
       const emptyXStart = x + 1;
       for (let y = matrixSize.height - 1; y >= 0; y--) {
         const rowLengthToRemove = matrixSize.width - emptyXStart;
@@ -131,7 +125,7 @@ const trimMatrixAxisX = (matrix: GridMatrix, matrixSize: Size): Size => {
       }
       return {
         height: matrixSize.height,
-        width: x + 1,
+        width: x + 1 + (bottomPadding ? columns : 0),
       };
     }
   }
@@ -141,11 +135,12 @@ const trimMatrixAxisX = (matrix: GridMatrix, matrixSize: Size): Size => {
 export const trimMatrix = (
   matrix: GridMatrix,
   matrixSize: Size,
-  { axis, bottomPadding, rows }: GridLayoutOptions
+  opts: GridLayoutOptions
 ): Size => {
   // start counting from the end
+  const { axis, bottomPadding, rows } = opts;
   if (axis === 'x') {
-    return trimMatrixAxisX(matrix, matrixSize);
+    return trimMatrixAxisX(matrix, matrixSize, opts);
   } else {
     for (let y = matrixSize.height - 1; y >= 0; y--) {
       const rowStartIndex = getMatrixIndexForPosition(matrixSize, { x: 0, y });

@@ -133,6 +133,7 @@ onUnmounted(() => {
         items,
         ...gridOptions,
         editable: true,
+        bottomPadding: true,
       }"
       @layout="onLayout"
       @firstLayout="onFirstLayout"
