@@ -142,6 +142,7 @@ export const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
   axis: 'x',
   reservedSpace: projectGridReservedSpace(b),
   fillAvailable: false,
+  bottomPadding: false,
 });
 
 export const useProjectData = defineStore('projectData', () => {
