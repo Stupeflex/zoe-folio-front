@@ -102,6 +102,8 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
   position: relative
   height: 100%
   width: 100%
+  min-height: 100%
+  padding-bottom: 3rem
 
   .project__title
     transition: all 0.3s $bezier 0s
@@ -212,10 +214,12 @@ const toggleArchived = (id: identifier) => async (newArchived: boolean) => {
     bottom: $unit
     right: $unit
     width: calc($cell-width * 3 + $unit * 2)
+    z-index: 15
 
   #layout__cta
     position: fixed
     bottom: $unit
     left: $unit
     width: calc($cell-width * 3 + $unit * 2)
+    z-index: 15
 </style>
