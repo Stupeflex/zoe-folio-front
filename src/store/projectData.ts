@@ -115,14 +115,20 @@ const projectGridReservedSpace = (b: Breakpoint) => {
         x: 0,
         y: Math.floor(rows() / 2),
         height: rows() - Math.floor(rows() / 2),
+        width: 1,
+      },
+      {
+        x: 0,
+        y: 0,
+        height: rows(),
         width: 0,
       },
-      // {
-      //   x: 0,
-      //   y: rows() - 2,
-      //   height: 2,
-      //   width: 100,
-      // },
+      {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 0,
+      },
       {
         x: 0,
         y: 12,
