@@ -160,21 +160,27 @@ const onResize = (itemId: identifier, borders: BorderEditData) => {
         break;
       }
       case 'top': {
-        const limit = props.axis === 'y' ? props.rows - value : Infinity;
+        const limit =
+          props.axis === 'y'
+            ? positionedItem.y + positionedItem.height
+            : props.rows - positionedItem.y;
         item.y = Math.max(positionedItem.y + (item.height ?? 1) - value, 0);
         item.height = Math.min(Math.max(value, 1), limit);
         break;
       }
       case 'right': {
         const limit =
-          props.axis === 'y' ? Infinity : props.columns - positionedItem.x;
+          props.axis === 'x' ? Infinity : props.columns - positionedItem.x;
         item.width = Math.min(Math.max(value, 1), limit);
         break;
       }
       case 'left': {
-        const limit = props.axis === 'y' ? Infinity : props.columns - value;
+        const limit =
+          props.axis === 'x'
+            ? Infinity
+            : Math.min(positionedItem.width + positionedItem.x, props.columns);
         item.x = Math.max(positionedItem.x + (item.width ?? 1) - value, 0);
-        item.width = Math.min(Math.max(value, 1), limit);
+        item.width = Math.max(Math.min(value, limit), 1);
         break;
       }
     }
