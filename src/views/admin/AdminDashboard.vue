@@ -93,7 +93,7 @@ const archivedProjectCount = computed(() =>
       </div>
     </router-link>
     <router-link
-      to="/admin/sections"
+      to="/admin/content"
       class="admin__panel__card hover__parent"
       id="c__sections"
     >

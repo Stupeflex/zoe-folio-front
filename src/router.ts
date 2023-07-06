@@ -7,6 +7,7 @@ const ProjectList = () => import('@/views/admin/ProjectList.vue');
 const ProjectEditor = () => import('@/views/admin/ProjectEditor.vue');
 const ProjectListEditor = () => import('@/views/admin/ProjectListEditor.vue');
 const AdminLogin = () => import('@/views/admin/AdminLogin.vue');
+const TextContentEditor = () => import('@/views/admin/TextContentEditor.vue');
 
 const routes = [
   {
@@ -53,6 +54,21 @@ const routes = [
         path: 'project-list-editor',
         component: ProjectListEditor,
         name: 'ProjectListEditor',
+      },
+      {
+        path: 'content',
+        component: TextContentEditor,
+        name: 'TextContentEditor',
+      },
+      {
+        path: 'usage',
+        component: TextContentEditor,
+        name: 'Usage',
+      },
+      {
+        path: 'clients',
+        component: TextContentEditor,
+        name: 'ClientsEditor',
       },
     ],
   },
