@@ -67,9 +67,7 @@ export const generateGridLayout = (
     normalizedItems,
     options
   );
-  console.log(options);
   matrixSize = trimMatrix(matrix, matrixSize, options);
-  // logMatrix(matrix, matrixSize);
   const layoutDimensions = getGridLayoutDimensions(matrixSize);
 
   return { items: placedItems, matrix, matrixSize, layoutDimensions };

@@ -66,7 +66,7 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   min-width: max-content
 
   @media only screen and (max-width: $b-mobile)
-    margin-left: calc($cell-width * -4 + $unit * -4)
+    //margin-left: calc($cell-width * -4 + $unit * -4)
 
 
 

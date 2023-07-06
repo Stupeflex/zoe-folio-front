@@ -9,6 +9,7 @@ import { Project, useProjectData } from '@/store/projectData';
 import { useGradientData } from '@/store/gradientData';
 import { useRouter } from 'vue-router';
 import { useScrollData } from '@/store/scrollData';
+import { useResponsiveData } from '@/store/responsiveData';
 
 type ProjectThumbnailProps = {
   project: Project;
@@ -20,6 +21,7 @@ type ProjectThumbnailProps = {
 const gradientData = useGradientData();
 const projectData = useProjectData();
 const scrollData = useScrollData();
+const responsiveData = useResponsiveData();
 const router = useRouter();
 
 const inTransition = ref<boolean>(false);
@@ -59,11 +61,13 @@ const extractPaletteFallback = (e: MouseEvent) => {
   }
 };
 
+const speedExponent = responsiveData.breakpoint === 'mobile' ? 2.3 : 3.9;
+
 const speed = computed(() =>
   (
     (1 -
       Math.min(props.project.size?.width || MAX_WIDTH, MAX_WIDTH) / MAX_WIDTH) *
-    3.9
+    speedExponent
   ).toFixed(1)
 );
 

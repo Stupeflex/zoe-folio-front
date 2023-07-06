@@ -75,8 +75,8 @@ const sectionStyle = computed(() => ({
   min-width: max-content
 
   @media only screen and (max-width: $b-mobile)
-    padding-right: 0
-    margin-right:  calc(($cell-width * 10 + $unit * 10) * -1)
+    margin-right: calc($cell-width * 4 + $unit * 4)
+    //padding-right: 0
 
 #projects__title
   grid-column-start: 1

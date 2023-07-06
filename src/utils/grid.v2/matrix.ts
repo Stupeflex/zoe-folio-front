@@ -103,32 +103,30 @@ export const fillMatrix = (
 const trimMatrixAxisX = (
   matrix: GridMatrix,
   matrixSize: Size,
-  { bottomPadding, columns }: GridLayoutOptions
+  { bottomPadding, columns, rows }: GridLayoutOptions
 ): Size => {
-  for (let x = matrixSize.width - 1; x > 0; x--) {
-    // check for non-empty column
-    const columnIsFilled = Array(matrixSize.height)
-      .fill('')
+  for (let x = matrixSize.width - 1; x >= 0; x--) {
+    const nonEmptyColumn = Array(rows)
+      .fill(0)
       .some((_, y) => {
-        const cell = getMatrixValueAtPosition(matrix, matrixSize, { x, y });
-        return cell !== 0 && cell !== 3;
+        const matrixIndex = getMatrixIndexForPosition(matrixSize, { x, y });
+        const cell = matrix[matrixIndex];
+        return cell !== 0 && cell !== 3 && cell !== 4;
       });
-    if (columnIsFilled) {
-      const emptyXStart = x + 1;
-      for (let y = matrixSize.height - 1; y >= 0; y--) {
-        const rowLengthToRemove = matrixSize.width - emptyXStart;
-        const rowStartIndex = getMatrixIndexForPosition(matrixSize, {
-          x: emptyXStart,
-          y,
-        });
-        matrix.splice(rowStartIndex, rowLengthToRemove);
-      }
+
+    if (nonEmptyColumn) {
+      const firstEmptyIndex = getMatrixIndexForPosition(matrixSize, {
+        x: x + 1,
+        y: 0,
+      });
+      matrix.splice(firstEmptyIndex);
       return {
         height: matrixSize.height,
         width: x + 1 + (bottomPadding ? columns : 0),
       };
     }
   }
+
   return matrixSize;
 };
 
@@ -146,7 +144,9 @@ export const trimMatrix = (
       const rowStartIndex = getMatrixIndexForPosition(matrixSize, { x: 0, y });
       // check for non-empty row
       const row = matrix.slice(rowStartIndex, rowStartIndex + matrixSize.width);
-      const rowIsFilled = row.some((cell) => cell !== 0 && cell !== 3);
+      const rowIsFilled = row.some(
+        (cell) => cell !== 0 && cell !== 3 && cell !== 4
+      );
       if (rowIsFilled) {
         const firstEmptyIndex = getMatrixIndexForPosition(matrixSize, {
           x: 0,
