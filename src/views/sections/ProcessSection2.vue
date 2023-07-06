@@ -61,8 +61,14 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   @include grid(auto-fit, true, 11)
   display: inline-grid
   padding-top: calc($cell-height + $unit + $unit)
+  padding-right: calc($cell-width * 2 + $unit-d)
   height: 100%
   min-width: max-content
+
+  @media only screen and (max-width: $b-mobile)
+    margin-left: calc($cell-width * -4 + $unit * -4)
+
+
 
 #process__title
   grid-column-start: 1
