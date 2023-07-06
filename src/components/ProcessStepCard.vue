@@ -192,6 +192,9 @@ const content = computed(() =>
     min-height: max-content
     white-space: normal
 
+    @media only screen and (min-width: 2000px)
+      font-size: 24px
+
     @media only screen and (max-width: $b-mobile)
       @include process-step
 </style>
