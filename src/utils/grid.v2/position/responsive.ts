@@ -53,7 +53,6 @@ const getMobileMediaSize = (media: ProjectMedia, gridWidth: number): Size => {
     media.mediaHeight && media.mediaWidth
       ? Math.round((media.mediaHeight / media.mediaWidth) * width)
       : media.size.height;
-  console.log(media, width, height);
   return {
     width,
     height,
@@ -97,7 +96,7 @@ export const convertMediasResponsive = (
       });
   }
 
-  const responsiveMedias = medias.map((media) => {
+  return medias.map((media) => {
     const size = isTablet
       ? convertSizeToResponsive(media, gridWidth)
       : media.size;
@@ -109,7 +108,4 @@ export const convertMediasResponsive = (
       },
     };
   });
-
-  console.log(responsiveMedias);
-  return responsiveMedias;
 };
