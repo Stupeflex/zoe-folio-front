@@ -21,7 +21,7 @@ const archivedProjectCount = computed(() =>
 </script>
 
 <template>
-  <div id="admin__panel">
+  <div id="admin__dashboard">
     <h1>Admin Panel</h1>
     <h3>– Dashboard</h3>
 
@@ -126,7 +126,7 @@ const archivedProjectCount = computed(() =>
 </template>
 
 <style scoped lang="sass">
-#admin__panel
+#admin__dashboard
   @include grid($columns, true, calc($rows - 1))
   height: 100%
   width: 100%

@@ -1,5 +1,5 @@
 <template>
-  <main id="admin__panel">
+  <main id="admin__panel" :class="{ scroll: shouldScroll }">
     <section id="admin__content">
       <router-view />
     </section>
@@ -33,6 +33,8 @@ onMounted(() => {
   gradientData.setColorsRgb(adminPanelPalette, true);
   redirectToLoginIfNeeded();
 });
+
+const shouldScroll = route.fullPath === '/admin/projects';
 </script>
 
 <style scoped lang="sass">
@@ -42,10 +44,14 @@ onMounted(() => {
   width: 100%
   overflow: hidden
 
+  &.scroll
+    overflow-y: auto
+
   #admin__content
     grid-column: 4 / -1
     grid-row: 1 / -1
     position: relative
+    min-height: 100%
 
     & > *
       opacity: 1
