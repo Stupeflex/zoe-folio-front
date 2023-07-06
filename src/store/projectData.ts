@@ -141,7 +141,7 @@ const projectGridReservedSpace = (b: Breakpoint) => {
 };
 
 export const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
-  marginX: 2,
+  marginX: b === 'mobile' ? 1 : 2,
   marginY: 1,
   rows: responsiveMap.rows[b] - 2,
   columns: responsiveMap.columns[b],
