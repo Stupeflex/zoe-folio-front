@@ -74,6 +74,10 @@ const sectionStyle = computed(() => ({
   height: 100%
   min-width: max-content
 
+  @media only screen and (max-width: $b-mobile)
+    padding-right: 0
+    margin-right:  calc(($cell-width * 10 + $unit * 10) * -1)
+
 #projects__title
   grid-column-start: 1
   grid-column-end: span 11

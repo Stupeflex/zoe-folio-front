@@ -102,6 +102,10 @@ $clients-row-start: 3
   position: relative
   z-index: 1
 
+  @media only screen and (max-width: $b-mobile)
+    margin-left: calc($cell-width * 4 + $unit * 4)
+
+
 #about__title
   grid-row-start: 1
   grid-column-end: span 17

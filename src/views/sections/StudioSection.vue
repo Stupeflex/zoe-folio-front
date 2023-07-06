@@ -84,6 +84,10 @@ const blurStyle = computed(() => scrollSpeedToBlurStyle(scrollData.speed));
   position: relative
   z-index: 1
 
+  @media only screen and (max-width: $b-mobile)
+    margin-left: calc($cell-width * 4 + $unit * 4)
+
+
 #studio__info
   display: grid
   grid-template-rows: repeat(3, $cell-height)

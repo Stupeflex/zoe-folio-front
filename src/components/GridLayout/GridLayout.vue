@@ -52,6 +52,7 @@ interface GridLayoutProps {
   allowDelete?: boolean;
   previewAllowed?: boolean;
   previewId?: identifier;
+  fillAvailable?: boolean;
 }
 
 const props = withDefaults(defineProps<GridLayoutProps>(), {
@@ -61,6 +62,7 @@ const props = withDefaults(defineProps<GridLayoutProps>(), {
   marginX: 0,
   marginY: 0,
   axis: 'x',
+  fillAvailable: false,
 });
 
 const emit = defineEmits([
