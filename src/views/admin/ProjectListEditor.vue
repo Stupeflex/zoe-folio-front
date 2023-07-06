@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import GridLayout from '@/components/GridLayout/v2/GridLayout.vue';
 import {
   projectGridOptions,
@@ -105,6 +105,22 @@ const onLayout = (layout: GridLayoutData) => {
 const onFirstLayout = (layout: GridLayoutData) => {
   updateGridItems(layout);
 };
+const onWheel = (e: WheelEvent) => {
+  const { deltaX, deltaY } = e;
+  const offset = deltaY !== 0 ? deltaY : deltaX;
+
+  if (containerRef.value) {
+    containerRef.value.scrollLeft = containerRef.value.scrollLeft + offset;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('wheel', onWheel);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('wheel', onWheel);
+});
 </script>
 
 <template>
