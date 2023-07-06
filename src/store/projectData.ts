@@ -3,7 +3,13 @@ import { defineStore } from 'pinia';
 import { fetchProjects } from '@/api/projects';
 import { extractPaletteFromUrl, rgbColor } from '@/utils/gradient';
 import { computed, ref } from 'vue';
-import { Breakpoint, columns, responsiveMap, rows } from '@/utils/responsive';
+import {
+  Breakpoint,
+  columns,
+  gridRatios,
+  responsiveMap,
+  rows,
+} from '@/utils/responsive';
 import { useResponsiveData } from '@/store/responsiveData';
 import {
   GridItem,
@@ -92,20 +98,36 @@ const projectGridReservedSpace = (b: Breakpoint) => {
       width: b === 'mobile' ? 2 : 3,
     },
   ];
-  if (b === 'mobile') {
+  if (b === 'tablet') {
     spaces = [
       ...spaces,
       {
         x: 0,
-        y: rows() - 1,
-        height: 1,
-        width: 50,
+        y: 12,
+        width: 100,
+        height: rows() - 12,
       },
+    ];
+  }
+  if (b === 'mobile') {
+    spaces = [
       {
         x: 0,
-        y: 7,
-        width: 4,
-        height: rows() - 7,
+        y: Math.floor(rows() / 2),
+        height: rows() - Math.floor(rows() / 2),
+        width: 0,
+      },
+      // {
+      //   x: 0,
+      //   y: rows() - 2,
+      //   height: 2,
+      //   width: 100,
+      // },
+      {
+        x: 0,
+        y: 12,
+        width: 100,
+        height: rows() - 12,
       },
     ];
   }
@@ -114,7 +136,7 @@ const projectGridReservedSpace = (b: Breakpoint) => {
 
 export const projectGridOptions = (b: Breakpoint): GridLayoutOptions => ({
   marginX: 2,
-  marginY: b === 'mobile' ? 2 : 1,
+  marginY: 1,
   rows: responsiveMap.rows[b] - 2,
   columns: responsiveMap.columns[b],
   axis: 'x',
@@ -151,7 +173,25 @@ export const useProjectData = defineStore('projectData', () => {
       : visibleProjects.value
   );
   const gridItems = computed((): (Partial<GridItem> & { id: identifier })[] => {
-    return normalizeGridItems(projectsToGridItems(filteredProjects.value));
+    const columnRatio = gridRatios.columns[responsiveData.breakpoint];
+    const rowRatio = gridRatios.rows[responsiveData.breakpoint];
+    const scale = responsiveMap.thumbnailScale[responsiveData.breakpoint];
+    return normalizeGridItems(projectsToGridItems(filteredProjects.value)).map(
+      (item) => {
+        const shouldAutoPosition =
+          responsiveData.breakpoint === 'tablet' ||
+          responsiveData.breakpoint === 'mobile';
+        const width = Math.round(item.width * columnRatio * scale);
+        const height = Math.round(item.height * rowRatio * scale);
+        return {
+          ...item,
+          width,
+          height,
+          x: shouldAutoPosition ? undefined : item.x,
+          y: shouldAutoPosition ? undefined : item.y,
+        };
+      }
+    );
   });
   const gridLayout = computed(
     (): GridLayoutData =>

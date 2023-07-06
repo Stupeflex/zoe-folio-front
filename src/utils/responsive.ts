@@ -6,7 +6,15 @@ export const breakpoints: { [key in Breakpoint]: number } = {
   default: 1920,
 };
 
-export const responsiveMap = {
+type ResponsiveMap = {
+  [k: string]: {
+    mobile: number;
+    tablet: number;
+    default: number;
+  };
+};
+
+export const responsiveMap: ResponsiveMap = {
   unit: {
     mobile: 8,
     tablet: 12,
@@ -21,6 +29,29 @@ export const responsiveMap = {
     mobile: 17,
     tablet: 14,
     default: 12,
+  },
+  widthOffset: {
+    mobile: 3,
+    tablet: 3,
+    default: 0,
+  },
+  thumbnailScale: {
+    default: 1,
+    tablet: 0.9,
+    mobile: 0.7,
+  },
+};
+
+export const gridRatios = {
+  columns: {
+    default: 1,
+    tablet: responsiveMap.columns.default / responsiveMap.columns.tablet + 0.5,
+    mobile: responsiveMap.columns.default / responsiveMap.columns.mobile,
+  },
+  rows: {
+    default: 1,
+    tablet: responsiveMap.rows.tablet / responsiveMap.rows.default,
+    mobile: responsiveMap.rows.mobile / responsiveMap.rows.default,
   },
 };
 
