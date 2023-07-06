@@ -16,17 +16,16 @@ import fragmentShader from '../shaders/gradient.frag';
 import { useResponsiveData } from '@/store/responsiveData';
 
 const responsiveData = useResponsiveData();
+const mouseData = useMouseData();
+const gradientData = useGradientData();
 
 let app: Application;
 const MaxCanvasWidth = responsiveData.getValue({
-  default: 1024,
-  tablet: 512,
-  mobile: 256,
+  default: window.innerWidth / 2,
+  tablet: window.innerWidth / 2,
+  mobile: window.innerWidth,
 });
 let tick = 0;
-
-const mouseData = useMouseData();
-const gradientData = useGradientData();
 
 const generateDimensions = (): { width: number; height: number } => {
   const ratio = window.innerWidth / window.innerHeight;
@@ -52,12 +51,16 @@ const twistFilter = new TwistFilter({
   offset: new Point(window.innerWidth / 2, window.innerHeight / 2),
 });
 
+const noiseSize = 0.2;
+
+console.log(noiseSize);
+
 const noiseFilter = new OldFilmFilter({
   sepia: 0,
   scratch: 0,
   scratchDensity: 0,
   noise: 0.05,
-  noiseSize: dimensions.value.width / window.innerWidth,
+  noiseSize,
   vignetting: 0,
 });
 noiseFilter.blendMode = BLEND_MODES.DARKEN;
@@ -93,11 +96,8 @@ const initPixi = () => {
       // gradientFilter,
       new KawaseBlurFilter(10, 3, true),
       twistFilter,
+      noiseFilter,
     ];
-    if (window.innerWidth > 800) {
-      app.stage.filters.push(noiseFilter);
-    }
-
     // app.render()
     // noiseFilter.seed = Math.random() * 0.01;
 
