@@ -21,19 +21,23 @@ const { t } = useI18n();
 
 const mediaPanelOpen = ref(false);
 const infoPanelOpen = ref(false);
+const edited = ref(false);
 const saving = ref(false);
 const saved = ref(false);
 const updating = ref(false);
 const updated = ref(false);
+const mediaUploading = ref(false);
 const infoPanelRef = ref<HTMLElement>();
 const mediaPanelRef = ref<HTMLElement>();
 
 const isNewProject = () => route.path === '/admin/project-editor/new';
 
-const project = reactive<Partial<Project>>({
+const initialProject = {
   title: 'New Project',
   ...(isNewProject() ? {} : projectData.selectedProject ?? {}),
-});
+};
+
+const project = reactive<Partial<Project>>(initialProject);
 
 const client = computed(() => adminProjectClient(adminData.token));
 
@@ -106,7 +110,8 @@ const fetchProject = async (updateMedia?: boolean, updateInfo?: boolean) => {
 };
 
 const onDrop = async (files: File[]) => {
-  if (files.length > 0 && project.id) {
+  if (files.length > 0 && project.id && !mediaUploading.value) {
+    mediaUploading.value = true;
     const response = await client.value.addMediasToProject(
       project.id,
       project.media?.length ?? 0,
@@ -115,6 +120,7 @@ const onDrop = async (files: File[]) => {
     if (response) {
       await fetchProject(true);
     }
+    mediaUploading.value = false;
   }
 };
 
@@ -145,6 +151,7 @@ const deleteMedia = async (mediaId: identifier) => {
 
 const onGridLayout = (l: GridLayoutData) => {
   gridLayout.value = l;
+  edited.value = true;
 };
 
 const unpinAll = () => {
@@ -186,6 +193,7 @@ const saveLayout = async () => {
       saved.value = true;
     }
     saving.value = false;
+    edited.value = false;
   }
 };
 
@@ -403,9 +411,14 @@ onSetup();
     <h2>Media</h2>
     <div class="edit__content" ref="mediaPanelRef">
       <div id="dropzone__container">
-        <div id="dropzone" :class="{ isDragActive }" v-bind="getRootProps()">
+        <div
+          id="dropzone"
+          :class="{ isDragActive, working: mediaUploading }"
+          v-bind="getRootProps()"
+        >
           <input type="file" v-bind="getInputProps()" />
-          <p v-if="isDragActive">Drop the files here ...</p>
+          <p v-if="mediaUploading">Media upload in progress...</p>
+          <p v-else-if="isDragActive">Drop the files here ...</p>
           <p v-else>Drag 'n' drop some files here, or click to select files</p>
         </div>
       </div>
@@ -530,6 +543,10 @@ aside
     left: $unit-h
     right: $unit-h
     z-index: 10
+    cursor: pointer
+
+    &.working
+      cursor: wait
 
   #btn__files
     height: 100%
