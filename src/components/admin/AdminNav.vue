@@ -147,7 +147,9 @@ const close = () => {
   open.value = false;
 };
 
-const displayBackButton = computed(() => route.name === 'projectDetails');
+const displayBackButton = computed(
+  () => route.name === 'projectEditor' || route.name === 'projectEditorCreate'
+);
 </script>
 
 <style lang="sass">

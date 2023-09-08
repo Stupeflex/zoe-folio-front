@@ -15,6 +15,8 @@ const adminData = useAdminData();
 
 const projectCount = computed(() => formatNumber(projectData.projects.length));
 const clientCount = computed(() => formatNumber(aboutData.clients.length));
+aboutData.getClients();
+console.log(aboutData);
 const archivedProjectCount = computed(() =>
   formatNumber(projectData.projects.filter(({ archived }) => archived).length)
 );
@@ -49,6 +51,8 @@ const archivedProjectCount = computed(() =>
       href="https://zoe-candito-backend.herokuapp.com/admin/content-manager/collectionType/api::client.client?page=1&pageSize=10&sort=name:ASC"
       class="admin__panel__card hover__parent"
       id="c__clients"
+      target="_blank"
+      rel="noopener"
     >
       <div class="c__inner">
         <span class="number">{{ clientCount }}</span>
@@ -67,7 +71,7 @@ const archivedProjectCount = computed(() =>
     </a>
     <router-link
       to="/admin/projects"
-      class="admin__panel__card hover__parent hover__parent"
+      class="admin__panel__card hover__parent"
       id="c__projects"
     >
       <div class="c__inner">
@@ -92,10 +96,12 @@ const archivedProjectCount = computed(() =>
         </span>
       </div>
     </router-link>
-    <router-link
-      to="/admin/content"
+    <a
+      href="https://zoe-candito-backend.herokuapp.com/admin/content-manager/collectionType/api::client.client?page=1&pageSize=10&sort=name:ASC"
       class="admin__panel__card hover__parent"
-      id="c__sections"
+      id="c__clients"
+      target="_blank"
+      rel="noopener"
     >
       <div class="c__inner">
         <span class="number">04</span>
@@ -108,7 +114,7 @@ const archivedProjectCount = computed(() =>
           <Arrow flip />
         </span>
       </div>
-    </router-link>
+    </a>
     <router-link
       to="/admin/usage"
       class="admin__panel__card hover__parent"
