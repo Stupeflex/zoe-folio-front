@@ -12,6 +12,7 @@ import ProjectMediaItem from '@/components/ProjectMedia.vue';
 import { formatNumber } from '@/utils/format';
 import { GridLayoutData } from '@/utils/grid';
 import { useAdminData } from '@/store/adminData';
+import { ProjectType } from '@/api/types';
 
 const route = useRoute();
 const router = useRouter();
@@ -32,12 +33,13 @@ const mediaPanelRef = ref<HTMLElement>();
 
 const isNewProject = () => route.path === '/admin/project-editor/new';
 
-const initialProject = {
-  title: 'New Project',
-  ...(isNewProject() ? {} : projectData.selectedProject ?? {}),
-};
-
-const project = reactive<Partial<Project>>(initialProject);
+const project = reactive<Partial<Project>>({
+  ...(isNewProject()
+    ? {
+        date: new Date(Date.now()),
+      }
+    : projectData.selectedProject ?? {}),
+});
 
 const client = computed(() => adminProjectClient(adminData.token));
 
@@ -57,18 +59,20 @@ const infoSaveAllowed = computed(() => isInfoFilled(project));
 
 const gridLayout = ref<GridLayoutData>();
 
-const displayDate = computed({
-  get() {
-    const D = project.date ?? new Date(Date.now());
-    const m = D.getMonth() + 1;
-    const d = D.getDate();
-    const y = D.getFullYear();
-    return `${y}-${formatNumber(m)}-${d}`;
-  },
-  set(newVal: string) {
-    project.date = new Date(newVal);
-  },
+const displayDate = computed(() => {
+  const D = project.date ?? new Date(Date.now());
+  const m = D.getMonth() + 1;
+  const d = D.getDate();
+  const y = D.getFullYear();
+  const s = `${y}-${formatNumber(m)}-${d}`;
+  console.log(s);
+  return s;
 });
+
+const setDisplayDate = (e: any) => {
+  const value: string = e.target.value;
+  project.date = new Date(value);
+};
 
 const toggleInfoPanel = () => {
   infoPanelOpen.value = !infoPanelOpen.value;
@@ -79,6 +83,7 @@ const toggleMediaPanel = () => {
 };
 
 const fetchProject = async (updateMedia?: boolean, updateInfo?: boolean) => {
+  console.log('fetch project');
   const ID: identifier | null = route?.params?.id
     ? String(route.params.id)
     : null;
@@ -197,7 +202,7 @@ const saveLayout = async () => {
   }
 };
 
-const createNewProject = async () => {
+const createNewProject = async (noReplace?: boolean) => {
   const res = await client.value.createNewProject({
     ...project,
     index: projectData.projects.length,
@@ -211,12 +216,14 @@ const createNewProject = async () => {
   await projectData.fetch();
 
   // set is new project to false
-  await router.replace(`/admin/project-editor/${res.id}`);
+  if (!noReplace) {
+    await router.replace(`/admin/project-editor/${res.id}`);
+  }
   return res;
 };
 
-const onSaveClick = () =>
-  isNewProject() ? createNewProject() : saveProjectInfo();
+const onSaveClick = async () =>
+  isNewProject() ? await createNewProject() : await saveProjectInfo();
 
 const saveProjectInfo = async () => {
   const p = Object.assign({}, project);
@@ -249,7 +256,10 @@ watch(
 watch(
   () => projectData.selectedProject,
   (data) => {
-    if (isNewProject()) return;
+    if (isNewProject()) {
+      console.debug(projectData);
+      return;
+    }
     Object.entries(data ?? {}).forEach(([key, value]) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -268,6 +278,7 @@ const setupNewProject = () => {
   project.title = 'New project';
   project.client = 'Unnamed client';
   project.date = new Date(Date.now());
+  project.type = 'pub' as ProjectType;
 };
 
 const onSetup = () => {
@@ -283,16 +294,24 @@ const onMediaEdit = async (payload: {
   files: File[];
 }) => {
   try {
-    if (project.id === undefined) return;
+    let id = project.id;
+    console.log(id);
+    if (id === undefined) {
+      const res = await createNewProject(true);
+      id = res?.id ?? id;
+      console.debug(project);
+    }
+    if (id === undefined) return;
     const isVideo = payload.type === 'video';
     const previousFileId = isVideo ? project.videoId : project.thumbnailId;
     await client.value.setThumbnail(
-      project.id,
+      id,
       payload.files[0],
       isVideo,
       previousFileId
     );
     await fetchProject(false, true);
+    await router.replace(`/admin/project-editor/${id}`);
   } catch (e) {
     console.error(e);
   }
@@ -387,7 +406,12 @@ onSetup();
       </label>
       <label
         >Date
-        <input type="date" v-model="displayDate" />
+        <input
+          type="date"
+          :value="displayDate"
+          @change="setDisplayDate"
+          pattern="\d{4}-\d{2}-\d{2}"
+        />
       </label>
       <label
         >Category

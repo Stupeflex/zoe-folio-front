@@ -161,7 +161,7 @@ const toggleThumbnailPreview = (force: boolean) => {
 };
 
 const onDrop = async (files: File[]) => {
-  if (files.length > 0 && props.project?.id) {
+  if (files.length > 0) {
     emit('editMedia', {
       files,
       type: forceShowThumbnail.value ? 'image' : 'video',
@@ -382,6 +382,7 @@ onMounted(() => {
       height: calc($unit * 3)
       transition: all 0.3s $bezier 0s
       color: $c-white
+      cursor: pointer
 
       &.active:not(.disabled)
         background: $c-white
@@ -416,6 +417,7 @@ onMounted(() => {
       width: calc($unit * 3)
       background: $c-white
       color: $c-black
+      cursor: pointer
 
       input
         display: none
