@@ -24,7 +24,7 @@ export const fr: Translation = {
   },
   sections: {
     studio: {
-      address: '82, Rue de la Victoire\n9ème arrondissement\n75009 Paris',
+      address: 'Rue de la Victoire\n9ème arrondissement\n75009 Paris',
       hook: 'Entre brainstorming et ajustements de courbes, le studio sait s’effacer pour laisser libre court à la vision de vos projets.',
       cta: 'Prendre rendez-vous',
     },
