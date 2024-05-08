@@ -26,8 +26,8 @@ export const en = {
   },
   sections: {
     studio: {
-      address: '24, Rue de Saint Antoine\n4ème arrondissement\n75004 Paris',
-      hook: 'Entre brainstorming et ajustements de courbes, le studio sait s’effacer pour laisser libre court à la vision de vos projets.',
+      address: '82, Rue de la Victoire\n9ème arrondissement\n75009 Paris',
+      hook: 'Between brainstorming and curve adjustments, the studio knows how to step aside to let the vision of your projects shine.',
       cta: 'Book a session',
     },
     about: {
